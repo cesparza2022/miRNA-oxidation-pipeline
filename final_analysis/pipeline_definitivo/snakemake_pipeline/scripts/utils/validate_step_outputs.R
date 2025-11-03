@@ -12,9 +12,13 @@ suppressPackageStartupMessages({
 })
 
 # Source validation functions - find the script in the same directory
-script_dir <- dirname(sys.frame(1)$ofile)
-if (length(script_dir) == 0 || script_dir == ".") {
-  # Try to find from current working directory
+# Get script path from commandArgs (works in Rscript)
+cmd_args <- commandArgs(trailingOnly = FALSE)
+script_path <- grep("^--file=", cmd_args, value = TRUE)
+if (length(script_path) > 0) {
+  script_dir <- dirname(sub("^--file=", "", script_path))
+} else {
+  # Fallback: try to find from current working directory
   script_dir <- file.path(getwd(), "scripts", "utils")
 }
 
@@ -23,8 +27,9 @@ if (!file.exists(validate_outputs_script)) {
   # Try alternative paths
   alt_paths <- c(
     "scripts/utils/validate_outputs.R",
-    file.path(dirname(getwd()), "scripts/utils/validate_outputs.R"),
-    "./scripts/utils/validate_outputs.R"
+    file.path(getwd(), "scripts/utils/validate_outputs.R"),
+    "./scripts/utils/validate_outputs.R",
+    file.path(dirname(getwd()), "scripts/utils/validate_outputs.R")
   )
   for (alt_path in alt_paths) {
     if (file.exists(alt_path)) {
