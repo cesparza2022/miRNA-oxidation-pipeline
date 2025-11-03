@@ -1,0 +1,66 @@
+# R outputs
+*.RData
+*.Rhistory
+*.Rproj
+.Rproj.user/
+
+# Output directories
+outputs/
+results/
+figures/
+*.png
+*.pdf
+*.html
+
+# Logs
+*.log
+logs/
+
+# Temporary files
+*.tmp
+*.temp
+tmp/
+temp/
+
+# Data files (except examples)
+*.csv
+*.tsv
+*.xlsx
+*.xls
+!*example*
+!*template*
+!*schema*
+
+# Environment files
+.env
+.venv
+venv/
+conda_env/
+
+# OS files
+.DS_Store
+Thumbs.db
+*.swp
+*.swo
+*~
+
+# IDE files
+.vscode/
+.idea/
+*.sublime-*
+
+# Python cache
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+
+# Jupyter
+.ipynb_checkpoints/
+*.ipynb
+
+# R package files
+packrat/
+renv/
+
