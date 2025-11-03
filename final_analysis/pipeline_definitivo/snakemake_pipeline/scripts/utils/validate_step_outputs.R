@@ -11,8 +11,69 @@ suppressPackageStartupMessages({
   library(stringr)
 })
 
-# Source validation functions
-source("scripts/utils/validate_outputs.R", local = TRUE)
+# Source validation functions - find the script in the same directory
+script_dir <- dirname(sys.frame(1)$ofile)
+if (length(script_dir) == 0 || script_dir == ".") {
+  # Try to find from current working directory
+  script_dir <- file.path(getwd(), "scripts", "utils")
+}
+
+validate_outputs_script <- file.path(script_dir, "validate_outputs.R")
+if (!file.exists(validate_outputs_script)) {
+  # Try alternative paths
+  alt_paths <- c(
+    "scripts/utils/validate_outputs.R",
+    file.path(dirname(getwd()), "scripts/utils/validate_outputs.R"),
+    "./scripts/utils/validate_outputs.R"
+  )
+  for (alt_path in alt_paths) {
+    if (file.exists(alt_path)) {
+      validate_outputs_script <- alt_path
+      break
+    }
+  }
+}
+
+if (file.exists(validate_outputs_script)) {
+  source(validate_outputs_script, local = TRUE)
+} else {
+  # Define basic validation functions inline if script not found
+  validate_file <- function(path) {
+    errors <- character(0)
+    if (!file.exists(path)) {
+      errors <- c(errors, paste("File does not exist:", path))
+      return(errors)
+    }
+    if (file.info(path)$size == 0) {
+      errors <- c(errors, paste("File is empty:", path))
+    }
+    return(errors)
+  }
+  
+  validate_figure <- function(path) {
+    errors <- validate_file(path)
+    if (length(errors) > 0) return(errors)
+    file_size <- file.info(path)$size
+    if (file_size < 1024) {
+      errors <- c(errors, paste("Image file is suspiciously small (<1KB):", path))
+    }
+    return(errors)
+  }
+  
+  validate_table <- function(path) {
+    errors <- validate_file(path)
+    if (length(errors) > 0) return(errors)
+    tryCatch({
+      data <- read_delim(path, delim = ",", n_max = 10, show_col_types = FALSE)
+      if (nrow(data) == 0 || ncol(data) == 0) {
+        errors <- c(errors, paste("Table has no rows or columns:", path))
+      }
+    }, error = function(e) {
+      errors <<- c(errors, paste("Cannot read table:", path, "-", e$message))
+    })
+    return(errors)
+  }
+}
 
 # Get command line arguments
 args <- commandArgs(trailingOnly = TRUE)
