@@ -6,11 +6,23 @@
 
 # Output directories
 outputs/
-results/
+
+# Results: Ignore large outputs, but allow metadata
+# Note: Pattern must be relative to this directory
+snakemake_pipeline/results/
+!snakemake_pipeline/results/pipeline_info/
+!snakemake_pipeline/results/pipeline_info/**
+!snakemake_pipeline/results/summary/
+!snakemake_pipeline/results/summary/**
+!snakemake_pipeline/results/INDEX.md
+
+# Figures and PDFs
 figures/
 *.png
 *.pdf
-*.html
+
+# HTML viewers (auto-generated)
+viewers/*.html
 
 # Logs
 *.log
@@ -22,7 +34,7 @@ logs/
 tmp/
 temp/
 
-# Data files (except examples)
+# Data files (except examples, templates, schemas)
 *.csv
 *.tsv
 *.xlsx
@@ -64,3 +76,8 @@ __pycache__/
 packrat/
 renv/
 
+# Snakemake cache
+.snakemake/
+
+# Configuration with user-specific paths (use .example instead)
+config/config.yaml
