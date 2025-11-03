@@ -189,41 +189,47 @@ validate_directory <- function(path) {
   return(errors)
 }
 
-# Main validation
-cat("\n")
-cat("═══════════════════════════════════════════════════════════════════\n")
-cat("  📋 VALIDATING OUTPUTS\n")
-cat("═══════════════════════════════════════════════════════════════════\n\n")
-
-cat("Path:", output_path, "\n")
-cat("Type:", validation_type, "\n\n")
-
-errors <- switch(validation_type,
-  "file" = validate_file(output_path),
-  "figure" = validate_figure(output_path),
-  "table" = validate_table(output_path),
-  "html" = validate_html(output_path),
-  "json" = validate_json(output_path),
-  "yaml" = validate_yaml(output_path),
-  "directory" = validate_directory(output_path),
-  {
-    warning("Unknown validation type: ", validation_type, ", using file validation")
-    validate_file(output_path)
-  }
-)
-
-# Print results
-if (length(errors) > 0) {
-  cat("❌ VALIDATION FAILED\n")
-  cat("═══════════════════════════════════════════════════════════════════\n\n")
-  for (error in errors) {
-    cat("  ❌", error, "\n")
-  }
+# Main validation - only run if called directly (not sourced)
+# Check if this script is being sourced or run directly
+is_sourced <- !identical(sys.frame(1)$ofile, NULL)
+if (!is_sourced) {
+  # This script is being run directly, perform validation
   cat("\n")
-  quit(status = 1)
-} else {
-  cat("✅ VALIDATION PASSED\n")
+  cat("═══════════════════════════════════════════════════════════════════\n")
+  cat("  📋 VALIDATING OUTPUTS\n")
   cat("═══════════════════════════════════════════════════════════════════\n\n")
-  quit(status = 0)
+  
+  cat("Path:", output_path, "\n")
+  cat("Type:", validation_type, "\n\n")
+  
+  errors <- switch(validation_type,
+    "file" = validate_file(output_path),
+    "figure" = validate_figure(output_path),
+    "table" = validate_table(output_path),
+    "html" = validate_html(output_path),
+    "json" = validate_json(output_path),
+    "yaml" = validate_yaml(output_path),
+    "directory" = validate_directory(output_path),
+    {
+      warning("Unknown validation type: ", validation_type, ", using file validation")
+      validate_file(output_path)
+    }
+  )
+  
+  # Print results
+  if (length(errors) > 0) {
+    cat("❌ VALIDATION FAILED\n")
+    cat("═══════════════════════════════════════════════════════════════════\n\n")
+    for (error in errors) {
+      cat("  ❌", error, "\n")
+    }
+    cat("\n")
+    quit(status = 1)
+  } else {
+    cat("✅ VALIDATION PASSED\n")
+    cat("═══════════════════════════════════════════════════════════════════\n\n")
+    quit(status = 0)
+  }
 }
+# If sourced, just define functions and return silently
 
