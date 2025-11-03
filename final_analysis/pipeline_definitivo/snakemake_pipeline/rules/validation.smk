@@ -67,7 +67,7 @@ rule validate_step1_outputs:
 rule validate_step1_5_outputs:
     input:
         # VAF filtered data (check if exists, make optional for now)
-        # vaf_filtered = STEP1_5_FINAL + "/data/vaf_filtered_data.csv",
+        vaf_filtered = STEP1_5_FINAL + "/tables/filtered_data/ALL_MUTATIONS_VAF_FILTERED.csv",
         # Diagnostic figures
         figures = expand(
             STEP1_5_FINAL + "/figures/{fig}.png",
@@ -83,7 +83,8 @@ rule validate_step1_5_outputs:
     params:
         step_name = "Step 1.5",
         output_dir = STEP1_5_FINAL,
-        script = SCRIPTS_UTILS + "/validate_step_outputs.R"
+        script = SCRIPTS_UTILS + "/validate_step_outputs.R",
+        quality_script = SCRIPTS_UTILS + "/validate_data_quality.R"
     log:
         OUTPUT_VALIDATION + "/step1_5_validation.log"
     shell:
@@ -96,8 +97,16 @@ rule validate_step1_5_outputs:
                 exit 1
             fi
         done
-        # Validate step outputs
+        # Validate step outputs (basic)
         if Rscript {params.script} "{params.step_name}" "{params.output_dir}" > {output} 2>&1; then
+            echo "" >> {output}
+            echo "📊 Data Quality Validation:" >> {output}
+            # Validate VAF values are in range [0, 1] if file exists
+            if [ -f {input.vaf_filtered} ]; then
+                Rscript {params.quality_script} {input.vaf_filtered} csv VAF 0 1 >> {output} 2>&1 || echo "  ⚠️  Warning: VAF validation failed (check if column exists)" >> {output}
+            else
+                echo "  ℹ️  VAF filtered data not found (optional)" >> {output}
+            fi
             echo "Step 1.5 validation completed at $(date)" >> {output}
         else
             echo "Step 1.5 validation FAILED at $(date)" >> {output}
@@ -125,7 +134,8 @@ rule validate_step2_outputs:
     params:
         step_name = "Step 2",
         output_dir = STEP2_FINAL,
-        script = SCRIPTS_UTILS + "/validate_step_outputs.R"
+        script = SCRIPTS_UTILS + "/validate_step_outputs.R",
+        quality_script = SCRIPTS_UTILS + "/validate_data_quality.R"
     log:
         OUTPUT_VALIDATION + "/step2_validation.log"
     shell:
@@ -147,8 +157,14 @@ rule validate_step2_outputs:
                 exit 1
             fi
         done
-        # Validate step outputs
+        # Validate step outputs (basic)
         if Rscript {params.script} "{params.step_name}" "{params.output_dir}" > {output} 2>&1; then
+            echo "" >> {output}
+            echo "📊 Data Quality Validation:" >> {output}
+            # Validate p-values are in range [0, 1]
+            Rscript {params.quality_script} {input.statistical_table} csv t_test_pvalue 0 1 >> {output} 2>&1 || echo "  ⚠️  Warning: t_test_pvalue validation failed (check if column exists)" >> {output}
+            # Validate log2FC values are reasonable (typically -10 to 10 for miRNA data)
+            Rscript {params.quality_script} {input.statistical_table} csv log2_fold_change -10 10 >> {output} 2>&1 || echo "  ⚠️  Warning: log2_fold_change validation failed (check if column exists)" >> {output}
             echo "Step 2 validation completed at $(date)" >> {output}
         else
             echo "Step 2 validation FAILED at $(date)" >> {output}
