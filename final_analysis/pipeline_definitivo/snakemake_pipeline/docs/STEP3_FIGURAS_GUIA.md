@@ -5,6 +5,19 @@
 
 ---
 
+## ⚠️ IMPORTANTE: MIRNAS Y SNVs USADOS
+
+**TODAS las figuras usan EXACTAMENTE los mismos miRNAs y SNVs:**
+
+- ✅ **260 G>T mutations significativas** (FDR < 0.05)
+- ✅ **68 miRNAs únicos** afectados
+- ✅ **Solo posiciones 2-8** (seed region)
+- ✅ **Solo log2FC > 0** (mayor oxidación en ALS)
+
+**Ver documento `STEP3_MIRNAS_SNVS_USADOS.md` para detalles completos.**
+
+---
+
 ## 📊 RESUMEN DE FIGURAS GENERADAS
 
 Step 3 genera **5 figuras** en total:
@@ -26,10 +39,20 @@ Step 3 genera **5 figuras** en total:
 ### **¿Qué Pregunta Responde?**
 "¿Qué vías biológicas (GO y KEGG) están más enriquecidas en los targets de los miRNAs oxidados?"
 
+### **¿Qué miRNAs y SNVs Usa?**
+**CRÍTICO:** Esta figura usa **SOLO los miRNAs más oxidados en seed region:**
+- **260 G>T mutations** significativas (FDR < 0.05)
+- **68 miRNAs únicos** afectados
+- **Solo posiciones 2-8** (seed region)
+- **Solo log2FC > 0** (mayor oxidación en ALS)
+
+**Input:** Targets de `S3_target_analysis.csv` (que contiene solo estos miRNAs filtrados)
+
 ### **¿Qué Datos Usa?**
 - Top 20 vías más enriquecidas (GO + KEGG combinadas)
 - Filtrado por `p.adjust < 0.1`
 - Ordenadas por `RichFactor` (descendente)
+- **Basadas en los targets de los 68 miRNAs más oxidados en seed region**
 
 ### **¿Qué Muestra?**
 - **Filas:** Vías (GO Biological Process + KEGG Pathways)
@@ -59,11 +82,21 @@ Step 3 genera **5 figuras** en total:
 ### **¿Qué Pregunta Responde?**
 "¿Cuáles son las 15 vías más significativamente enriquecidas en los targets de los miRNAs oxidados?"
 
+### **¿Qué miRNAs y SNVs Usa?**
+**CRÍTICO:** Esta figura usa **SOLO los miRNAs más oxidados en seed region:**
+- **260 G>T mutations** significativas (FDR < 0.05)
+- **68 miRNAs únicos** afectados
+- **Solo posiciones 2-8** (seed region)
+- **Solo log2FC > 0** (mayor oxidación en ALS)
+
+**Input:** `S3_go_enrichment.csv` + `S3_kegg_enrichment.csv` (basados en targets de estos miRNAs)
+
 ### **¿Qué Datos Usa?**
 - Top 10 GO Biological Process terms
 - Top 10 KEGG Pathways
 - Combinados y ordenados por `p.adjust`
 - Top 15 más significativas
+- **Todos basados en los 68 miRNAs más oxidados en seed region**
 
 ### **¿Qué Muestra?**
 - **Eje X (vertical):** Nombre de la vía (truncado a 50 caracteres)
@@ -100,10 +133,19 @@ Step 3 genera **5 figuras** en total:
 ### **¿Qué Pregunta Responde?**
 "¿Qué miRNAs tienen mayor impacto funcional en genes relevantes para ALS?"
 
+### **¿Qué miRNAs y SNVs Usa?**
+**CRÍTICO:** Esta figura usa **SOLO los miRNAs más oxidados en seed region:**
+- **260 G>T mutations** significativas (FDR < 0.05)
+- **68 miRNAs únicos** afectados
+- **Solo posiciones 2-8** (seed region)
+- **Solo log2FC > 0** (mayor oxidación en ALS)
+
+**Input:** `S3_als_relevant_genes.csv` (260 filas, una por cada G>T mutation significativa)
+
 ### **¿Qué Datos Usa?**
-- `S3_als_relevant_genes.csv`
 - Agrupado por `miRNA_name`
 - Top 20 miRNAs por `total_impact`
+- **Todos son miRNAs con G>T mutations significativas en seed region**
 
 ### **¿Qué Muestra?**
 - **Eje X (vertical):** Nombre del miRNA
@@ -146,12 +188,20 @@ Step 3 genera **5 figuras** en total:
 ### **¿Qué Pregunta Responde?**
 "¿Cuántos targets se pierden cuando un miRNA se oxida comparado con su forma canónica?"
 
+### **¿Qué miRNAs y SNVs Usa?**
+**CRÍTICO:** Esta figura usa **SOLO los miRNAs más oxidados en seed region:**
+- **68 miRNAs únicos** con G>T mutations significativas
+- **Solo posiciones 2-8** (seed region)
+- **Solo log2FC > 0** (mayor oxidación en ALS)
+
+**Input:** `S3_target_comparison.csv` (68 filas, una por miRNA único)
+
 ### **¿Qué Datos Usa?**
-- `S3_target_comparison.csv`
 - Top 15 miRNAs (ordenados por `avg_log2FC`)
 - Transformación a formato largo:
   - `canonical_targets_estimate` → "Canonical"
   - `oxidized_targets_estimate` → "Oxidized (G>T)"
+- **Todos son miRNAs con G>T mutations significativas en seed region**
 
 ### **¿Qué Muestra?**
 - **Eje X (vertical):** Nombre del miRNA
@@ -192,12 +242,20 @@ Step 3 genera **5 figuras** en total:
 ### **¿Qué Pregunta Responde?**
 "¿En qué posiciones del miRNA tiene mayor impacto funcional la oxidación?"
 
+### **¿Qué miRNAs y SNVs Usa?**
+**CRÍTICO:** Esta figura usa **SOLO los miRNAs más oxidados en seed region:**
+- **260 G>T mutations** significativas (FDR < 0.05)
+- **Solo posiciones 2-8** (seed region)
+- **Solo log2FC > 0** (mayor oxidación en ALS)
+
+**Input:** `S3_target_analysis.csv` (260 filas, una por cada G>T mutation significativa)
+
 ### **¿Qué Datos Usa?**
-- `S3_target_analysis.csv`
-- Agrupado por `position` (1-23)
+- Agrupado por `position` (solo posiciones 2-8, no 1-23)
 - Calcula:
-  - `n_mutations`: Número de mutaciones por posición
+  - `n_mutations`: Número de G>T mutations por posición
   - `total_impact`: Suma de functional_impact_score
+- **Solo muestra posiciones 2-8 (seed region)**
 
 ### **¿Qué Muestra?**
 - **Eje X:** Posición en miRNA (1-23, breaks cada 2)
