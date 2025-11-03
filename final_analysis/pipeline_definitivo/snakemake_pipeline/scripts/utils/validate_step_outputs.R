@@ -120,12 +120,18 @@ if (dir.exists(figures_dir)) {
   if (length(figures) == 0) {
     cat("  ⚠️  Warning: No figures found in", figures_dir, "\n")
   } else {
+    all_figure_errors <- character(0)
     for (fig in figures) {
-      errors <- validate_figure(fig)
-      if (length(errors) > 0) {
-        cat("  ❌", basename(fig), ":", errors[1], "\n")
-        quit(status = 1)
+      fig_errors <- validate_figure(fig)
+      if (length(fig_errors) > 0) {
+        all_figure_errors <- c(all_figure_errors, paste("  ❌", basename(fig), ":", fig_errors[1]))
       }
+    }
+    if (length(all_figure_errors) > 0) {
+      for (err in all_figure_errors) {
+        cat(err, "\n")
+      }
+      quit(status = 1)
     }
     cat("  ✅", length(figures), "figures validated\n")
   }
@@ -135,17 +141,23 @@ if (dir.exists(figures_dir)) {
 tables_dir <- file.path(output_dir, "tables")
 if (dir.exists(tables_dir)) {
   cat("\n📋 Validating tables...\n")
-  tables <- list.files(tables_dir, pattern = "\\.(csv|tsv)$", full.names = TRUE)
+  tables <- list.files(tables_dir, pattern = "\\.(csv|tsv)$", full.names = TRUE, recursive = TRUE)
   
   if (length(tables) == 0) {
     cat("  ⚠️  Warning: No tables found in", tables_dir, "\n")
   } else {
+    all_table_errors <- character(0)
     for (table in tables) {
-      errors <- validate_table(table)
-      if (length(errors) > 0) {
-        cat("  ❌", basename(table), ":", errors[1], "\n")
-        quit(status = 1)
+      table_errors <- validate_table(table)
+      if (length(table_errors) > 0) {
+        all_table_errors <- c(all_table_errors, paste("  ❌", basename(table), ":", table_errors[1]))
       }
+    }
+    if (length(all_table_errors) > 0) {
+      for (err in all_table_errors) {
+        cat(err, "\n")
+      }
+      quit(status = 1)
     }
     cat("  ✅", length(tables), "tables validated\n")
   }
