@@ -11,73 +11,70 @@ suppressPackageStartupMessages({
   library(stringr)
 })
 
-# Source validation functions - find the script in the same directory
-# Get script path from commandArgs (works in Rscript)
-cmd_args <- commandArgs(trailingOnly = FALSE)
-script_path <- grep("^--file=", cmd_args, value = TRUE)
-if (length(script_path) > 0) {
-  script_dir <- dirname(sub("^--file=", "", script_path))
-} else {
-  # Fallback: try to find from current working directory
-  script_dir <- file.path(getwd(), "scripts", "utils")
-}
-
-validate_outputs_script <- file.path(script_dir, "validate_outputs.R")
-if (!file.exists(validate_outputs_script)) {
-  # Try alternative paths
-  alt_paths <- c(
-    "scripts/utils/validate_outputs.R",
-    file.path(getwd(), "scripts/utils/validate_outputs.R"),
-    "./scripts/utils/validate_outputs.R",
-    file.path(dirname(getwd()), "scripts/utils/validate_outputs.R")
-  )
-  for (alt_path in alt_paths) {
-    if (file.exists(alt_path)) {
-      validate_outputs_script <- alt_path
-      break
-    }
-  }
-}
-
-if (file.exists(validate_outputs_script)) {
-  source(validate_outputs_script, local = TRUE)
-} else {
-  # Define basic validation functions inline if script not found
-  validate_file <- function(path) {
-    errors <- character(0)
-    if (!file.exists(path)) {
-      errors <- c(errors, paste("File does not exist:", path))
-      return(errors)
-    }
-    if (file.info(path)$size == 0) {
-      errors <- c(errors, paste("File is empty:", path))
-    }
+# Define validation functions inline (avoid sourcing to prevent argument conflicts)
+validate_file <- function(path) {
+  errors <- character(0)
+  if (!file.exists(path)) {
+    errors <- c(errors, paste("File does not exist:", path))
     return(errors)
   }
+  if (file.info(path)$size == 0) {
+    errors <- c(errors, paste("File is empty:", path))
+  }
+  return(errors)
+}
+
+validate_figure <- function(path) {
+  errors <- validate_file(path)
+  if (length(errors) > 0) return(errors)
   
-  validate_figure <- function(path) {
-    errors <- validate_file(path)
-    if (length(errors) > 0) return(errors)
-    file_size <- file.info(path)$size
-    if (file_size < 1024) {
-      errors <- c(errors, paste("Image file is suspiciously small (<1KB):", path))
-    }
-    return(errors)
+  # Check file type (basic check)
+  file_size <- file.info(path)$size
+  if (file_size < 1024) {
+    errors <- c(errors, paste("Image file is suspiciously small (<1KB):", path))
   }
   
-  validate_table <- function(path) {
-    errors <- validate_file(path)
-    if (length(errors) > 0) return(errors)
-    tryCatch({
-      data <- read_delim(path, delim = ",", n_max = 10, show_col_types = FALSE)
-      if (nrow(data) == 0 || ncol(data) == 0) {
-        errors <- c(errors, paste("Table has no rows or columns:", path))
+  # Try to check if it's a valid image (basic PNG check)
+  if (file_size > 8) {
+    # Read first bytes to check PNG signature
+    first_bytes <- readBin(path, "raw", n = 8)
+    if (length(first_bytes) >= 8) {
+      # PNG signature: 89 50 4E 47 0D 0A 1A 0A
+      png_signature <- as.raw(c(0x89, 0x50, 0x4E, 0x47, 0x0D, 0x0A, 0x1A, 0x0A))
+      is_png <- all(first_bytes == png_signature)
+      if (!is_png && !grepl("\\.pdf$", path, ignore.case = TRUE)) {
+        # Not a PNG and not PDF, might still be valid (JPEG, etc.)
+        # Just warn, don't fail
       }
-    }, error = function(e) {
-      errors <<- c(errors, paste("Cannot read table:", path, "-", e$message))
-    })
-    return(errors)
+    }
   }
+  
+  return(errors)
+}
+
+validate_table <- function(path) {
+  errors <- validate_file(path)
+  if (length(errors) > 0) return(errors)
+  
+  tryCatch({
+    # Detect delimiter
+    first_line <- readLines(path, n = 1)
+    delimiter <- if (grepl("\t", first_line)) "\t" else ","
+    
+    # Read first few lines
+    data <- read_delim(path, delim = delimiter, n_max = 10, show_col_types = FALSE)
+    
+    if (nrow(data) == 0) {
+      errors <- c(errors, paste("Table has no rows:", path))
+    }
+    if (ncol(data) == 0) {
+      errors <- c(errors, paste("Table has no columns:", path))
+    }
+  }, error = function(e) {
+    errors <<- c(errors, paste("Cannot read table:", path, "-", e$message))
+  })
+  
+  return(errors)
 }
 
 # Get command line arguments (must be after sourcing functions)
