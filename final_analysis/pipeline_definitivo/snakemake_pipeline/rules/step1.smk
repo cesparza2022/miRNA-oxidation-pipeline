@@ -42,6 +42,8 @@ rule panel_b_gt_count_by_position:
         table = OUTPUT_TABLES_SUMMARY + "/S1_B_gt_counts_by_position.csv"
     params:
         functions = FUNCTIONS_COMMON
+    benchmark:
+        OUTPUT_LOGS + "/benchmarks/panel_b.txt"
     # conda:
     #     "envs/r_analysis.yaml"  # Disabled - using local R
     log:
