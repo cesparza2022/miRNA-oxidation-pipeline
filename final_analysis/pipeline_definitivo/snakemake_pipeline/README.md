@@ -8,29 +8,70 @@ Reproducible Snakemake pipeline for analyzing G>T oxidation patterns in miRNAs a
 
 ## 🚀 Quick Start
 
+### Opción 1: Setup Automático (Recomendado)
+
 ```bash
 # 1. Clone repository
-git clone <repository-url>
-cd snakemake_pipeline
+git clone https://github.com/cesparza2022/als-mirna-oxidation-pipeline.git
+cd als-mirna-oxidation-pipeline/final_analysis/pipeline_definitivo/snakemake_pipeline
 
-# 2. Configure (copy example and edit paths)
-cp config/config.yaml.example config/config.yaml
-nano config/config.yaml  # Update paths to your data
+# 2. Ejecutar script de setup automático
+bash setup.sh --mamba  # Usa mamba (más rápido) o --conda para conda
 
-# 3. Install dependencies
-conda env create -f environment.yaml
+# 3. Activar ambiente
 conda activate als_mirna_pipeline
 
-# 4. Run pipeline
+# 4. Configurar datos
+cp config/config.yaml.example config/config.yaml
+nano config/config.yaml  # Actualiza las rutas a tus datos
+
+# 5. Probar pipeline (dry-run)
+snakemake -n
+
+# 6. Ejecutar pipeline
 snakemake -j 4
 ```
 
+### Opción 2: Setup Manual
+
+```bash
+# 1. Clone repository
+git clone https://github.com/cesparza2022/als-mirna-oxidation-pipeline.git
+cd als-mirna-oxidation-pipeline/final_analysis/pipeline_definitivo/snakemake_pipeline
+
+# 2. Crear ambiente conda/mamba
+conda env create -f environment.yaml
+# O con mamba (más rápido):
+# mamba env create -f environment.yaml
+
+# 3. Activar ambiente
+conda activate als_mirna_pipeline
+
+# 4. Configurar datos
+cp config/config.yaml.example config/config.yaml
+nano config/config.yaml  # Actualiza las rutas a tus datos
+
+# 5. Ejecutar pipeline
+snakemake -j 4
+```
+
+**📚 Para instrucciones detalladas, consulta [SETUP.md](SETUP.md)**
+
 ## 📋 Requirements
 
+### Software Requerido
+
+- **Conda** (Miniconda o Anaconda) o **Mamba** - [Instalar Miniconda](https://docs.conda.io/en/latest/miniconda.html)
+  - Mamba es más rápido y recomendado: [Instalar Mamba](https://mamba.readthedocs.io/en/latest/installation.html)
+
+### Dependencias del Pipeline (instaladas automáticamente)
+
 - **Python** 3.10+
-- **Snakemake** 7.0+
-- **R** 4.3+ (installed via conda)
-- **Conda** or **Mamba**
+- **Snakemake** 7.32+
+- **R** 4.3.2+ (instalado via conda)
+- **Paquetes R:** ggplot2, dplyr, pheatmap, patchwork, ggrepel, viridis, y más
+
+**Nota:** Todas las dependencias se instalan automáticamente al crear el ambiente conda/mamba.
 
 ## 📊 Input Format
 
@@ -141,10 +182,16 @@ See `config/config.yaml.example` for detailed documentation.
 
 ## 📚 Documentation
 
-- **Quick Start Guide**: `README_SIMPLE.md`
-- **Step-by-step Guide**: `GUIA_USO_PASO_A_PASO.md`
-- **Performance Optimizations**: `OPTIMIZACIONES_RENDIMIENTO.md`
-- **Current Status Analysis**: `ANALISIS_OBJETIVO_vs_REALIDAD.md`
+### Para Empezar
+* **⚡ Inicio Rápido**: `QUICK_START.md` - Empieza aquí (5 minutos)
+* **🛠️ Setup Completo**: `SETUP.md` - Guía detallada de instalación
+* **📖 Guía Paso a Paso**: `GUIA_USO_PASO_A_PASO.md`
+
+### Documentación Técnica
+* **📊 Estado de Viewers**: `ESTADO_VIEWERS.md`
+* **👁️ Guía de Viewers**: `GUIA_VIEWERS.md`
+* **⚙️ Optimizaciones**: `OPTIMIZACIONES_RENDIMIENTO.md`
+* **📈 Análisis de Estado**: `ANALISIS_OBJETIVO_vs_REALIDAD.md`
 
 ## 🔧 Troubleshooting
 
@@ -157,10 +204,38 @@ See `config/config.yaml.example` for detailed documentation.
 - Reinstall: `conda env update -f environment.yaml --prune`
 
 ### Error: "Snakemake not found"
+
+* Verifica que el ambiente esté activado: `conda activate als_mirna_pipeline`
+* Si aún no está instalado:
+  ```bash
+  conda install -c bioconda -c conda-forge snakemake
+  # o con mamba (más rápido):
+  mamba install -c bioconda -c conda-forge snakemake
+  ```
+
+### Error: "Conda/Mamba not found"
+
+**Instalar Miniconda (recomendado):**
+* **macOS**: `curl -O https://repo.anaconda.com/miniconda/Miniconda3-latest-MacOSX-arm64.sh && bash Miniconda3-latest-MacOSX-arm64.sh`
+* **Linux**: `wget https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh && bash Miniconda3-latest-Linux-x86_64.sh`
+* Reinicia tu terminal después de la instalación
+
+**Instalar Mamba (opcional, más rápido):**
 ```bash
-pip install snakemake
-# or
-conda install -c bioconda snakemake
+conda install mamba -n base -c conda-forge
+```
+
+### Verificar Instalación
+
+```bash
+# Ejecutar script de verificación
+bash setup.sh --check
+
+# O manualmente
+conda activate als_mirna_pipeline
+snakemake --version
+R --version
+Rscript -e "library(ggplot2); library(dplyr); cat('✅ OK\n')"
 ```
 
 ## 🤝 Contributing

@@ -16,6 +16,8 @@ dependencies:
   - r-stringr
   - r-tibble
   - r-scales
+  - r-purrr
+  - r-forcats
   
   # Visualization extensions
   - r-patchwork
@@ -25,6 +27,7 @@ dependencies:
   # Heatmaps and advanced plots
   - r-pheatmap
   - r-viridis
+  - r-reshape2  # Para melt() y funciones de reshaping
   
   # Statistical and utilities
   - r-e1071
@@ -33,4 +36,7 @@ dependencies:
   - r-base64enc
   - r-rmarkdown
   - r-knitr
+  
+  # Additional utilities (common in scripts)
+  - r-RColorBrewer
 
