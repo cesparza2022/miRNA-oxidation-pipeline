@@ -8,7 +8,7 @@ Reproducible Snakemake pipeline for analyzing G>T oxidation patterns in miRNAs a
 
 ## 🚀 Quick Start
 
-### Opción 1: Setup Automático (Recomendado)
+### Opción 1: Setup Automático (Recomendado) ⚡
 
 ```bash
 # 1. Clone repository
@@ -21,15 +21,34 @@ bash setup.sh --mamba  # Usa mamba (más rápido) o --conda para conda
 # 3. Activar ambiente
 conda activate als_mirna_pipeline
 
-# 4. Configurar datos
-cp config/config.yaml.example config/config.yaml
-nano config/config.yaml  # Actualiza las rutas a tus datos
+# 4. Configurar datos (editar ruta a tu archivo CSV)
+nano config/config.yaml  # Actualiza la ruta a tu archivo de datos
 
-# 5. Probar pipeline (dry-run)
-snakemake -n
-
-# 6. Ejecutar pipeline
+# 5. Ejecutar pipeline (todo se genera automáticamente)
 snakemake -j 4
+
+# ✅ ¡Listo! Los resultados están en results/
+```
+
+**📁 Estructura de Output Automática:**
+```
+results/
+├── step1/final/figures/      # 6 figuras PNG
+├── step1/final/tables/       # 6 tablas CSV
+├── step1_5/final/figures/    # 11 figuras PNG
+├── step1_5/final/tables/     # Datos filtrados y reportes
+├── step2/final/figures/      # 2 figuras PNG
+├── step2/final/tables/       # Resultados estadísticos
+├── viewers/                  # 3 viewers HTML interactivos
+├── summary/                  # Reporte consolidado
+└── validation/              # Reportes de validación
+```
+
+**Ver resultados:**
+```bash
+# Abrir viewers HTML
+open viewers/step1_viewer.html
+open summary/summary_report.html
 ```
 
 ### Opción 2: Setup Manual
@@ -148,26 +167,40 @@ chmod +x run.sh
 snakemake_pipeline/
 ├── README.md                 # This file
 ├── Snakefile                 # Main pipeline orchestrator
-├── run.sh                    # Simple execution wrapper
+├── setup.sh                  # ⚡ Automated setup script
 ├── config/
 │   ├── config.yaml.example   # Configuration template
-│   └── config.yaml           # Your configuration (create from example)
+│   └── config.yaml           # Your configuration (edit with your data path)
 ├── scripts/                  # R analysis scripts
 │   ├── step1/               # Step 1 analysis scripts
 │   ├── step1_5/             # Step 1.5 VAF QC scripts
-│   └── utils/                # Shared utilities
+│   ├── step2/               # Step 2 statistical scripts
+│   └── utils/                # Shared utilities & validations
 ├── rules/                    # Snakemake rule files
+│   ├── output_structure.smk  # ⚡ Auto-creates output directories
 │   ├── step1.smk
 │   ├── step1_5.smk
-│   └── viewers.smk
+│   ├── step2.smk
+│   ├── viewers.smk
+│   ├── validation.smk       # Output validation
+│   └── ...
 ├── envs/                     # Conda environment files
 │   ├── r_base.yaml
 │   └── r_analysis.yaml
-└── outputs/                  # Generated outputs (gitignored)
-    ├── step1/
-    ├── step1_5/
-    └── step2/
+└── results/                  # 📊 Generated outputs (auto-organized)
+    ├── step1/final/         # Figures + Tables
+    ├── step1_5/final/       # Figures + Tables
+    ├── step2/final/         # Figures + Tables
+    ├── viewers/             # HTML interactive reports
+    ├── summary/             # Consolidated summaries
+    └── validation/          # Validation reports
 ```
+
+**📊 Output Organization:**
+- **Figures**: Automatically organized by step in `results/stepX/final/figures/`
+- **Tables**: Automatically organized by step in `results/stepX/final/tables/`
+- **Viewers**: HTML reports in `results/viewers/` and `viewers/`
+- **All directories created automatically** - no manual setup needed!
 
 ## ⚙️ Configuration
 
