@@ -94,6 +94,8 @@ top_pathways <- bind_rows(
   arrange(p.adjust) %>%
   head(15) %>%
   mutate(
+    Pathway_Label = ifelse(is.na(Pathway_Label), Description, Pathway_Label),
+    Pathway_Label = ifelse(is.na(Pathway_Label), Pathway_Name, Pathway_Label),
     Pathway_Label = ifelse(nchar(Pathway_Label) > 50, 
                           paste0(str_sub(Pathway_Label, 1, 47), "..."),
                           Pathway_Label)
@@ -257,9 +259,9 @@ position_impact <- target_data %>%
   arrange(position)
 
 # Get statistics
-seed_impact <- position_impact %>% filter(in_seed) %>% summarise(total = sum(total_impact)) %>% pull(total)
-nonseed_impact <- position_impact %>% filter(!in_seed) %>% summarise(total = sum(total_impact)) %>% pull(total)
-seed_ratio <- round(seed_impact / nonseed_impact, 2) if nonseed_impact > 0 else Inf
+seed_impact <- position_impact %>% filter(in_seed) %>% summarise(total = sum(total_impact, na.rm = TRUE)) %>% pull(total)
+nonseed_impact <- position_impact %>% filter(!in_seed) %>% summarise(total = sum(total_impact, na.rm = TRUE)) %>% pull(total)
+seed_ratio <- if (nonseed_impact > 0) round(seed_impact / nonseed_impact, 2) else Inf
 
 panel_d <- ggplot(position_impact, aes(x = position, y = total_impact)) +
   annotate("rect", xmin = 2 - 0.5, xmax = 8 + 0.5, 
