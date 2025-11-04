@@ -172,20 +172,21 @@ snakemake -j 1 all_step1_5
 # Step 2: Statistical Comparisons (includes position-specific analysis)
 snakemake -j 4 all_step2
 
-# Step 3: Functional Analysis
-snakemake -j 4 all_step3
+# REORDERED: Logical flow - structure discovery before functional interpretation
+# Step 7: Clustering Analysis (discovers groups with similar patterns)
+snakemake -j 4 all_step7
 
-# Step 4: Biomarker Analysis
-snakemake -j 4 all_step4
-
-# Step 5: Family Analysis
+# Step 5: Family Analysis (compares clusters with biological families)
 snakemake -j 4 all_step5
 
-# Step 6: Expression-Oxidation Correlation
+# Step 6: Expression-Oxidation Correlation (examines expression relationships)
 snakemake -j 4 all_step6
 
-# Step 7: Clustering Analysis
-snakemake -j 4 all_step7
+# Step 3: Functional Analysis (functional implications with context)
+snakemake -j 4 all_step3
+
+# Step 4: Biomarker Analysis (integrates all previous insights) - LAST
+snakemake -j 4 all_step4
 ```
 
 ### Dry Run (Preview)

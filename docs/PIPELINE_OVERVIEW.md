@@ -37,25 +37,31 @@ Raw Data (CSV)
     ├── Group Comparisons
     └── Position-Specific Analysis (NEW)
     ↓
-[Step 3] Functional Analysis
-    ├── Target Prediction
+[Step 7] Clustering Analysis ⭐ REORDERED
+    └── Discover groups of miRNAs with similar oxidation patterns
+    ↓
+[Step 5] Family Analysis ⭐ REORDERED
+    ├── Family Identification
+    └── Compare clusters with biological families
+    ↓
+[Step 6] Expression Correlation ⭐ REORDERED
+    └── Expression vs Oxidation relationships
+    ↓
+[Step 3] Functional Analysis ⭐ REORDERED
+    ├── Target Prediction (with cluster/family context)
     ├── Pathway Enrichment
     └── Disease-Relevant Genes
     ↓
-[Step 4] Biomarker Analysis
-    ├── ROC Curves
+[Step 4] Biomarker Analysis ⭐ REORDERED (LAST)
+    ├── ROC Curves (integrates all insights)
     └── Diagnostic Signatures
-    ↓
-[Step 5] Family Analysis
-    ├── Family Identification
-    └── Family-Level Patterns
-    ↓
-[Step 6] Expression Correlation
-    └── Expression vs Oxidation
-    ↓
-[Step 7] Clustering Analysis
-    └── miRNA Clustering
 ```
+
+**Note:** Steps have been reordered for logical flow:
+- **Structure discovery first** (Step 7: Clustering, Step 5: Families)
+- **Relationship analysis** (Step 6: Expression)
+- **Functional interpretation** (Step 3: Functional)
+- **Biomarker integration** (Step 4: Biomarkers - integrates all)
 
 ---
 
