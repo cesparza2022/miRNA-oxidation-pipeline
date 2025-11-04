@@ -1,0 +1,213 @@
+{
+	"meta": {
+		"generatedAt": "2025-09-19T15:24:38.694Z",
+		"tasksAnalyzed": 25,
+		"totalTasks": 25,
+		"analysisCount": 25,
+		"thresholdScore": 5,
+		"projectName": "Taskmaster",
+		"usedResearch": true
+	},
+	"complexityAnalysis": [
+		{
+			"taskId": 1,
+			"taskTitle": "Initialize Project Repository and Environment",
+			"complexityScore": 4,
+			"recommendedSubtasks": 6,
+			"expansionPrompt": "Break down the initialization process into: (1) directory structure creation, (2) git repository setup, (3) renv environment initialization, (4) .gitignore and README creation, (5) R version and package locking, (6) config.yaml and data_schema.json template preparation.",
+			"reasoning": "This task is foundational but follows well-established best practices for reproducible R projects, including project-oriented workflows, version control, and environment management[1][2]. Each step is discrete and can be independently verified, but the overall process is straightforward for experienced R users."
+		},
+		{
+			"taskId": 2,
+			"taskTitle": "Migrate and Modularize Existing Notebook Code",
+			"complexityScore": 7,
+			"recommendedSubtasks": 7,
+			"expansionPrompt": "Expand by module: (1) io.R, (2) qc.R, (3) normalize.R, (4) seedmap.R, (5) stats.R, (6) cluster.R, (7) targets.R/plots.R. For each, include code migration, API definition, roxygen2 documentation, invariant enforcement, and unit testing.",
+			"reasoning": "Refactoring notebook code into modular, pure R scripts with strict APIs and documentation is moderately complex, requiring careful separation of concerns, removal of side effects, and adherence to best practices for maintainability and testability[3]. Each module represents a logical subtask."
+		},
+		{
+			"taskId": 3,
+			"taskTitle": "Implement Data I/O and Schema Parsing",
+			"complexityScore": 6,
+			"recommendedSubtasks": 5,
+			"expansionPrompt": "Divide into: (1) fast I/O implementation with data.table, (2) SNV/TOTAL column pairing logic, (3) sample metadata parsing, (4) manual override support, (5) sample_metadata.tsv output and validation.",
+			"reasoning": "This task involves both efficient data handling and robust parsing logic, including regex-based extraction and support for overrides. Each component is distinct and testable, but the patterns are standard in data engineering."
+		},
+		{
+			"taskId": 4,
+			"taskTitle": "Implement Data Quality Control and Schema Validation",
+			"complexityScore": 6,
+			"recommendedSubtasks": 5,
+			"expansionPrompt": "Subdivide into: (1) schema validation against data_schema.json, (2) SNV ≤ Total invariant checks, (3) missingness handling, (4) coverage summarization, (5) qc_report.tsv generation and threshold enforcement.",
+			"reasoning": "QC and schema validation are essential for data integrity and reproducibility, involving multiple checks and reporting steps. Each check is a logical subtask, and the process aligns with industry standards for data pipelines."
+		},
+		{
+			"taskId": 5,
+			"taskTitle": "Normalize Data and Compute VAF/RPM",
+			"complexityScore": 5,
+			"recommendedSubtasks": 4,
+			"expansionPrompt": "Expand into: (1) library size calculation, (2) SNV-RPM computation, (3) VAF calculation, (4) output table generation and validation.",
+			"reasoning": "Normalization and metric calculation are routine in bioinformatics pipelines. The logic is clear, and each output table represents a natural subtask, but care is needed to ensure correctness and reproducibility."
+		},
+		{
+			"taskId": 9,
+			"taskTitle": "Global G>T Signal Analysis (ALS vs Control)",
+			"complexityScore": 7,
+			"recommendedSubtasks": 5,
+			"expansionPrompt": "Break down into: (1) data aggregation for G>T, (2) GLM/GLMM model implementation, (3) stratified permutation testing, (4) result table generation, (5) violin plot creation and validation.",
+			"reasoning": "This task requires statistical modeling, permutation testing, and visualization, each with its own complexity. Proper stratification and model validation are critical, and each step is a logical subtask."
+		},
+		{
+			"taskId": 12,
+			"taskTitle": "Mutation Type Mixture at Top Positions",
+			"complexityScore": 4,
+			"recommendedSubtasks": 3,
+			"expansionPrompt": "Divide into: (1) top position identification, (2) mutation type fraction computation, (3) stacked bar plot generation and validation.",
+			"reasoning": "Summarizing mutation mixtures is a focused analysis with clear steps. The logic is straightforward, and the main complexity lies in accurate aggregation and visualization."
+		},
+		{
+			"taskId": 17,
+			"taskTitle": "Batch/Timepoint Stratified Consistency Checks",
+			"complexityScore": 6,
+			"recommendedSubtasks": 4,
+			"expansionPrompt": "Expand into: (1) data stratification by batch/timepoint/site, (2) interaction/stratified GLMM fitting, (3) result table generation, (4) stratified plot creation and validation.",
+			"reasoning": "Stratified analysis and interaction modeling require careful data handling and statistical expertise. Each step is distinct, and the process is standard in multi-batch studies."
+		},
+		{
+			"taskId": 20,
+			"taskTitle": "ALS-Bias Testing in Discovered Clusters",
+			"complexityScore": 5,
+			"recommendedSubtasks": 3,
+			"expansionPrompt": "Subdivide into: (1) cluster prevalence calculation, (2) statistical test implementation (χ²/Fisher/GLM), (3) result table generation and validation.",
+			"reasoning": "Testing for group bias in clusters is a common statistical task. The main complexity is in correct test selection and interpretation, but the workflow is well-established."
+		},
+		{
+			"taskId": 25,
+			"taskTitle": "Adaptive Controller and Run Registry Implementation",
+			"complexityScore": 8,
+			"recommendedSubtasks": 6,
+			"expansionPrompt": "Break down into: (1) controller logic design, (2) diagnostic reading implementation, (3) adaptive question proposal logic, (4) threshold grid search automation, (5) run registry writer (run.json), (6) simulation and validation of adaptive branching.",
+			"reasoning": "Implementing an adaptive controller with branching logic and automated registry management is complex, requiring robust state management, automation, and integration with diagnostics. Each component is a substantial subtask, and the overall task is advanced."
+		},
+		{
+			"taskId": 6,
+			"taskTitle": "Parse and Annotate Seed Positions",
+			"complexityScore": 5,
+			"recommendedSubtasks": 3,
+			"expansionPrompt": "Break down this task with a focus on parse and annotate seed positions.",
+			"reasoning": "Automatically added due to missing analysis in AI response."
+		},
+		{
+			"taskId": 7,
+			"taskTitle": "Summarize miRNA Expression and Select Top miRNAs",
+			"complexityScore": 5,
+			"recommendedSubtasks": 3,
+			"expansionPrompt": "Break down this task with a focus on summarize mirna expression and select top mirnas.",
+			"reasoning": "Automatically added due to missing analysis in AI response."
+		},
+		{
+			"taskId": 8,
+			"taskTitle": "Validate Sample Metadata and Cohort Parsing",
+			"complexityScore": 5,
+			"recommendedSubtasks": 3,
+			"expansionPrompt": "Break down this task with a focus on validate sample metadata and cohort parsing.",
+			"reasoning": "Automatically added due to missing analysis in AI response."
+		},
+		{
+			"taskId": 10,
+			"taskTitle": "Base Change Composition Analysis",
+			"complexityScore": 5,
+			"recommendedSubtasks": 3,
+			"expansionPrompt": "Break down this task with a focus on base change composition analysis.",
+			"reasoning": "Automatically added due to missing analysis in AI response."
+		},
+		{
+			"taskId": 11,
+			"taskTitle": "Positional Mutation Summaries",
+			"complexityScore": 5,
+			"recommendedSubtasks": 3,
+			"expansionPrompt": "Break down this task with a focus on positional mutation summaries.",
+			"reasoning": "Automatically added due to missing analysis in AI response."
+		},
+		{
+			"taskId": 13,
+			"taskTitle": "Differential Mutation Testing by Position (ALS vs Control)",
+			"complexityScore": 5,
+			"recommendedSubtasks": 3,
+			"expansionPrompt": "Break down this task with a focus on differential mutation testing by position (als vs control).",
+			"reasoning": "Automatically added due to missing analysis in AI response."
+		},
+		{
+			"taskId": 14,
+			"taskTitle": "Seed vs Non-Seed Enrichment Analysis",
+			"complexityScore": 5,
+			"recommendedSubtasks": 3,
+			"expansionPrompt": "Break down this task with a focus on seed vs non-seed enrichment analysis.",
+			"reasoning": "Automatically added due to missing analysis in AI response."
+		},
+		{
+			"taskId": 15,
+			"taskTitle": "Position-Specific G>T Difference Curves",
+			"complexityScore": 5,
+			"recommendedSubtasks": 3,
+			"expansionPrompt": "Break down this task with a focus on position-specific g>t difference curves.",
+			"reasoning": "Automatically added due to missing analysis in AI response."
+		},
+		{
+			"taskId": 16,
+			"taskTitle": "Per-miRNA Positionwise Testing and Heatmaps",
+			"complexityScore": 5,
+			"recommendedSubtasks": 3,
+			"expansionPrompt": "Break down this task with a focus on per-mirna positionwise testing and heatmaps.",
+			"reasoning": "Automatically added due to missing analysis in AI response."
+		},
+		{
+			"taskId": 18,
+			"taskTitle": "Build Per-miRNA Seed Vectors",
+			"complexityScore": 5,
+			"recommendedSubtasks": 3,
+			"expansionPrompt": "Break down this task with a focus on build per-mirna seed vectors.",
+			"reasoning": "Automatically added due to missing analysis in AI response."
+		},
+		{
+			"taskId": 19,
+			"taskTitle": "De Novo Seed-Cluster Discovery and Model Selection",
+			"complexityScore": 5,
+			"recommendedSubtasks": 3,
+			"expansionPrompt": "Break down this task with a focus on de novo seed-cluster discovery and model selection.",
+			"reasoning": "Automatically added due to missing analysis in AI response."
+		},
+		{
+			"taskId": 21,
+			"taskTitle": "Build Oxidation-Mimic Seeds",
+			"complexityScore": 5,
+			"recommendedSubtasks": 3,
+			"expansionPrompt": "Break down this task with a focus on build oxidation-mimic seeds.",
+			"reasoning": "Automatically added due to missing analysis in AI response."
+		},
+		{
+			"taskId": 22,
+			"taskTitle": "Predict Canonical vs Mimic Targets and Compute ΔTargets",
+			"complexityScore": 5,
+			"recommendedSubtasks": 3,
+			"expansionPrompt": "Break down this task with a focus on predict canonical vs mimic targets and compute δtargets.",
+			"reasoning": "Automatically added due to missing analysis in AI response."
+		},
+		{
+			"taskId": 23,
+			"taskTitle": "Pathway Enrichment and ALS-Relevance Tagging",
+			"complexityScore": 5,
+			"recommendedSubtasks": 3,
+			"expansionPrompt": "Break down this task with a focus on pathway enrichment and als-relevance tagging.",
+			"reasoning": "Automatically added due to missing analysis in AI response."
+		},
+		{
+			"taskId": 24,
+			"taskTitle": "Stability and Convergence of ΔTargets/Terms",
+			"complexityScore": 5,
+			"recommendedSubtasks": 3,
+			"expansionPrompt": "Break down this task with a focus on stability and convergence of δtargets/terms.",
+			"reasoning": "Automatically added due to missing analysis in AI response."
+		}
+	]
+}

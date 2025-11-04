@@ -1,0 +1,2 @@
+File name	Total read	PM read	%	1MM read	%	2MM read	%
+rCMC_cont_IP	9430660	3700128	39.24	115616	1.23	128419	1.36

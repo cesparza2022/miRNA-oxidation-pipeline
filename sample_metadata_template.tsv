@@ -1,0 +1,47 @@
+# Sample Metadata Template for ALS miRNA Oxidation Research
+# This file serves as a template for sample metadata
+# Replace the example data with your actual sample information
+
+# Required columns:
+# - sample_id: Unique identifier for each sample
+# - group: Sample group (ALS, Control, Treatment)
+# - timepoint: Time point (e.g., 0d, 7d, 14d, 1m, 3m, 6m, 1y)
+# - subject_id: Unique identifier for each subject
+# - batch: Batch or run identifier
+# - age: Age of the subject (optional)
+# - sex: Sex of the subject (optional)
+# - diagnosis: Clinical diagnosis (optional)
+# - treatment: Treatment received (optional)
+# - notes: Additional notes (optional)
+
+sample_id	group	timepoint	subject_id	batch	age	sex	diagnosis	treatment	notes
+sample_001	ALS	0d	ALS_001	batch_1	65	M	ALS	None	Baseline sample
+sample_002	ALS	7d	ALS_001	batch_1	65	M	ALS	None	1 week follow-up
+sample_003	ALS	14d	ALS_001	batch_1	65	M	ALS	None	2 week follow-up
+sample_004	Control	0d	CTRL_001	batch_1	62	F	Healthy	None	Healthy control
+sample_005	Control	7d	CTRL_001	batch_1	62	F	Healthy	None	1 week follow-up
+sample_006	Control	14d	CTRL_001	batch_1	62	F	Healthy	None	2 week follow-up
+sample_007	Treatment	0d	TREAT_001	batch_2	58	M	ALS	Drug_A	Pre-treatment
+sample_008	Treatment	7d	TREAT_001	batch_2	58	M	ALS	Drug_A	1 week post-treatment
+sample_009	Treatment	14d	TREAT_001	batch_2	58	M	ALS	Drug_A	2 weeks post-treatment
+sample_010	ALS	0d	ALS_002	batch_2	71	F	ALS	None	Baseline sample
+sample_011	ALS	7d	ALS_002	batch_2	71	F	ALS	None	1 week follow-up
+sample_012	ALS	14d	ALS_002	batch_2	71	F	ALS	None	2 week follow-up
+sample_013	Control	0d	CTRL_002	batch_2	69	M	Healthy	None	Healthy control
+sample_014	Control	7d	CTRL_002	batch_2	69	M	Healthy	None	1 week follow-up
+sample_015	Control	14d	CTRL_002	batch_2	69	M	Healthy	None	2 week follow-up
+sample_016	Treatment	0d	TREAT_002	batch_3	63	F	ALS	Drug_B	Pre-treatment
+sample_017	Treatment	7d	TREAT_002	batch_3	63	F	ALS	Drug_B	1 week post-treatment
+sample_018	Treatment	14d	TREAT_002	batch_3	63	F	ALS	Drug_B	2 weeks post-treatment
+sample_019	ALS	0d	ALS_003	batch_3	67	M	ALS	None	Baseline sample
+sample_020	ALS	7d	ALS_003	batch_3	67	M	ALS	None	1 week follow-up
+sample_021	ALS	14d	ALS_003	batch_3	67	M	ALS	None	2 week follow-up
+sample_022	Control	0d	CTRL_003	batch_3	64	F	Healthy	None	Healthy control
+sample_023	Control	7d	CTRL_003	batch_3	64	F	Healthy	None	1 week follow-up
+sample_024	Control	14d	CTRL_003	batch_3	64	F	Healthy	None	2 week follow-up
+sample_025	Treatment	0d	TREAT_003	batch_4	59	M	ALS	Drug_A	Pre-treatment
+sample_026	Treatment	7d	TREAT_003	batch_4	59	M	ALS	Drug_A	1 week post-treatment
+sample_027	Treatment	14d	TREAT_003	batch_4	59	M	ALS	Drug_A	2 weeks post-treatment
+sample_028	ALS	0d	ALS_004	batch_4	73	F	ALS	None	Baseline sample
+sample_029	ALS	7d	ALS_004	batch_4	73	F	ALS	None	1 week follow-up
+sample_030	ALS	14d	ALS_004	batch_4	73	F	ALS	None	2 week follow-up

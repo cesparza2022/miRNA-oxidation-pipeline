@@ -1,0 +1,90 @@
+# Configuration file for Snakemake Pipeline
+# ALS miRNA Oxidation Analysis Pipeline
+
+# Project information
+project:
+  name: "ALS miRNA Oxidation Analysis"
+  version: "1.0.0"
+  description: "Reproducible pipeline for analyzing G>T oxidation patterns in miRNAs"
+
+# Paths (absolute)
+paths:
+  project_root: "/Users/cesaresparza/New_Desktop/UCSD/8OG/final_analysis/pipeline_definitivo"
+  snakemake_dir: "/Users/cesaresparza/New_Desktop/UCSD/8OG/final_analysis/pipeline_definitivo/snakemake_pipeline"
+  
+  # Input data
+  data:
+    # Try multiple locations for RAW data (first existing will be used)
+    raw: "/Users/cesaresparza/New_Desktop/UCSD/8OG/final_analysis/data/raw/miRNA_count.Q33.txt"
+    raw_alt: "/Users/cesaresparza/New_Desktop/UCSD/8OG/organized/02_data/Magen_ALS-bloodplasma/miRNA_count.Q33.txt"
+    processed_dir: "/Users/cesaresparza/New_Desktop/UCSD/8OG/final_analysis/processed_data"
+    processed_clean: "/Users/cesaresparza/New_Desktop/UCSD/8OG/final_analysis/pipeline_definitivo/pipeline_2/final_processed_data_CLEAN.csv"
+    # Original data for Step 1.5 (VAF filtering - needs SNV + total counts)
+    step1_original: "/Users/cesaresparza/New_Desktop/UCSD/8OG/final_analysis/tercer_intento/step_by_step_analysis/step1_original_data.csv"
+  
+  # Output directories (relative to snakemake_dir)
+  # FASE 1: Reorganized structure with intermediate/ and final/
+  outputs:
+    step1: "results/step1/final"
+    step1_5: "results/step1_5/final"
+    step2: "results/step2/final"
+  # Intermediate directories (for debugging/reprocessing)
+  intermediates:
+    step1: "results/step1/intermediate"
+    step1_5: "results/step1_5/intermediate"
+    step2: "results/step2/intermediate"
+  
+  # Scripts directories
+  scripts:
+    step1: "scripts/step1"
+    step1_5: "scripts/step1_5"
+    step2: "scripts/step2"
+    utils: "scripts/utils"
+  
+  # Viewers directory
+  viewers: "viewers"
+  
+  # Golden copies (reference figures from previous pipeline)
+  golden_copies:
+    dir: "/Users/cesaresparza/New_Desktop/UCSD/8OG/final_analysis/pipeline_definitivo/pipeline_2/HTML_VIEWERS_FINALES/figures_paso2_CLEAN"
+    fig_2_13: "FIG_2.13_DENSITY_HEATMAP_ALS.png"
+    fig_2_14: "FIG_2.14_DENSITY_HEATMAP_CONTROL.png"
+    fig_2_15: "FIG_2.15_DENSITY_COMBINED.png"
+
+# Analysis parameters
+analysis:
+  # VAF filtering
+  vaf_filter_threshold: 0.5  # Filter VAFs > 50%
+  
+  # Statistical parameters
+  alpha: 0.05  # Significance threshold
+  fdr_method: "BH"  # FDR correction method (Benjamini-Hochberg)
+  log2fc_threshold: 0.58  # Log2 fold change threshold (1.5x = log2(1.5) ≈ 0.58)
+  
+  # Visualization
+  colors:
+    gt: "#D62728"  # Red for G>T (oxidation)
+    control: "grey60"  # Grey for control
+    als: "#D62728"  # Red for ALS
+  
+  # Figure settings
+  figure:
+    dpi: 300
+    width: 10
+    height: 8
+    units: "in"
+
+# Resources
+resources:
+  # Number of threads for parallel execution
+  threads: 4
+  
+  # Memory requirements (in GB)
+  memory_gb: 8
+
+# Conda environments
+conda_envs:
+  r_base: "envs/r_base.yaml"
+  r_analysis: "envs/r_analysis.yaml"
+
+

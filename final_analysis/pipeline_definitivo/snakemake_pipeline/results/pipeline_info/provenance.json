@@ -1,0 +1,41 @@
+{
+  "pipeline": {
+    "name": "ALS miRNA Oxidation Analysis",
+    "version": "1.0.0",
+    "execution_date": "2025-11-03"
+  },
+  "inputs": {
+    "raw_data": {
+      "path": "/Users/cesaresparza/New_Desktop/UCSD/8OG/final_analysis/data/raw/miRNA_count.Q33.txt",
+      "description": "Raw miRNA count data",
+      "exists": true
+    },
+    "processed_clean": {
+      "path": "/Users/cesaresparza/New_Desktop/UCSD/8OG/final_analysis/pipeline_definitivo/pipeline_2/final_processed_data_CLEAN.csv",
+      "description": "Processed clean data (input for Step 1)",
+      "exists": true
+    }
+  },
+  "outputs": {
+    "step1": {
+      "path": "./results/step1/final",
+      "description": "Step 1: Exploratory analysis results",
+      "exists": true
+    },
+    "step1_5": {
+      "path": "./results/step1_5/final",
+      "description": "Step 1.5: VAF filtered data",
+      "exists": true
+    },
+    "step2": {
+      "path": "./results/step2/final",
+      "description": "Step 2: Statistical comparisons",
+      "exists": true
+    }
+  },
+  "processing": {
+    "step1_uses": "processed_clean",
+    "step1_5_uses": "step1_original",
+    "step2_uses": "step1_5_filtered_data"
+  }
+}

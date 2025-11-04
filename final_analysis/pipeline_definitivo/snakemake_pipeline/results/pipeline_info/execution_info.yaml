@@ -1,0 +1,30 @@
+pipeline:
+  name: ALS miRNA Oxidation Analysis
+  version: 1.0.0
+  description: Reproducible pipeline for analyzing G>T oxidation patterns in miRNAs
+execution:
+  date: '2025-11-03'
+  time: '09:34:26'
+  datetime: 2025-11-03 09:34:26 PST
+  status: completed
+  steps_completed:
+  - step1
+  - step1_5
+  - step2
+parameters:
+  vaf_threshold: 0.5
+  alpha: 0.05
+  fdr_method: BH
+  log2fc_threshold: 0.58
+  threads: 4
+  memory_gb: 8
+inputs:
+  raw_data: /Users/cesaresparza/New_Desktop/UCSD/8OG/final_analysis/data/raw/miRNA_count.Q33.txt
+  processed_data: /Users/cesaresparza/New_Desktop/UCSD/8OG/final_analysis/pipeline_definitivo/pipeline_2/final_processed_data_CLEAN.csv
+outputs:
+  step1: results/step1/final
+  step1_5: results/step1_5/final
+  step2: results/step2/final
+  total_figures: 19.0
+  total_tables: 13.0
+  total_logs: 14.0

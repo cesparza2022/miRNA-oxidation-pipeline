@@ -1,0 +1,16 @@
+# Basic usage: ./Mapping_miRNA_with_bowtie.py -r mature_miRNA_sequence.fa
+
+# Dependency
+1) python2.7 (with package: pandas)
+
+# Note:
+1) All 5 scripts must be in same directory!
+   (scripts: Mapping_miRNA_with_bowtie.py, FastQcollapse.py, parse_bowtie_result.py, count_miRNA.py & extract_bowtie_unmapped_reads.py)
+2) "mature_miRNA_sequence.fa" must be in DNA sequence!
+   (if it's downloaded from miRBase, it is in RNA sequence)
+
+# FINAL OUTPUT: 
+1) Mapping_summary.txt	(format: "file_name" | "total_read" | "PM_read" | "PM%" | "1MM_read" | "1MM%" | "2MM_read" | "2MM%")
+2) miRNA_count.txt	(format: "miR_name" | "pos:mut" | "read_count" | "total_miR_count (PM+1MM+2MM)")
++
+3) bowtie_unmapped.fastq (optional, if option "-un" is used)

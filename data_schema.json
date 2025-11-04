@@ -1,0 +1,302 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "ALS miRNA Oxidation Research Data Schema",
+  "description": "Schema for validating input data files in the ALS miRNA oxidation research project",
+  "type": "object",
+  "properties": {
+    "input_matrix": {
+      "type": "object",
+      "description": "Main input matrix with SNV and TOTAL columns",
+      "properties": {
+        "required_columns": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "contains": {
+            "const": "SNV"
+          },
+          "contains": {
+            "const": "TOTAL"
+          }
+        },
+        "data_types": {
+          "SNV": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "TOTAL": {
+            "type": "integer",
+            "minimum": 0
+          }
+        },
+        "constraints": {
+          "SNV_less_than_TOTAL": {
+            "description": "SNV values must be less than or equal to TOTAL values",
+            "type": "boolean"
+          }
+        }
+      },
+      "required": ["SNV", "TOTAL"]
+    },
+    "sample_metadata": {
+      "type": "object",
+      "description": "Sample metadata with group, timepoint, subject_id, and batch information",
+      "properties": {
+        "required_columns": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "contains": {
+            "const": "group"
+          },
+          "contains": {
+            "const": "timepoint"
+          },
+          "contains": {
+            "const": "subject_id"
+          },
+          "contains": {
+            "const": "batch"
+          }
+        },
+        "data_types": {
+          "group": {
+            "type": "string",
+            "enum": ["ALS", "Control", "Treatment"]
+          },
+          "timepoint": {
+            "type": "string",
+            "pattern": "^[0-9]+[dwmy]$"
+          },
+          "subject_id": {
+            "type": "string",
+            "minLength": 1
+          },
+          "batch": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "constraints": {
+          "unique_subject_ids": {
+            "description": "subject_id values must be unique",
+            "type": "boolean"
+          },
+          "valid_groups": {
+            "description": "group values must be valid (ALS, Control, Treatment)",
+            "type": "boolean"
+          }
+        }
+      },
+      "required": ["group", "timepoint", "subject_id", "batch"]
+    },
+    "mirna_sequences": {
+      "type": "object",
+      "description": "miRNA sequence data in FASTA format",
+      "properties": {
+        "format": {
+          "type": "string",
+          "const": "fasta"
+        },
+        "required_fields": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "contains": {
+            "const": "header"
+          },
+          "contains": {
+            "const": "sequence"
+          }
+        },
+        "sequence_constraints": {
+          "valid_nucleotides": {
+            "type": "string",
+            "pattern": "^[ATCGU]+$"
+          },
+          "min_length": {
+            "type": "integer",
+            "minimum": 15
+          },
+          "max_length": {
+            "type": "integer",
+            "maximum": 30
+          }
+        }
+      },
+      "required": ["format", "header", "sequence"]
+    },
+    "quality_control": {
+      "type": "object",
+      "description": "Quality control parameters and thresholds",
+      "properties": {
+        "coverage_thresholds": {
+          "min_coverage": {
+            "type": "integer",
+            "minimum": 1,
+            "default": 10
+          },
+          "max_coverage": {
+            "type": "integer",
+            "minimum": 100,
+            "default": 10000
+          }
+        },
+        "sample_filtering": {
+          "min_reads_per_sample": {
+            "type": "integer",
+            "minimum": 100,
+            "default": 1000
+          },
+          "max_missing_proportion": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 1,
+            "default": 0.5
+          }
+        },
+        "mirna_filtering": {
+          "min_samples_with_coverage": {
+            "type": "integer",
+            "minimum": 1,
+            "default": 3
+          },
+          "min_variants_per_mirna": {
+            "type": "integer",
+            "minimum": 0,
+            "default": 1
+          }
+        }
+      }
+    },
+    "analysis_parameters": {
+      "type": "object",
+      "description": "Analysis parameters and statistical settings",
+      "properties": {
+        "statistical": {
+          "alpha": {
+            "type": "number",
+            "minimum": 0.001,
+            "maximum": 0.1,
+            "default": 0.05
+          },
+          "fdr_method": {
+            "type": "string",
+            "enum": ["BH", "BY", "bonferroni", "holm"],
+            "default": "BH"
+          },
+          "n_permutations": {
+            "type": "integer",
+            "minimum": 100,
+            "maximum": 10000,
+            "default": 1000
+          }
+        },
+        "clustering": {
+          "methods": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "enum": ["ward", "hdbscan", "spectral", "kmeans"]
+            },
+            "default": ["ward", "hdbscan", "spectral"]
+          },
+          "k_range": {
+            "type": "array",
+            "items": {
+              "type": "integer",
+              "minimum": 2,
+              "maximum": 50
+            },
+            "minItems": 2,
+            "maxItems": 2,
+            "default": [2, 20]
+          }
+        },
+        "seed_region": {
+          "start_position": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 10,
+            "default": 2
+          },
+          "end_position": {
+            "type": "integer",
+            "minimum": 5,
+            "maximum": 15,
+            "default": 8
+          }
+        }
+      }
+    },
+    "output_validation": {
+      "type": "object",
+      "description": "Validation rules for output files",
+      "properties": {
+        "required_outputs": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "contains": {
+            "const": "sample_metadata.tsv"
+          },
+          "contains": {
+            "const": "qc_report.tsv"
+          },
+          "contains": {
+            "const": "global_gt_tests.tsv"
+          },
+          "contains": {
+            "const": "position_delta.tsv"
+          },
+          "contains": {
+            "const": "seed_vectors.tsv"
+          },
+          "contains": {
+            "const": "cluster_bias_tests.tsv"
+          },
+          "contains": {
+            "const": "mimic_seeds.tsv"
+          },
+          "contains": {
+            "const": "enrichment_results.tsv"
+          }
+        },
+        "required_figures": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "contains": {
+            "const": "gt_violin_by_group.png"
+          },
+          "contains": {
+            "const": "position_delta_curve.png"
+          },
+          "contains": {
+            "const": "seed_vs_nonseed_odds.png"
+          },
+          "contains": {
+            "const": "cluster_consensus_map.png"
+          },
+          "contains": {
+            "const": "enrichment_heatmap.png"
+          }
+        }
+      }
+    }
+  },
+  "required": [
+    "input_matrix",
+    "sample_metadata",
+    "mirna_sequences",
+    "quality_control",
+    "analysis_parameters",
+    "output_validation"
+  ],
+  "additionalProperties": false
+}
