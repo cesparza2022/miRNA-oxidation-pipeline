@@ -1,7 +1,13 @@
 # Snakemake outputs
 outputs/
-results/
 .snakemake/
+
+# Ignore results/ but allow specific subdirectories for GitHub
+results/*
+!results/pipeline_info/
+!results/pipeline_info/**
+!results/summary/
+!results/summary/**
 
 # Logs
 *.log
@@ -11,6 +17,7 @@ logs/
 # HTML viewers (automatically generated)
 viewers/
 *.html
+!results/summary/*.html
 
 # Python cache
 __pycache__/
@@ -143,6 +150,7 @@ renv/
 !package.json
 !nx.json
 !tsconfig*.json
+!results/summary/*.json
 
 # Remove scripts (keep only essential)
 *.sh
