@@ -92,7 +92,6 @@ PROPUESTA_*.md
 PROXIMOS_*.md
 PRUEBAS_*.md
 PUSH_*.md
-QUICK_START.md
 README_SIMPLE.md
 RESUMEN_*.md
 REVISION_*.md
@@ -107,10 +106,12 @@ VERIFICACION_*.md
 
 # Keep essential documentation (explicit exceptions)
 !README.md
+!QUICK_START.md
 !COMPREHENSIVE_PIPELINE_REVIEW.md
 !CRITICAL_EXPERT_REVIEW.md
 !SOFTWARE_VERSIONS.md
 !TESTING_PLAN.md
+!REVIEW_STEPS_3-7.md
 !docs/**/*.md
 
 # Remove duplicate/old directories
