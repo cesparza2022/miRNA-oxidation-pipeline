@@ -25,6 +25,17 @@ suppressPackageStartupMessages({
 # Load common functions
 source(snakemake@params[["functions"]], local = TRUE)
 
+# Load group comparison utilities for dynamic group detection
+group_functions_path <- if (!is.null(snakemake@params[["group_functions"]])) {
+  snakemake@params[["group_functions"]]
+} else {
+  "scripts/utils/group_comparison.R"
+}
+
+if (file.exists(group_functions_path)) {
+  source(group_functions_path, local = TRUE)
+}
+
 # Initialize logging
 log_file <- if (length(snakemake@log) > 0) snakemake@log[[1]] else {
   file.path(dirname(snakemake@output[[1]]), "functional_target_analysis.log")
@@ -88,6 +99,27 @@ significant_gt <- statistical_results %>%
 log_info(paste("Significant G>T mutations in seed region:", nrow(significant_gt)))
 log_info(paste("Unique miRNAs affected:", n_distinct(significant_gt$miRNA_name)))
 
+# Detect group mean columns dynamically
+mean_cols <- names(statistical_results)[str_detect(names(statistical_results), "_mean$")]
+if (length(mean_cols) >= 2) {
+  group_names <- str_replace(mean_cols, "_mean$", "")
+  group_names <- group_names[!group_names %in% c("ALS", "Control")][1:2]
+  if (length(group_names) >= 2) {
+    group1_name <- sort(group_names)[1]
+    group2_name <- sort(group_names)[2]
+    group1_mean_col <- paste0(group1_name, "_mean")
+    group2_mean_col <- paste0(group2_name, "_mean")
+  } else {
+    group1_mean_col <- "ALS_mean"
+    group2_mean_col <- "Control_mean"
+  }
+} else {
+  group1_mean_col <- "ALS_mean"
+  group2_mean_col <- "Control_mean"
+}
+
+log_info(paste("Using group mean columns:", group1_mean_col, "and", group2_mean_col))
+
 # ============================================================================
 # TARGET PREDICTION (Simplified approach)
 # ============================================================================
@@ -111,7 +143,10 @@ ALS_RELEVANT_GENES <- c(
 # Create target prediction table
 # In a real implementation, this would use actual target prediction algorithms
 target_analysis <- significant_gt %>%
-  select(miRNA_name, pos.mut, position, ALS_mean, Control_mean, log2_fold_change, t_test_fdr) %>%
+  select(miRNA_name, pos.mut, position, 
+         all_of(c(group1_mean_col, group2_mean_col)),  # Dynamic columns
+         ALS_mean, Control_mean,  # Backward compatibility
+         log2_fold_change, t_test_fdr) %>%
   mutate(
     # Simulate target prediction (in real implementation, use TargetScan/miRDB)
     # For demonstration, we create a structured output
