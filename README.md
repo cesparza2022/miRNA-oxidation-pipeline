@@ -103,9 +103,36 @@ hsa-miR-1-1,2:G>A,2,95,1,75,...
 ```
 
 **Required columns:**
-- `miRNA name`: miRNA identifier
-- `pos:mut`: Position and mutation (format: `position:mutation`)
+- `miRNA name` (or `miRNA_name`): miRNA identifier
+- `pos:mut` (or `pos.mut`): Position and mutation (format: `position:mutation`)
 - Sample columns: `SampleName_SNV` and `SampleName (PM+1MM+2MM)` pairs
+
+### 🎯 Flexible Group Assignment
+
+The pipeline supports **any group names** (not just "ALS" and "Control") through a metadata file system:
+
+**Option 1: Metadata File (Recommended)**
+```yaml
+# config.yaml
+paths:
+  data:
+    metadata: "sample_metadata.tsv"
+```
+
+```tsv
+# sample_metadata.tsv
+sample_id	group	batch	age	sex
+Sample1	Disease	Batch1	65	M
+Sample2	Control	Batch1	62	F
+```
+
+**Option 2: Pattern Matching (Fallback)**
+- If no metadata file provided, pipeline uses pattern matching
+- Searches for "ALS" → Disease group
+- Searches for "control" → Control group
+- Works automatically with existing data
+
+**See:** [Flexible Group System Documentation](docs/FLEXIBLE_GROUP_SYSTEM.md) for details
 
 ## 📈 Pipeline Steps
 
@@ -296,10 +323,11 @@ See `config/config.yaml.example` for detailed documentation.
 ## 📚 Documentation
 
 ### Essential Documentation
+* **🔄 Flexible Group System**: [docs/FLEXIBLE_GROUP_SYSTEM.md](docs/FLEXIBLE_GROUP_SYSTEM.md) - How to use any group names (not just ALS/Control) via metadata file
+* **🔧 How It Works**: [docs/HOW_IT_WORKS.md](docs/HOW_IT_WORKS.md) - Technical explanation of the flexible group system
+* **📊 Data Format**: [docs/DATA_FORMAT_AND_FLEXIBILITY.md](docs/DATA_FORMAT_AND_FLEXIBILITY.md) - Input data format and parsing details
 * **📊 Statistical Methodology**: [docs/METHODOLOGY.md](docs/METHODOLOGY.md) - Comprehensive documentation of statistical methods, assumptions validation, batch effects, and confounders
 * **🧪 Testing Plan**: [TESTING_PLAN.md](TESTING_PLAN.md) - Step-by-step testing plan for validating Phase 1 critical corrections
-* **📋 Questions Answered**: [SUMMARY_QUESTIONS_STEPS_3-7.md](SUMMARY_QUESTIONS_STEPS_3-7.md) - Executive summary of questions answered by Steps 3-7
-* **📖 Detailed Review**: [REVIEW_STEPS_3-7.md](REVIEW_STEPS_3-7.md) - Exhaustive review of Steps 3-7
 * **🔧 Software Versions**: [SOFTWARE_VERSIONS.md](SOFTWARE_VERSIONS.md) - All software and package versions
 * **🔬 Critical Expert Review**: [CRITICAL_EXPERT_REVIEW.md](CRITICAL_EXPERT_REVIEW.md) - Expert bioinformatics and statistical review
 

@@ -281,6 +281,56 @@ Sample3	Control
 
 ---
 
+## 🔄 How It Works (Technical Details)
+
+### Step-by-Step Flow
+
+1. **Script Execution:**
+   - Each R script loads `group_comparison.R` utilities
+   - Calls `extract_sample_groups(data, metadata_file = metadata_file)`
+
+2. **Group Detection:**
+   - If `metadata_file` provided in `config.yaml` → Loads from metadata
+   - If metadata not provided → Uses pattern matching on column names
+   - Validates groups (at least 2 groups, 2+ samples each)
+
+3. **Dynamic Column Generation:**
+   - Scripts detect group names from `groups_df`
+   - Generate column names dynamically: `{group_name}_mean`, `{group_name}_sd`
+   - Falls back to `ALS_mean`/`Control_mean` if dynamic columns not found
+
+4. **Visualization:**
+   - Labels use dynamic group names
+   - Colors assigned based on group names (configurable in `config.yaml`)
+   - Figures automatically adapt to group names
+
+### Example: Complete Workflow
+
+**Input:**
+```yaml
+# config.yaml
+paths:
+  data:
+    metadata: "sample_metadata.tsv"
+```
+
+**Metadata file:**
+```tsv
+sample_id	group
+Sample1	Parkinson
+Sample2	Parkinson
+Sample3	Healthy
+Sample4	Healthy
+```
+
+**Result:**
+- Groups detected: "Parkinson" (2 samples), "Healthy" (2 samples)
+- Tables: `Parkinson_mean`, `Healthy_mean`, `log2FoldChange`
+- Figures: Labels show "Parkinson vs Healthy"
+- Colors: Applied to Parkinson and Healthy groups
+
+---
+
 **Document Maintained By:** Pipeline Development Team  
 **Last Updated:** 2025-01-21
 

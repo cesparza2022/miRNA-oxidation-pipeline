@@ -191,6 +191,17 @@ log_info(paste("Top 10 families by SNV count:",
 
 log_subsection("Creating family summary table")
 
+# Detect group mean columns dynamically
+group1_mean_col <- paste0(group1_name, "_mean")
+group2_mean_col <- paste0(group2_name, "_mean")
+# Fallback to ALS/Control if dynamic columns not found
+if (!group1_mean_col %in% names(statistical_results)) {
+  group1_mean_col <- "ALS_mean"
+}
+if (!group2_mean_col %in% names(statistical_results)) {
+  group2_mean_col <- "Control_mean"
+}
+
 family_summary <- statistical_results %>%
   filter(in_seed == TRUE) %>%  # Focus on seed region
   group_by(family) %>%
@@ -201,12 +212,21 @@ family_summary <- statistical_results %>%
     avg_log2FC = mean(log2_fold_change, na.rm = TRUE),
     median_log2FC = median(log2_fold_change, na.rm = TRUE),
     n_significant = sum((t_test_fdr < alpha | wilcoxon_fdr < alpha) & !is.na(log2_fold_change), na.rm = TRUE),
-    avg_ALS_mean = mean(ALS_mean, na.rm = TRUE),
-    avg_Control_mean = mean(Control_mean, na.rm = TRUE),
+    avg_group1_mean = mean(!!sym(group1_mean_col), na.rm = TRUE),
+    avg_group2_mean = mean(!!sym(group2_mean_col), na.rm = TRUE),
+    # Backward compatibility columns
+    avg_ALS_mean = if ("ALS_mean" %in% names(statistical_results)) mean(ALS_mean, na.rm = TRUE) else NA_real_,
+    avg_Control_mean = if ("Control_mean" %in% names(statistical_results)) mean(Control_mean, na.rm = TRUE) else NA_real_,
     .groups = "drop"
   ) %>%
   mutate(
-    avg_oxidation_diff = avg_ALS_mean - avg_Control_mean,
+    avg_oxidation_diff = avg_group1_mean - avg_group2_mean,
+    # Backward compatibility
+    avg_oxidation_diff_legacy = if (!is.na(avg_ALS_mean) && !is.na(avg_Control_mean)) {
+      avg_ALS_mean - avg_Control_mean
+    } else {
+      avg_oxidation_diff
+    },
     pct_significant = (n_significant / n_mutations) * 100
   ) %>%
   arrange(desc(n_significant), desc(n_mutations))
