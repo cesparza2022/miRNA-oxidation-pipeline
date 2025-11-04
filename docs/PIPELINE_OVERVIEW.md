@@ -156,70 +156,40 @@ Raw Data (CSV)
 
 ---
 
-### Step 3: Functional Analysis
+### Step 7: Clustering Analysis ⭐ REORDERED (Now Step 4 in execution)
 
-**Purpose:** Understand biological impact of oxidized miRNAs.
-
-**What it does:**
-
-1. **Target Prediction:**
-   - Predicts mRNA targets for oxidized miRNAs
-   - Uses seed region sequences (positions 2-8)
-   - Calculates binding scores
-
-2. **Pathway Enrichment:**
-   - GO term enrichment (Biological Process, Molecular Function, Cellular Component)
-   - KEGG pathway enrichment
-   - Disease-relevant pathway identification
-
-3. **Disease-Relevant Genes:**
-   - Identifies targets that are ALS-relevant genes
-   - Calculates impact scores
-
-**Filters applied:**
-- Significant G>T mutations only
-- Seed region only (positions 2-8)
-- Log2FC threshold: `log2_fold_change > 1.0`
-
-**Outputs:**
-- 5 figures: Pathway enrichment, target comparison, position impact
-- 6 tables: Target analysis, GO enrichment, KEGG enrichment
-
----
-
-### Step 4: Biomarker Analysis
-
-**Purpose:** Evaluate diagnostic potential of oxidized miRNAs.
+**Purpose:** Identify groups of miRNAs with similar oxidation patterns.
 
 **What it does:**
-- ROC curve analysis for individual miRNAs
-- AUC calculation
-- Multi-miRNA signature identification
-- Sensitivity and specificity calculation
+- Hierarchical clustering of miRNAs
+- Identifies clusters (k=6)
+- Characterizes cluster patterns
 
 **Filters applied:**
 - Significant G>T mutations in seed region
-- Top 50 by log2FC (for ROC analysis)
 
 **Outputs:**
-- 2 figures: ROC curves, biomarker signature heatmap
-- 2 tables: ROC results, biomarker signatures
+- 2 figures: Cluster heatmap, dendrogram
+- 2 tables: Cluster assignments, cluster summary
 
-**Key metrics:**
-- AUC (Area Under Curve): >0.7 = good, >0.8 = excellent
-- Sensitivity: True positive rate
-- Specificity: True negative rate
+**Key insights:**
+- Which miRNAs co-oxidize
+- Groups of miRNAs with similar oxidation patterns
+- **Informs downstream analyses** (family, functional, biomarker)
+
+**Why this order?** Clustering discovers structure in the data, which informs family analysis, functional interpretation, and biomarker development.
 
 ---
 
-### Step 5: miRNA Family Analysis
+### Step 5: miRNA Family Analysis ⭐ REORDERED (Now Step 5 in execution)
 
-**Purpose:** Identify family-level oxidation patterns.
+**Purpose:** Identify family-level oxidation patterns and compare with clusters.
 
 **What it does:**
 - Groups miRNAs by family (let-7, miR-1, etc.)
 - Calculates family-level oxidation metrics
 - Compares families between groups
+- **Can compare clusters (from Step 7) with biological families**
 
 **Filters applied:**
 - Significant G>T mutations in seed region
@@ -231,10 +201,13 @@ Raw Data (CSV)
 **Key insights:**
 - Which families are most affected
 - Family-level conservation patterns
+- Do clusters match biological families?
+
+**Why this order?** After discovering clusters, we can check if they align with known biological families.
 
 ---
 
-### Step 6: Expression-Oxidation Correlation
+### Step 6: Expression-Oxidation Correlation ⭐ REORDERED (Now Step 6 in execution)
 
 **Purpose:** Examine relationship between miRNA expression and oxidation.
 
@@ -254,27 +227,75 @@ Raw Data (CSV)
 **Key question:**
 - Are highly expressed miRNAs more or less oxidized?
 
+**Why this order?** After understanding structure (clusters, families), we examine expression relationships.
+
 ---
 
-### Step 7: Clustering Analysis
+### Step 3: Functional Analysis ⭐ REORDERED (Now Step 7 in execution)
 
-**Purpose:** Identify groups of miRNAs with similar oxidation patterns.
+**Purpose:** Understand biological impact of oxidized miRNAs (with context from clustering/families).
 
 **What it does:**
-- Hierarchical clustering of miRNAs
-- Identifies clusters (k=6)
-- Characterizes cluster patterns
+
+1. **Target Prediction:**
+   - Predicts mRNA targets for oxidized miRNAs
+   - Uses seed region sequences (positions 2-8)
+   - Calculates binding scores
+   - **Can analyze functional implications of clusters and families**
+
+2. **Pathway Enrichment:**
+   - GO term enrichment (Biological Process, Molecular Function, Cellular Component)
+   - KEGG pathway enrichment
+   - Disease-relevant pathway identification
+
+3. **Disease-Relevant Genes:**
+   - Identifies targets that are ALS-relevant genes
+   - Calculates impact scores
+
+**Filters applied:**
+- Significant G>T mutations only
+- Seed region only (positions 2-8)
+- Log2FC threshold: `log2_fold_change > 1.0`
+
+**Outputs:**
+- 5 figures: Pathway enrichment, target comparison, position impact
+- 6 tables: Target analysis, GO enrichment, KEGG enrichment
+
+**Key insights:**
+- Which pathways are affected
+- Which ALS-relevant genes are targeted
+- Functional impact of oxidation
+- Functional implications of co-oxidized clusters
+
+**Why this order?** Functional analysis benefits from context: knowing which miRNAs co-oxidize (clusters) and which families are affected helps interpret functional significance.
+
+---
+
+### Step 4: Biomarker Analysis ⭐ REORDERED (Now Step 8 - LAST in execution)
+
+**Purpose:** Evaluate diagnostic potential of oxidized miRNAs (integrating all previous insights).
+
+**What it does:**
+- ROC curve analysis for individual miRNAs
+- AUC calculation
+- Multi-miRNA signature identification
+- Sensitivity and specificity calculation
+- **Can incorporate cluster, family, expression, and functional information**
 
 **Filters applied:**
 - Significant G>T mutations in seed region
+- Top 50 by log2FC (for ROC analysis)
 
 **Outputs:**
-- 2 figures: Cluster heatmap, dendrogram
-- 2 tables: Cluster assignments, cluster summary
+- 2 figures: ROC curves, biomarker signature heatmap
+- 2 tables: ROC results, biomarker signatures
 
-**Key insights:**
-- Which miRNAs co-oxidize
-- Functional relationships between clusters
+**Key metrics:**
+- AUC (Area Under Curve): >0.7 = good, >0.8 = excellent
+- Sensitivity: True positive rate
+- Specificity: True negative rate
+
+**Why this order?** Biomarker analysis integrates all insights: statistical significance, clustering patterns, family relationships, expression correlations, and functional relevance.
 
 ---
 
@@ -305,6 +326,17 @@ Functional/Biomarker/Family/Clustering Results
 3. **G>T only** → Step 2
 4. **Significant + Log2FC** → Step 2 results
 5. **Seed region (2-8)** → Steps 3-7
+
+### Analysis Flow Logic
+
+**Discovery → Description → Interpretation → Integration**
+
+1. **Step 1-2**: Exploratory and statistical identification
+2. **Step 7**: Structure discovery (clustering) ⭐ REORDERED
+3. **Step 5**: Biological grouping (families) ⭐ REORDERED
+4. **Step 6**: Relationship analysis (expression) ⭐ REORDERED
+5. **Step 3**: Functional interpretation (with context) ⭐ REORDERED
+6. **Step 4**: Biomarker integration (all insights) ⭐ REORDERED - LAST
 
 ---
 
