@@ -1,23 +1,28 @@
 # Snakemake outputs
 outputs/
+results/
 .snakemake/
 
 # Logs
 *.log
 logs/
+**/logs/
 
 # HTML viewers (generados automáticamente)
-viewers/*.html
+viewers/
+*.html
 
 # Python cache
 __pycache__/
 *.pyc
 *.pyo
 
-# R cache
+# R cache and environment
 .Rhistory
 .RData
 .Rproj.user/
+renv/
+renv.lock
 
 # OS files
 .DS_Store
@@ -45,7 +50,6 @@ config/config.yaml
 # Large output files
 *.png
 *.pdf
-*.html
 
 # IDE files
 .vscode/
@@ -56,3 +60,76 @@ config/config.yaml
 *.bak
 *.backup
 *_old.*
+
+# Documentation - Internal/Development (keep only essential)
+# These are temporary planning documents, not needed for pipeline execution
+ACTUALIZACION_*.md
+ADAPTACION_*.md
+ALS_Neuronal_miRNAs.md
+ANALISIS_*.md
+COMMITS_*.md
+COMO_FUNCIONA_*.md
+CONECTAR_*.md
+CORRECCIONES_*.md
+DIAGRAMA_*.md
+ESTADO_*.md
+EXPLICACION_*.md
+FASE*.md
+GUIA_*.md
+IMPLEMENTACION_*.md
+INSTALACION_*.md
+INVENTARIO_*.md
+OPCIONES_*.md
+OPTIMIZACIONES_*.md
+ORGANIZACION_*.md
+PASO*.md
+PASOS_*.md
+PLAN_*.md
+PREPARACION_*.md
+PROPUESTA_*.md
+PROXIMOS_*.md
+PRUEBAS_*.md
+PUSH_*.md
+QUICK_START.md
+README_SIMPLE.md
+RESUMEN_*.md
+REVISION_*.md
+SETUP.md
+STEP*.md
+TAREA_*.md
+VALIDACIONES_*.md
+VERIFICACION_*.md
+
+# Keep essential documentation (explicit exceptions)
+!README.md
+!SOFTWARE_VERSIONS.md
+!REVIEW_STEPS_3-7.md
+!RESUMEN_PREGUNTAS_STEPS_3-7.md
+
+# Keep docs/ subdirectory (if it has essential content)
+!docs/STEP3_*.md
+!docs/UMBRALES_*.md
+
+# Duplicate directories
+final_analysis/
+
+# Scripts and other non-essential files
+*.sh
+!setup.sh
+!run.sh
+push_to_github.sh
+setup_github.sh
+
+# Other temporary files
+*.fasta
+*.sam
+*.xlsx
+*.docx
+*.pdf
+*.png
+*.zip
+*.pkg
+*.tgz
+*.json
+!data_schema.json
+!package.json
