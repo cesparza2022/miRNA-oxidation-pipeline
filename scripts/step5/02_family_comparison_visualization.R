@@ -27,6 +27,17 @@ suppressPackageStartupMessages({
 source(snakemake@params[["functions"]], local = TRUE)
 # Theme is loaded via functions_common.R
 
+# Load group comparison utilities for dynamic group detection
+group_functions_path <- if (!is.null(snakemake@params[["group_functions"]])) {
+  snakemake@params[["group_functions"]]
+} else {
+  "scripts/utils/group_comparison.R"
+}
+
+if (file.exists(group_functions_path)) {
+  source(group_functions_path, local = TRUE)
+}
+
 # Initialize logging
 log_file <- if (length(snakemake@log) > 0) snakemake@log[[1]] else {
   file.path(dirname(snakemake@output[[1]]), "family_visualization.log")
@@ -72,6 +83,41 @@ family_comparison <- read_csv(input_family_comparison, show_col_types = FALSE)
 log_info(paste("Loaded family summary:", nrow(family_summary), "families"))
 log_info(paste("Loaded family comparison:", nrow(family_comparison), "families"))
 
+# Detect group names from family_comparison columns
+# Look for group1_mean_vaf and group2_mean_vaf, or fallback to als_mean_vaf/control_mean_vaf
+if ("group1_mean_vaf" %in% names(family_comparison) && "group2_mean_vaf" %in% names(family_comparison)) {
+  # Extract group names from column names (remove _mean_vaf suffix)
+  group1_name <- str_replace("group1", "group1", 
+    if ("group1_mean_vaf" %in% names(family_comparison)) {
+      # Try to infer from other columns or use defaults
+      if ("avg_group1_mean" %in% names(family_summary)) {
+        str_replace(names(family_summary)[str_detect(names(family_summary), "avg_.*_mean")][1], "avg_|_mean", "")
+      } else {
+        "Group1"
+      }
+    } else {
+      "Group1"
+    })
+  group2_name <- "Group2"
+  
+  # Try to extract from column names in family_summary
+  mean_cols <- names(family_summary)[str_detect(names(family_summary), "avg_.*_mean$")]
+  if (length(mean_cols) >= 2) {
+    group_names <- str_replace(mean_cols, "avg_|_mean", "")
+    group_names <- group_names[!group_names %in% c("ALS", "Control")][1:2]
+    if (length(group_names) >= 2) {
+      group1_name <- group_names[1]
+      group2_name <- group_names[2]
+    }
+  }
+} else {
+  # Fallback: use ALS/Control
+  group1_name <- "ALS"
+  group2_name <- "Control"
+}
+
+log_info(paste("Detected groups:", group1_name, "vs", group2_name))
+
 # ============================================================================
 # PANEL A: Family Oxidation Comparison (ALS vs Control)
 # ============================================================================
@@ -79,21 +125,31 @@ log_info(paste("Loaded family comparison:", nrow(family_comparison), "families")
 log_subsection("Creating Panel A: Family Oxidation Comparison (separate figure)")
 
 # Prepare data for grouped barplot
+# Use dynamic columns if available, fallback to als_mean_vaf/control_mean_vaf
+vaf_cols <- if ("group1_mean_vaf" %in% names(family_comparison) && "group2_mean_vaf" %in% names(family_comparison)) {
+  c("group1_mean_vaf", "group2_mean_vaf")
+} else {
+  c("als_mean_vaf", "control_mean_vaf")
+}
+
 top_families <- family_comparison %>%
   arrange(desc(n_significant), desc(abs(vaf_difference))) %>%
   head(20)  # Top 20 families
 
 family_comparison_long <- top_families %>%
-  select(family, als_mean_vaf, control_mean_vaf, n_significant) %>%
+  select(family, all_of(vaf_cols), n_significant) %>%
   pivot_longer(
-    cols = c(als_mean_vaf, control_mean_vaf),
+    cols = all_of(vaf_cols),
     names_to = "Group",
     values_to = "Mean_VAF"
   ) %>%
   mutate(
     Group = case_when(
-      Group == "als_mean_vaf" ~ "ALS",
-      TRUE ~ "Control"
+      Group == vaf_cols[1] ~ group1_name,
+      Group == vaf_cols[2] ~ group2_name,
+      Group == "als_mean_vaf" ~ "ALS",  # Backward compatibility
+      Group == "control_mean_vaf" ~ "Control",  # Backward compatibility
+      TRUE ~ Group
     )
   )
 
@@ -106,13 +162,17 @@ top_family_significant <- top_families$n_significant[1]
 panel_a <- ggplot(family_comparison_long, aes(x = reorder(family, Mean_VAF), y = Mean_VAF, fill = Group)) +
   geom_bar(stat = "identity", position = "dodge", alpha = 0.85, width = 0.7) +
   scale_fill_manual(
-    values = c("ALS" = color_als, "Control" = color_control),
+    values = c(
+      setNames(c(color_als, color_control), c(group1_name, group2_name)),
+      "ALS" = color_als,  # Backward compatibility
+      "Control" = color_control  # Backward compatibility
+    ),
     name = "Group"
   ) +
   scale_y_continuous(expand = expansion(mult = c(0, 0.1))) +
   coord_flip() +
   labs(
-    title = "miRNA Family Oxidation Patterns: ALS vs Control",
+    title = paste0("miRNA Family Oxidation Patterns: ", group1_name, " vs ", group2_name),
     subtitle = paste("Top 20 families by significance | Seed region (", seed_start, "-", seed_end, ") |",
                      "Total families analyzed:", total_families),
     x = "miRNA Family",
@@ -153,6 +213,9 @@ heatmap_matrix <- heatmap_families %>%
     Log2FC = log2_fold_change,
     N_Significant = n_significant,
     N_Mutations = n_mutations,
+    Group1_Mean_VAF = if ("group1_mean_vaf" %in% names(.)) group1_mean_vaf else als_mean_vaf,
+    Group2_Mean_VAF = if ("group2_mean_vaf" %in% names(.)) group2_mean_vaf else control_mean_vaf,
+    # Backward compatibility
     ALS_Mean_VAF = als_mean_vaf,
     Control_Mean_VAF = control_mean_vaf
   ) %>%
@@ -162,10 +225,14 @@ heatmap_matrix <- heatmap_families %>%
     Log2FC_norm = scales::rescale(Log2FC, to = c(0, 1), na.rm = TRUE),
     N_Sig_norm = scales::rescale(N_Significant, to = c(0, 1)),
     N_Mut_norm = scales::rescale(N_Mutations, to = c(0, 1)),
+    Group1_VAF_norm = scales::rescale(Group1_Mean_VAF, to = c(0, 1)),
+    Group2_VAF_norm = scales::rescale(Group2_Mean_VAF, to = c(0, 1)),
+    # Backward compatibility
     ALS_VAF_norm = scales::rescale(ALS_Mean_VAF, to = c(0, 1)),
     Control_VAF_norm = scales::rescale(Control_Mean_VAF, to = c(0, 1))
   ) %>%
-  select(family, VAF_Diff_norm, Log2FC_norm, N_Sig_norm, N_Mut_norm, ALS_VAF_norm, Control_VAF_norm) %>%
+  select(family, VAF_Diff_norm, Log2FC_norm, N_Sig_norm, N_Mut_norm, 
+         Group1_VAF_norm, Group2_VAF_norm, ALS_VAF_norm, Control_VAF_norm) %>%
   column_to_rownames(var = "family") %>%
   as.matrix()
 

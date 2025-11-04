@@ -19,6 +19,17 @@ suppressPackageStartupMessages({
 # Load common functions
 source(snakemake@params[["functions"]], local = TRUE)
 
+# Load group comparison utilities for dynamic group detection
+group_functions_path <- if (!is.null(snakemake@params[["group_functions"]])) {
+  snakemake@params[["group_functions"]]
+} else {
+  "scripts/utils/group_comparison.R"
+}
+
+if (file.exists(group_functions_path)) {
+  source(group_functions_path, local = TRUE)
+}
+
 # Initialize logging
 log_file <- if (length(snakemake@log) > 0) snakemake@log[[1]] else {
   file.path(dirname(snakemake@output[[1]]), "clustering_analysis.log")
@@ -80,21 +91,52 @@ if ("pos:mut" %in% names(vaf_data)) {
 
 # Extract sample groups
 sample_cols <- setdiff(names(vaf_data), c("miRNA_name", "pos.mut", "miRNA name", "pos:mut"))
-sample_groups <- tibble(sample_id = sample_cols) %>%
-  mutate(
-    group = case_when(
-      str_detect(sample_id, regex("ALS", ignore_case = TRUE)) ~ "ALS",
-      str_detect(sample_id, regex("control|Control|CTRL", ignore_case = TRUE)) ~ "Control",
-      TRUE ~ NA_character_
-    )
-  ) %>%
-  filter(!is.na(group))
+# Get metadata file path from Snakemake params if available
+metadata_file <- if (!is.null(snakemake@params[["metadata_file"]])) {
+  metadata_path <- snakemake@params[["metadata_file"]]
+  if (metadata_path != "" && file.exists(metadata_path)) {
+    log_info(paste("Using metadata file:", metadata_path))
+    metadata_path
+  } else {
+    NULL
+  }
+} else {
+  NULL
+}
 
-als_samples <- sample_groups %>% filter(group == "ALS") %>% pull(sample_id)
-control_samples <- sample_groups %>% filter(group == "Control") %>% pull(sample_id)
+# Use flexible group extraction
+sample_groups <- tryCatch({
+  extract_sample_groups(vaf_data, metadata_file = metadata_file)
+}, error = function(e) {
+  handle_error(e, context = "Step 7.1 - Group Identification", exit_code = 1, log_file = log_file)
+})
 
-log_info(paste("ALS samples:", length(als_samples)))
-log_info(paste("Control samples:", length(control_samples)))
+# Get dynamic group names
+unique_groups <- sort(unique(sample_groups$group))
+if (length(unique_groups) < 2) {
+  stop("Need at least 2 groups for clustering. Found:", paste(unique_groups, collapse = ", "))
+}
+
+group1_name <- unique_groups[1]
+group2_name <- unique_groups[2]
+
+group1_samples <- sample_groups %>% filter(group == group1_name) %>% pull(sample_id)
+group2_samples <- sample_groups %>% filter(group == group2_name) %>% pull(sample_id)
+
+log_info(paste("Group 1 (", group1_name, ") samples:", length(group1_samples)))
+log_info(paste("Group 2 (", group2_name, ") samples:", length(group2_samples)))
+
+# For backward compatibility
+if (group1_name == "ALS" || str_detect(group1_name, regex("als|disease", ignore_case = TRUE))) {
+  als_samples <- group1_samples
+  control_samples <- group2_samples
+} else if (group2_name == "ALS" || str_detect(group2_name, regex("als|disease", ignore_case = TRUE))) {
+  als_samples <- group2_samples
+  control_samples <- group1_samples
+} else {
+  als_samples <- group1_samples
+  control_samples <- group2_samples
+}
 
 # ============================================================================
 # PREPARE DATA FOR CLUSTERING
@@ -195,8 +237,17 @@ cluster_summary <- cluster_assignments_df %>%
       summarise(
         n_mutations = n(),
         avg_log2FC = mean(log2_fold_change, na.rm = TRUE),
-        avg_ALS_mean = mean(ALS_mean, na.rm = TRUE),
-        avg_Control_mean = mean(Control_mean, na.rm = TRUE),
+        # Detect group mean columns dynamically
+        group1_mean_col <- paste0(group1_name, "_mean")
+        group2_mean_col <- paste0(group2_name, "_mean")
+        if (!group1_mean_col %in% names(significant_gt)) group1_mean_col <- "ALS_mean"
+        if (!group2_mean_col %in% names(significant_gt)) group2_mean_col <- "Control_mean"
+        
+        avg_group1_mean = mean(!!sym(group1_mean_col), na.rm = TRUE),
+        avg_group2_mean = mean(!!sym(group2_mean_col), na.rm = TRUE),
+        # Backward compatibility
+        avg_ALS_mean = if ("ALS_mean" %in% names(significant_gt)) mean(ALS_mean, na.rm = TRUE) else NA_real_,
+        avg_Control_mean = if ("Control_mean" %in% names(significant_gt)) mean(Control_mean, na.rm = TRUE) else NA_real_,
         .groups = "drop"
       ),
     by = "miRNA_name"
@@ -206,9 +257,17 @@ cluster_summary <- cluster_assignments_df %>%
     n_miRNAs = n(),
     avg_n_mutations = mean(n_mutations, na.rm = TRUE),
     avg_log2FC = mean(avg_log2FC, na.rm = TRUE),
+    avg_group1_mean = mean(avg_group1_mean, na.rm = TRUE),
+    avg_group2_mean = mean(avg_group2_mean, na.rm = TRUE),
+    avg_oxidation_diff = mean(avg_group1_mean - avg_group2_mean, na.rm = TRUE),
+    # Backward compatibility
     avg_ALS_mean = mean(avg_ALS_mean, na.rm = TRUE),
     avg_Control_mean = mean(avg_Control_mean, na.rm = TRUE),
-    avg_oxidation_diff = mean(avg_ALS_mean - avg_Control_mean, na.rm = TRUE),
+    avg_oxidation_diff_legacy = if (!all(is.na(avg_ALS_mean)) && !all(is.na(avg_Control_mean))) {
+      mean(avg_ALS_mean - avg_Control_mean, na.rm = TRUE)
+    } else {
+      avg_oxidation_diff
+    },
     .groups = "drop"
   ) %>%
   arrange(desc(avg_oxidation_diff))
