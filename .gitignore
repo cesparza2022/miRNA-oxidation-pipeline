@@ -114,6 +114,11 @@ VERIFICACION_*.md
 !REVIEW_STEPS_3-7.md
 !docs/**/*.md
 
+# Remove duplicate/old documentation files
+COMPREHENSIVE_REVIEW.md
+README_SIMPLE.md
+TESTING_RESULTS.md
+
 # Remove duplicate/old directories
 final_analysis/
 first_step/
