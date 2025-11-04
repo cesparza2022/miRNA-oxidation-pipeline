@@ -28,6 +28,17 @@ suppressPackageStartupMessages({
 source(snakemake@params[["functions"]], local = TRUE)
 # Theme is loaded via functions_common.R
 
+# Load group comparison utilities for dynamic group detection
+group_functions_path <- if (!is.null(snakemake@params[["group_functions"]])) {
+  snakemake@params[["group_functions"]]
+} else {
+  "scripts/utils/group_comparison.R"
+}
+
+if (file.exists(group_functions_path)) {
+  source(group_functions_path, local = TRUE)
+}
+
 # Initialize logging
 log_file <- if (length(snakemake@log) > 0) snakemake@log[[1]] else {
   file.path(dirname(snakemake@output[[1]]), "biomarker_roc_analysis.log")
@@ -79,23 +90,56 @@ if ("pos:mut" %in% names(vaf_data)) {
   vaf_data <- vaf_data %>% rename(pos.mut = `pos:mut`)
 }
 
-# Extract sample groups
+# Extract sample groups (dynamic - supports metadata file or pattern matching)
 sample_cols <- setdiff(names(vaf_data), c("miRNA_name", "pos.mut", "miRNA name", "pos:mut"))
-sample_groups <- tibble(sample_id = sample_cols) %>%
-  mutate(
-    group = case_when(
-      str_detect(sample_id, regex("ALS", ignore_case = TRUE)) ~ "ALS",
-      str_detect(sample_id, regex("control|Control|CTRL", ignore_case = TRUE)) ~ "Control",
-      TRUE ~ NA_character_
-    )
-  ) %>%
-  filter(!is.na(group))
 
-als_samples <- sample_groups %>% filter(group == "ALS") %>% pull(sample_id)
-control_samples <- sample_groups %>% filter(group == "Control") %>% pull(sample_id)
+# Get metadata file path from Snakemake params if available
+metadata_file <- if (!is.null(snakemake@params[["metadata_file"]])) {
+  metadata_path <- snakemake@params[["metadata_file"]]
+  if (metadata_path != "" && file.exists(metadata_path)) {
+    log_info(paste("Using metadata file:", metadata_path))
+    metadata_path
+  } else {
+    NULL
+  }
+} else {
+  NULL
+}
 
-log_info(paste("ALS samples:", length(als_samples)))
-log_info(paste("Control samples:", length(control_samples)))
+# Use flexible group extraction
+sample_groups <- tryCatch({
+  extract_sample_groups(vaf_data, metadata_file = metadata_file)
+}, error = function(e) {
+  handle_error(e, context = "Step 4.1 - Group Identification", exit_code = 1, log_file = log_file)
+})
+
+# Get dynamic group names
+unique_groups <- sort(unique(sample_groups$group))
+if (length(unique_groups) < 2) {
+  stop("Need at least 2 groups for ROC analysis. Found:", paste(unique_groups, collapse = ", "))
+}
+
+group1_name <- unique_groups[1]  # Typically "Disease" or "ALS"
+group2_name <- unique_groups[2]  # Typically "Control"
+
+group1_samples <- sample_groups %>% filter(group == group1_name) %>% pull(sample_id)
+group2_samples <- sample_groups %>% filter(group == group2_name) %>% pull(sample_id)
+
+log_info(paste("Group 1 (", group1_name, ") samples:", length(group1_samples)))
+log_info(paste("Group 2 (", group2_name, ") samples:", length(group2_samples)))
+
+# For backward compatibility, also create als_samples and control_samples if they match
+if (group1_name == "ALS" || str_detect(group1_name, regex("als|disease", ignore_case = TRUE))) {
+  als_samples <- group1_samples
+  control_samples <- group2_samples
+} else if (group2_name == "ALS" || str_detect(group2_name, regex("als|disease", ignore_case = TRUE))) {
+  als_samples <- group2_samples
+  control_samples <- group1_samples
+} else {
+  # Use first group as "disease-like" and second as "control-like" for ROC
+  als_samples <- group1_samples  # Disease-like
+  control_samples <- group2_samples  # Control-like
+}
 
 # ============================================================================
 # PREPARE DATA FOR ROC ANALYSIS
@@ -153,11 +197,15 @@ for (i in 1:min(nrow(significant_gt), 30)) {  # Top 30 for computational efficie
   
   if (nrow(roc_data) < 10) next  # Need minimum samples
   
-  # Calculate ROC
+  # Calculate ROC (use dynamic group names)
+  # For ROC: response should be disease (positive) vs control (negative)
+  # Ensure group2_name is control-like and group1_name is disease-like
+  roc_data$group_factor <- factor(roc_data$group, levels = c(group2_name, group1_name))
+  
   tryCatch({
-    roc_obj <- roc(response = roc_data$group, 
+    roc_obj <- roc(response = roc_data$group_factor, 
                   predictor = roc_data$value,
-                  levels = c("Control", "ALS"),
+                  levels = c(group2_name, group1_name),  # Control-like first, then Disease-like
                   direction = "<")
     
     auc_value <- as.numeric(auc(roc_obj))
@@ -168,8 +216,19 @@ for (i in 1:min(nrow(significant_gt), 30)) {  # Top 30 for computational efficie
       pos.mut = pos_mut,
       AUC = auc_value,
       n_samples = nrow(roc_data),
-      n_ALS = sum(roc_data$group == "ALS"),
-      n_Control = sum(roc_data$group == "Control")
+      n_group1 = sum(roc_data$group == group1_name),
+      n_group2 = sum(roc_data$group == group2_name),
+      # Backward compatibility columns
+      n_ALS = if (group1_name == "ALS" || str_detect(group1_name, regex("als|disease", ignore_case = TRUE))) {
+        sum(roc_data$group == group1_name)
+      } else {
+        sum(roc_data$group == group2_name)
+      },
+      n_Control = if (group2_name == "Control" || str_detect(group2_name, regex("control|ctrl", ignore_case = TRUE))) {
+        sum(roc_data$group == group2_name)
+      } else {
+        sum(roc_data$group == group1_name)
+      }
     )
   }, error = function(e) {
     log_warning(paste("ROC failed for", snv_id, ":", e$message))
@@ -235,7 +294,7 @@ if (nrow(top_biomarkers) > 0) {
       tryCatch({
         combined_roc <- roc(response = signature_data$group,
                             predictor = signature_data$Combined_Score,
-                            levels = c("Control", "ALS"),
+                            levels = c(group2_name, group1_name),  # Control-like first, then Disease-like
                             direction = "<")
         combined_auc <- as.numeric(auc(combined_roc))
         
@@ -254,8 +313,19 @@ if (nrow(top_biomarkers) > 0) {
           pos.mut = "Combined",
           AUC = combined_auc,
           n_samples = nrow(signature_data),
-          n_ALS = sum(signature_data$group == "ALS"),
-          n_Control = sum(signature_data$group == "Control"),
+          n_group1 = sum(signature_data$group == group1_name),
+          n_group2 = sum(signature_data$group == group2_name),
+          # Backward compatibility
+          n_ALS = if (group1_name == "ALS" || str_detect(group1_name, regex("als|disease", ignore_case = TRUE))) {
+            sum(signature_data$group == group1_name)
+          } else {
+            sum(signature_data$group == group2_name)
+          },
+          n_Control = if (group2_name == "Control" || str_detect(group2_name, regex("control|ctrl", ignore_case = TRUE))) {
+            sum(signature_data$group == group2_name)
+          } else {
+            sum(signature_data$group == group1_name)
+          },
           Biomarker_Quality = case_when(
             combined_auc >= 0.9 ~ "Excellent",
             combined_auc >= 0.8 ~ "Good",
@@ -326,7 +396,7 @@ for (i in 1:nrow(top_5)) {
     tryCatch({
       roc_obj <- roc(response = roc_data$group,
                     predictor = roc_data$value,
-                    levels = c("Control", "ALS"),
+                    levels = c(group2_name, group1_name),  # Control-like first, then Disease-like
                     direction = "<")
       
       roc_df <- tibble(
@@ -379,7 +449,7 @@ roc_plot <- ggplot(all_roc, aes(x = Specificity, y = Sensitivity, color = Label)
     subtitle = paste("Top", nrow(top_5), "individual biomarkers + combined signature | G>T mutations in seed region"),
     x = "1 - Specificity (False Positive Rate)",
     y = "Sensitivity (True Positive Rate)",
-    caption = paste("Analysis based on", length(als_samples), "ALS and", length(control_samples), "Control samples")
+    caption = paste("Analysis based on", length(group1_samples), group1_name, "and", length(group2_samples), group2_name, "samples")
   ) +
   theme_professional +
   theme(

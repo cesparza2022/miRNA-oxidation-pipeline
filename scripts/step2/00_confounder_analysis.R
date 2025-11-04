@@ -365,10 +365,20 @@ if (!is.null(output_balance_plot) && (!is.null(group_balance$age) || !is.null(gr
       filter(!is.na(age), group %in% unique_groups)
     
     if (nrow(age_data) > 0) {
-      # Get colors from config or use defaults
+      # Get colors from config or use defaults (dynamic based on group names)
       config <- snakemake@config
-      color_group1 <- if (!is.null(config$analysis$colors$als)) config$analysis$colors$als else "#D62728"
-      color_group2 <- if (!is.null(config$analysis$colors$control)) config$analysis$colors$control else "grey60"
+      # Use dynamic color assignment - if group1_name is "ALS" or contains "Disease", use als color
+      color_group1 <- if (group1_name == "ALS" || str_detect(group1_name, regex("disease|als", ignore_case = TRUE))) {
+        if (!is.null(config$analysis$colors$als)) config$analysis$colors$als else "#D62728"
+      } else {
+        if (!is.null(config$analysis$colors$gt)) config$analysis$colors$gt else "#D62728"
+      }
+      # Use dynamic color assignment - if group2_name is "Control" or contains "control", use control color
+      color_group2 <- if (group2_name == "Control" || str_detect(group2_name, regex("control|ctrl", ignore_case = TRUE))) {
+        if (!is.null(config$analysis$colors$control)) config$analysis$colors$control else "grey60"
+      } else {
+        "grey60"  # Default for other groups
+      }
       
       group_colors <- setNames(c(color_group1, color_group2), unique_groups)
       
