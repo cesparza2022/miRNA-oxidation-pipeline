@@ -1,0 +1,95 @@
+{
+  "pipeline": {
+    "name": "ALS miRNA Oxidation Analysis",
+    "version": "1.0.0",
+    "execution_date": "2025-11-03",
+    "status": "completed"
+  },
+  "outputs": {
+    "step1": {
+      "figures": 6,
+      "tables": 4
+    },
+    "total_figures": 19,
+    "total_tables": 13
+  },
+  "statistical_results": {
+    "total_mutations_analyzed": 5448,
+    "significant_mutations": 269,
+    "significant_t_test": 23,
+    "significant_wilcoxon": 265,
+    "significant_percentage": 4.94
+  },
+  "top_findings": [
+    {
+      "rank": 1,
+      "miRNA_name": "hsa-let-7a-5p",
+      "position": "10:AC",
+      "log2_fold_change": "-Inf",
+      "fdr": 0.4544
+    },
+    {
+      "rank": 2,
+      "miRNA_name": "hsa-let-7a-5p",
+      "position": "14:TA",
+      "log2_fold_change": "-Inf",
+      "fdr": 0.4544
+    },
+    {
+      "rank": 3,
+      "miRNA_name": "hsa-let-7a-5p",
+      "position": "18:TG",
+      "log2_fold_change": "-Inf",
+      "fdr": 0.4544
+    },
+    {
+      "rank": 4,
+      "miRNA_name": "hsa-let-7a-5p",
+      "position": "22:TG",
+      "log2_fold_change": "-Inf",
+      "fdr": 0.4544
+    },
+    {
+      "rank": 5,
+      "miRNA_name": "hsa-let-7a-5p",
+      "position": "7:AT",
+      "log2_fold_change": "-Inf",
+      "fdr": 0.4544
+    },
+    {
+      "rank": 6,
+      "miRNA_name": "hsa-let-7a-5p",
+      "position": "8:GA",
+      "log2_fold_change": "-Inf",
+      "fdr": 0.4544
+    },
+    {
+      "rank": 7,
+      "miRNA_name": "hsa-let-7b-5p",
+      "position": "12:GC",
+      "log2_fold_change": "-Inf",
+      "fdr": 0.4544
+    },
+    {
+      "rank": 8,
+      "miRNA_name": "hsa-let-7b-5p",
+      "position": "13:TA",
+      "log2_fold_change": "-Inf",
+      "fdr": 0.4544
+    },
+    {
+      "rank": 9,
+      "miRNA_name": "hsa-let-7b-5p",
+      "position": "16:TA",
+      "log2_fold_change": "-Inf",
+      "fdr": 0.4544
+    },
+    {
+      "rank": 10,
+      "miRNA_name": "hsa-let-7b-5p",
+      "position": "16:TG",
+      "log2_fold_change": "-Inf",
+      "fdr": 0.4544
+    }
+  ]
+}

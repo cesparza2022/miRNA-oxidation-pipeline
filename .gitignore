@@ -1,0 +1,58 @@
+# Snakemake outputs
+outputs/
+.snakemake/
+
+# Logs
+*.log
+logs/
+
+# HTML viewers (generados automáticamente)
+viewers/*.html
+
+# Python cache
+__pycache__/
+*.pyc
+*.pyo
+
+# R cache
+.Rhistory
+.RData
+.Rproj.user/
+
+# OS files
+.DS_Store
+Thumbs.db
+*.swp
+*.swo
+*~
+
+# Temporary files
+*.tmp
+*.temp
+
+# Conda environments (si se crean localmente)
+.env
+.conda/
+
+# Configuration with user-specific paths (use config.yaml.example instead)
+config/config.yaml
+
+# Data files (too large for git)
+*.csv
+*.txt
+!example_data/*.csv  # Keep example data small
+
+# Large output files
+*.png
+*.pdf
+*.html
+
+# IDE files
+.vscode/
+.idea/
+*.Rproj
+
+# Backup files
+*.bak
+*.backup
+*_old.*
