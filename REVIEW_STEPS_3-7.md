@@ -1,61 +1,61 @@
-# 📋 REVISIÓN EXHAUSTIVA: Steps 3-7 del Pipeline
+# 📋 EXHAUSTIVE REVIEW: Steps 3-7 of the Pipeline
 
-## 🎯 OBJETIVO
-Este documento revisa críticamente qué preguntas responden los Steps 3-7, qué datos específicos utilizan, cómo generan outputs, y su coherencia con el estilo del pipeline.
+## 🎯 OBJECTIVE
+This document critically reviews what questions Steps 3-7 answer, what specific data they use, how they generate outputs, and their coherence with the pipeline style.
 
 ---
 
-## 📊 STEP 3: ANÁLISIS FUNCIONAL
+## 📊 STEP 3: FUNCTIONAL ANALYSIS
 
-### ❓ **Preguntas que Responde:**
+### ❓ **Questions Answered:**
 
-1. **¿Qué genes son afectados por la oxidación de miRNAs en la región semilla?**
-   - Identifica targets potenciales de miRNAs oxidados
-   - Compara targets canónicos vs oxidados
-   - Evalúa impacto funcional por posición
+1. **What genes are affected by miRNA oxidation in the seed region?**
+   - Identifies potential targets of oxidized miRNAs
+   - Compares canonical vs oxidized targets
+   - Evaluates functional impact by position
 
-2. **¿Qué vías biológicas están enriquecidas?**
-   - Análisis de enriquecimiento GO (Gene Ontology)
-   - Análisis de enriquecimiento KEGG (vías metabólicas)
-   - Identificación de vías específicas de ALS
+2. **What biological pathways are enriched?**
+   - GO (Gene Ontology) enrichment analysis
+   - KEGG (metabolic pathways) enrichment analysis
+   - Identification of ALS-specific pathways
 
-3. **¿Qué genes relevantes para ALS son impactados?**
-   - Lista de 23 genes conocidos de ALS
-   - Análisis de impacto funcional por miRNA
-   - Scoring de impacto funcional
+3. **What ALS-relevant genes are impacted?**
+   - List of 23 known ALS genes
+   - Functional impact analysis by miRNA
+   - Functional impact scoring
 
-### 🔍 **Datos Utilizados (CRÍTICO):**
+### 🔍 **Data Used (CRITICAL):**
 
-**Filtro aplicado (igual que Steps 1-2):**
+**Filter applied (same as Steps 1-2):**
 ```r
 significant_gt <- statistical_results %>%
   filter(
-    str_detect(pos.mut, ":GT$"),                    # Solo mutaciones G>T
-    !is.na(t_test_fdr) | !is.na(wilcoxon_fdr),     # Tiene tests estadísticos
-    (t_test_fdr < alpha | wilcoxon_fdr < alpha),   # Significativo (FDR < 0.05)
+    str_detect(pos.mut, ":GT$"),                    # Only G>T mutations
+    !is.na(t_test_fdr) | !is.na(wilcoxon_fdr),     # Has statistical tests
+    (t_test_fdr < alpha | wilcoxon_fdr < alpha),   # Significant (FDR < 0.05)
     !is.na(log2_fold_change),
-    log2_fold_change > log2fc_threshold_step3       # Mayor en ALS (log2FC > 1.0)
+    log2_fold_change > log2fc_threshold_step3       # Higher in ALS (log2FC > 1.0)
   ) %>%
   mutate(
     position = as.numeric(str_extract(pos.mut, "^\\d+")),
     in_seed = position >= seed_start & position <= seed_end  # seed_start=2, seed_end=8
   ) %>%
-  filter(in_seed == TRUE) %>%  # ⚠️ SOLO REGIÓN SEMILLA (posiciones 2-8)
+  filter(in_seed == TRUE) %>%  # ⚠️ ONLY SEED REGION (positions 2-8)
   distinct(miRNA_name, pos.mut, .keep_all = TRUE)
 ```
 
-**✅ VERIFICACIÓN:**
-- ✅ Usa solo G>T en región semilla (2-8)
-- ✅ Filtra por significancia estadística (FDR < alpha)
-- ✅ Requiere log2FC > 1.0 (mayor en ALS)
-- ✅ Usa miRNAs más oxidados significativamente
+**✅ VERIFICATION:**
+- ✅ Uses only G>T in seed region (2-8)
+- ✅ Filters by statistical significance (FDR < alpha)
+- ✅ Requires log2FC > 1.0 (higher in ALS)
+- ✅ Uses significantly most oxidized miRNAs
 
-### 📁 **Formato de Output:**
+### 📁 **Output Format:**
 
-**Tablas (CSV):**
+**Tables (CSV):**
 - `results/step3/final/tables/functional/S3_target_analysis.csv`
-  - Columnas: `miRNA_name`, `pos.mut`, `position`, `ALS_mean`, `Control_mean`, `log2_fold_change`, `t_test_fdr`, `canonical_targets`, `oxidized_targets`, `binding_impact`, `functional_impact_score`
-  - Formato: CSV con `write_csv()` (readr)
+  - Columns: `miRNA_name`, `pos.mut`, `position`, `ALS_mean`, `Control_mean`, `log2_fold_change`, `t_test_fdr`, `canonical_targets`, `oxidized_targets`, `binding_impact`, `functional_impact_score`
+  - Format: CSV with `write_csv()` (readr)
   
 - `results/step3/final/tables/functional/S3_als_relevant_genes.csv`
 - `results/step3/final/tables/functional/S3_target_comparison.csv`
@@ -63,11 +63,11 @@ significant_gt <- statistical_results %>%
 - `results/step3/final/tables/functional/S3_kegg_enrichment.csv`
 - `results/step3/final/tables/functional/S3_als_pathways.csv`
 
-**Figuras (PNG):**
+**Figures (PNG):**
 - `results/step3/final/figures/step3_panelA_pathway_enrichment.png`
-  - Formato: PNG, 3000x2400px (12x10in @ 300 DPI)
-  - Función: `ggsave(output, plot, width=12, height=10, dpi=300, bg="white")`
-  - Tema: `theme_professional` (consistente con pipeline)
+  - Format: PNG, 3000x2400px (12x10in @ 300 DPI)
+  - Function: `ggsave(output, plot, width=12, height=10, dpi=300, bg="white")`
+  - Theme: `theme_professional` (consistent with pipeline)
   
 - `results/step3/final/figures/step3_panelB_als_genes_impact.png`
 - `results/step3/final/figures/step3_panelC_target_comparison.png`
@@ -79,44 +79,44 @@ significant_gt <- statistical_results %>%
 - `results/step3/final/logs/pathway_enrichment.log`
 - `results/step3/final/logs/complex_functional_viz.log`
 
-### 🎨 **Coherencia con Pipeline:**
+### 🎨 **Coherence with Pipeline:**
 
-✅ **Consistente:**
-- Usa `theme_professional` (mismo estilo que Steps 1-2)
-- Usa `functions_common.R` (logging, validación, colores)
-- Lee parámetros de `config.yaml` (alpha, seed_region, log2fc_threshold_step3)
-- Estructura de logging idéntica (initialize_logging, log_section, log_subsection)
-- Nomenclatura de archivos: `S3_*` (Step 3)
-- Colores: `color_gt = "#D62728"` (rojo para oxidación)
+✅ **Consistent:**
+- Uses `theme_professional` (same style as Steps 1-2)
+- Uses `functions_common.R` (logging, validation, colors)
+- Reads parameters from `config.yaml` (alpha, seed_region, log2fc_threshold_step3)
+- Identical logging structure (initialize_logging, log_section, log_subsection)
+- File nomenclature: `S3_*` (Step 3)
+- Colors: `color_gt = "#D62728"` (red for oxidation)
 
-❌ **Puntos de Mejora Potenciales:**
-- Target prediction es simplificada (usa placeholders en lugar de TargetScan/miRDB real)
-- Enriquecimiento GO/KEGG es simulado (en implementación real usaría clusterProfiler)
+❌ **Potential Improvement Points:**
+- Target prediction is simplified (uses placeholders instead of real TargetScan/miRDB)
+- GO/KEGG enrichment is simulated (real implementation would use clusterProfiler)
 
 ---
 
-## 📊 STEP 4: ANÁLISIS DE BIOMARCADORES
+## 📊 STEP 4: BIOMARKER ANALYSIS
 
-### ❓ **Preguntas que Responde:**
+### ❓ **Questions Answered:**
 
-1. **¿Pueden los miRNAs oxidados usarse como biomarcadores diagnósticos?**
-   - ROC curves para cada miRNA individual
+1. **Can oxidized miRNAs be used as diagnostic biomarkers?**
+   - ROC curves for each individual miRNA
    - AUC (Area Under Curve) calculation
-   - Ranking de mejores biomarcadores
+   - Ranking of best biomarkers
 
-2. **¿Hay una firma combinada de múltiples miRNAs?**
-   - Signatura multi-miRNA
-   - ROC curve combinada
-   - Comparación de rendimiento individual vs combinado
+2. **Is there a combined signature of multiple miRNAs?**
+   - Multi-miRNA signature
+   - Combined ROC curve
+   - Individual vs combined performance comparison
 
-3. **¿Qué miRNAs tienen mejor capacidad diagnóstica?**
-   - Top 5-10 biomarcadores por AUC
-   - Sensibilidad y especificidad
-   - Heatmap de signaturas por muestra
+3. **Which miRNAs have better diagnostic capacity?**
+   - Top 5-10 biomarkers by AUC
+   - Sensitivity and specificity
+   - Signature heatmap by sample
 
-### 🔍 **Datos Utilizados (CRÍTICO):**
+### 🔍 **Data Used (CRITICAL):**
 
-**Filtro aplicado (igual que Step 3):**
+**Filter applied (same as Step 3):**
 ```r
 significant_gt <- statistical_results %>%
   filter(
@@ -130,67 +130,67 @@ significant_gt <- statistical_results %>%
     position = as.numeric(str_extract(pos.mut, "^\\d+")),
     in_seed = position >= seed_start & position <= seed_end
   ) %>%
-  filter(in_seed == TRUE) %>%  # ⚠️ SOLO REGIÓN SEMILLA
+  filter(in_seed == TRUE) %>%  # ⚠️ ONLY SEED REGION
   distinct(miRNA_name, pos.mut, .keep_all = TRUE) %>%
   arrange(desc(log2_fold_change)) %>%
-  head(50)  # Top 50 para análisis ROC
+  head(50)  # Top 50 for ROC analysis
 ```
 
-**✅ VERIFICACIÓN:**
-- ✅ Usa solo G>T en región semilla (2-8)
-- ✅ Filtra por significancia estadística
-- ✅ Requiere log2FC > 1.0
-- ✅ Selecciona top 50 por log2FC (mejores biomarcadores)
+**✅ VERIFICATION:**
+- ✅ Uses only G>T in seed region (2-8)
+- ✅ Filters by statistical significance
+- ✅ Requires log2FC > 1.0
+- ✅ Selects top 50 by log2FC (best biomarkers)
 
-### 📁 **Formato de Output:**
+### 📁 **Output Format:**
 
-**Tablas (CSV):**
+**Tables (CSV):**
 - `results/step4/final/tables/biomarkers/S4_roc_analysis.csv`
-  - Columnas: `SNV_id`, `miRNA_name`, `pos.mut`, `AUC`, `Sensitivity`, `Specificity`, `95%_CI_lower`, `95%_CI_upper`
-  - Incluye fila `COMBINED_SIGNATURE` con AUC de la firma combinada
+  - Columns: `SNV_id`, `miRNA_name`, `pos.mut`, `AUC`, `Sensitivity`, `Specificity`, `95%_CI_lower`, `95%_CI_upper`
+  - Includes `COMBINED_SIGNATURE` row with combined signature AUC
   
 - `results/step4/final/tables/biomarkers/S4_biomarker_signatures.csv`
-  - Columnas: `sample_id`, `group`, `signature_score`, `individual_biomarker_scores...`
+  - Columns: `sample_id`, `group`, `signature_score`, `individual_biomarker_scores...`
 
-**Figuras (PNG):**
+**Figures (PNG):**
 - `results/step4/final/figures/step4_roc_curves.png`
-  - Formato: PNG, 3000x2400px (12x10in @ 300 DPI)
-  - Múltiples curvas ROC (top 5 individuales + combinada)
-  - Tema: `theme_professional`
+  - Format: PNG, 3000x2400px (12x10in @ 300 DPI)
+  - Multiple ROC curves (top 5 individual + combined)
+  - Theme: `theme_professional`
   
 - `results/step4/final/figures/step4_biomarker_signature_heatmap.png`
-  - Heatmap de signaturas por muestra
-  - Colores: rojo para ALS, gris para Control
+  - Signature heatmap by sample
+  - Colors: red for ALS, gray for Control
 
-### 🎨 **Coherencia con Pipeline:**
+### 🎨 **Coherence with Pipeline:**
 
-✅ **Consistente:**
-- Usa `theme_professional`
-- Usa `functions_common.R`
-- Lee de `config.yaml`
-- Logging consistente
-- Nomenclatura: `S4_*`
-- Colores consistentes
+✅ **Consistent:**
+- Uses `theme_professional`
+- Uses `functions_common.R`
+- Reads from `config.yaml`
+- Consistent logging
+- Nomenclature: `S4_*`
+- Consistent colors
 
 ---
 
-## 📊 STEP 5: ANÁLISIS DE FAMILIAS
+## 📊 STEP 5: miRNA FAMILY ANALYSIS
 
-### ❓ **Preguntas que Responde:**
+### ❓ **Questions Answered:**
 
-1. **¿Qué familias de miRNAs son más afectadas por oxidación?**
-   - Identificación de familias (let-7, miR-X, etc.)
-   - Resumen de oxidación por familia
-   - Comparación ALS vs Control por familia
+1. **Which miRNA families are most affected by oxidation?**
+   - Family identification (let-7, miR-X, etc.)
+   - Oxidation summary by family
+   - ALS vs Control comparison by family
 
-2. **¿Hay familias con mayor susceptibilidad?**
-   - Ranking de familias por número de mutaciones
-   - Promedio de log2FC por familia
-   - Porcentaje de miRNAs significativos por familia
+2. **Are there families with higher susceptibility?**
+   - Family ranking by number of mutations
+   - Average log2FC by family
+   - Percentage of significant miRNAs by family
 
-### 🔍 **Datos Utilizados (CRÍTICO):**
+### 🔍 **Data Used (CRITICAL):**
 
-**Filtro aplicado:**
+**Filter applied:**
 ```r
 significant_gt_family <- statistical_results_family %>%
   filter(
@@ -204,132 +204,132 @@ significant_gt_family <- statistical_results_family %>%
     position = as.numeric(str_extract(pos.mut, "^\\d+")),
     in_seed = position >= seed_start & position <= seed_end
   ) %>%
-  filter(in_seed == TRUE)  # ⚠️ SOLO REGIÓN SEMILLA
+  filter(in_seed == TRUE)  # ⚠️ ONLY SEED REGION
 ```
 
-**✅ VERIFICACIÓN:**
-- ✅ Usa solo G>T en región semilla (2-8)
-- ✅ Filtra por significancia estadística
-- ✅ Requiere log2FC > 1.0
-- ✅ Agrupa por familia (let-7, miR-X)
+**✅ VERIFICATION:**
+- ✅ Uses only G>T in seed region (2-8)
+- ✅ Filters by statistical significance
+- ✅ Requires log2FC > 1.0
+- ✅ Groups by family (let-7, miR-X)
 
-### 📁 **Formato de Output:**
+### 📁 **Output Format:**
 
-**Tablas (CSV):**
+**Tables (CSV):**
 - `results/step5/final/tables/families/S5_family_summary.csv`
-  - Columnas: `family`, `n_miRNAs`, `n_mutations`, `n_seed_mutations`, `avg_log2FC`, `median_log2FC`, `n_significant`, `avg_ALS_mean`, `avg_Control_mean`, `avg_oxidation_diff`, `pct_significant`
+  - Columns: `family`, `n_miRNAs`, `n_mutations`, `n_seed_mutations`, `avg_log2FC`, `median_log2FC`, `n_significant`, `avg_ALS_mean`, `avg_Control_mean`, `avg_oxidation_diff`, `pct_significant`
   
 - `results/step5/final/tables/families/S5_family_comparison.csv`
-  - Columnas: `family`, `mean_vaf_ALS`, `mean_vaf_Control`, `vaf_difference`, `fold_change`, `log2_fold_change`, `n_miRNAs`, `n_mutations`, `n_significant`, `avg_log2FC`
+  - Columns: `family`, `mean_vaf_ALS`, `mean_vaf_Control`, `vaf_difference`, `fold_change`, `log2_fold_change`, `n_miRNAs`, `n_mutations`, `n_significant`, `avg_log2FC`
 
-**Figuras (PNG):**
+**Figures (PNG):**
 - `results/step5/final/figures/step5_panelA_family_oxidation_comparison.png`
-  - Barplot comparando ALS vs Control por familia
-  - Top 20 familias por diferencia de VAF
+  - Barplot comparing ALS vs Control by family
+  - Top 20 families by VAF difference
   
 - `results/step5/final/figures/step5_panelB_family_heatmap.png`
-  - Heatmap de log2FC y % significativo por familia
-  - Top 20 familias
+  - Heatmap of log2FC and % significant by family
+  - Top 20 families
 
-### 🎨 **Coherencia con Pipeline:**
+### 🎨 **Coherence with Pipeline:**
 
-✅ **Consistente:**
-- Usa `theme_professional`
-- Usa `functions_common.R`
-- Lee de `config.yaml`
-- Logging consistente
-- Nomenclatura: `S5_*`
-- Colores consistentes
+✅ **Consistent:**
+- Uses `theme_professional`
+- Uses `functions_common.R`
+- Reads from `config.yaml`
+- Consistent logging
+- Nomenclature: `S5_*`
+- Consistent colors
 
 ---
 
-## 📊 STEP 6: CORRELACIÓN EXPRESIÓN vs OXIDACIÓN
+## 📊 STEP 6: EXPRESSION vs OXIDATION CORRELATION
 
-### ❓ **Preguntas que Responde:**
+### ❓ **Questions Answered:**
 
-1. **¿Hay correlación entre expresión de miRNAs y oxidación?**
-   - Correlación de Pearson (r) entre RPM y G>T counts
-   - P-value de correlación
-   - Análisis de correlación de Spearman (robustez)
+1. **Is there a correlation between miRNA expression and oxidation?**
+   - Pearson correlation (r) between RPM and G>T counts
+   - Correlation p-value
+   - Robust analysis (Spearman correlation)
 
-2. **¿Los miRNAs más expresados son más oxidados?**
-   - Categorización por nivel de expresión (quintiles)
-   - Comparación de oxidación por categoría
-   - Identificación de miRNAs high-expression high-oxidation
+2. **Are more highly expressed miRNAs more oxidized?**
+   - Categorization by expression level (quintiles)
+   - Oxidation comparison by category
+   - Identification of high-expression high-oxidation miRNAs
 
-### 🔍 **Datos Utilizados (CRÍTICO):**
+### 🔍 **Data Used (CRITICAL):**
 
-**Filtro aplicado:**
+**Filter applied:**
 ```r
-# Para calcular oxidación:
+# To calculate oxidation:
 oxidation_data_per_mirna <- vaf_data %>%
-  semi_join(significant_gt, by = c("miRNA_name", "pos.mut")) %>%  # Solo significant G>T in seed
+  semi_join(significant_gt, by = c("miRNA_name", "pos.mut")) %>%  # Only significant G>T in seed
   pivot_longer(cols = all_of(sample_cols), names_to = "sample_id", values_to = "vaf") %>%
   mutate(
     position = as.numeric(str_extract(pos.mut, "^\\d+")),
     in_seed = position >= seed_start & position <= seed_end
   ) %>%
-  filter(in_seed == TRUE) %>%  # ⚠️ SOLO REGIÓN SEMILLA
+  filter(in_seed == TRUE) %>%  # ⚠️ ONLY SEED REGION
   group_by(miRNA_name) %>%
   summarise(total_gt_vaf = sum(vaf, na.rm = TRUE), .groups = "drop")
 ```
 
-**✅ VERIFICACIÓN:**
-- ✅ Usa solo G>T en región semilla (2-8)
-- ✅ Usa `significant_gt` (filtrado por significancia)
-- ✅ Calcula RPM desde datos raw (expresión)
-- ✅ Suma VAF de todos los G>T en seed por miRNA
+**✅ VERIFICATION:**
+- ✅ Uses only G>T in seed region (2-8)
+- ✅ Uses `significant_gt` (filtered by significance)
+- ✅ Calculates RPM from raw data (expression)
+- ✅ Sums VAF of all G>T in seed by miRNA
 
-### 📁 **Formato de Output:**
+### 📁 **Output Format:**
 
-**Tablas (CSV):**
+**Tables (CSV):**
 - `results/step6/final/tables/correlation/S6_expression_oxidation_correlation.csv`
-  - Columnas: `miRNA_name`, `estimated_rpm`, `total_gt_counts`, `total_gt_vaf`
-  - Datos por miRNA para scatterplot
+  - Columns: `miRNA_name`, `estimated_rpm`, `total_gt_counts`, `total_gt_vaf`
+  - Data by miRNA for scatterplot
   
 - `results/step6/final/tables/correlation/S6_expression_summary.csv`
-  - Columnas: `expression_category`, `n_miRNAs`, `mean_avg_rpm`, `median_avg_rpm`, `mean_total_gt_vaf`, `median_total_gt_vaf`
-  - Resumen por categoría de expresión (Low, Medium-Low, Medium, Medium-High, High)
+  - Columns: `expression_category`, `n_miRNAs`, `mean_avg_rpm`, `median_avg_rpm`, `mean_total_gt_vaf`, `median_total_gt_vaf`
+  - Summary by expression category (Low, Medium-Low, Medium, Medium-High, High)
 
-**Figuras (PNG):**
+**Figures (PNG):**
 - `results/step6/final/figures/step6_panelA_expression_vs_oxidation.png`
   - Scatterplot: RPM (log10) vs Total G>T VAF (log10)
-  - Regresión lineal con intervalo de confianza
-  - Anotación: r de Pearson, p-value
+  - Linear regression with confidence interval
+  - Annotation: Pearson r, p-value
   
 - `results/step6/final/figures/step6_panelB_expression_groups_comparison.png`
-  - Boxplot: Total G>T VAF por categoría de expresión
-  - 5 categorías de expresión
+  - Boxplot: Total G>T VAF by expression category
+  - 5 expression categories
 
-### 🎨 **Coherencia con Pipeline:**
+### 🎨 **Coherence with Pipeline:**
 
-✅ **Consistente:**
-- Usa `theme_professional`
-- Usa `functions_common.R`
-- Lee de `config.yaml`
-- Logging consistente
-- Nomenclatura: `S6_*`
-- Colores consistentes
+✅ **Consistent:**
+- Uses `theme_professional`
+- Uses `functions_common.R`
+- Reads from `config.yaml`
+- Consistent logging
+- Nomenclature: `S6_*`
+- Consistent colors
 
 ---
 
-## 📊 STEP 7: ANÁLISIS DE CLUSTERS
+## 📊 STEP 7: CLUSTERING ANALYSIS
 
-### ❓ **Preguntas que Responde:**
+### ❓ **Questions Answered:**
 
-1. **¿Hay grupos de miRNAs con patrones similares de oxidación?**
-   - Clustering jerárquico (hierarchical clustering)
-   - Identificación de clusters (k=6)
-   - Dendrograma mostrando relaciones
+1. **Are there groups of miRNAs with similar oxidation patterns?**
+   - Hierarchical clustering
+   - Cluster identification (k=6)
+   - Dendrogram showing relationships
 
-2. **¿Qué miRNAs tienen patrones de oxidación similares?**
-   - Heatmap de clusters
-   - Asignación de cluster por miRNA
-   - Resumen estadístico por cluster
+2. **Which miRNAs have similar oxidation patterns?**
+   - Cluster heatmap
+   - Cluster assignment by miRNA
+   - Statistical summary by cluster
 
-### 🔍 **Datos Utilizados (CRÍTICO):**
+### 🔍 **Data Used (CRITICAL):**
 
-**Filtro aplicado:**
+**Filter applied:**
 ```r
 significant_gt <- statistical_results %>%
   filter(
@@ -342,9 +342,9 @@ significant_gt <- statistical_results %>%
     position = as.numeric(str_extract(pos.mut, "^\\d+")),
     in_seed = position >= seed_start & position <= seed_end
   ) %>%
-  filter(in_seed == TRUE)  # ⚠️ SOLO REGIÓN SEMILLA
+  filter(in_seed == TRUE)  # ⚠️ ONLY SEED REGION
 
-# Matriz de clustering:
+# Clustering matrix:
 clustering_data <- vaf_data %>%
   filter(
     str_detect(pos.mut, ":GT$"),
@@ -354,83 +354,83 @@ clustering_data <- vaf_data %>%
     position = as.numeric(str_extract(pos.mut, "^\\d+")),
     in_seed = position >= seed_start & position <= seed_end
   ) %>%
-  filter(in_seed == TRUE) %>%  # ⚠️ SOLO REGIÓN SEMILLA
+  filter(in_seed == TRUE) %>%  # ⚠️ ONLY SEED REGION
   select(miRNA_name, all_of(sample_cols)) %>%
   group_by(miRNA_name) %>%
   summarise(across(all_of(sample_cols), ~ mean(.x, na.rm = TRUE)), .groups = "drop")
 ```
 
-**✅ VERIFICACIÓN:**
-- ✅ Usa solo G>T en región semilla (2-8)
-- ✅ Filtra por significancia estadística
-- ✅ Promedia VAF por miRNA (across samples)
-- ✅ Normaliza por z-score antes de clustering
+**✅ VERIFICATION:**
+- ✅ Uses only G>T in seed region (2-8)
+- ✅ Filters by statistical significance
+- ✅ Averages VAF by miRNA (across samples)
+- ✅ Normalizes by z-score before clustering
 
-### 📁 **Formato de Output:**
+### 📁 **Output Format:**
 
-**Tablas (CSV):**
+**Tables (CSV):**
 - `results/step7/final/tables/clusters/S7_cluster_assignments.csv`
-  - Columnas: `miRNA_name`, `cluster` (1-6)
-  - Asignación de cluster para cada miRNA
+  - Columns: `miRNA_name`, `cluster` (1-6)
+  - Cluster assignment for each miRNA
   
 - `results/step7/final/tables/clusters/S7_cluster_summary.csv`
-  - Columnas: `cluster`, `n_miRNAs`, `avg_n_mutations`, `avg_log2FC`, `avg_ALS_mean`, `avg_Control_mean`, `avg_oxidation_diff`
+  - Columns: `cluster`, `n_miRNAs`, `avg_n_mutations`, `avg_log2FC`, `avg_ALS_mean`, `avg_Control_mean`, `avg_oxidation_diff`
 
-**Figuras (PNG):**
+**Figures (PNG):**
 - `results/step7/final/figures/step7_panelA_cluster_heatmap.png`
-  - Heatmap: miRNAs (filas) x Samples (columnas)
-  - Anotación de clusters por color
-  - Normalizado por z-score
+  - Heatmap: miRNAs (rows) x Samples (columns)
+  - Cluster annotation by color
+  - Normalized by z-score
   
 - `results/step7/final/figures/step7_panelB_cluster_dendrogram.png`
-  - Dendrograma jerárquico
-  - Rectángulos de colores por cluster (k=6)
-  - Método: Ward.D2
+  - Hierarchical dendrogram
+  - Colored rectangles by cluster (k=6)
+  - Method: Ward.D2
 
-### 🎨 **Coherencia con Pipeline:**
+### 🎨 **Coherence with Pipeline:**
 
-✅ **Consistente:**
-- Usa `theme_professional` (para dendrogram base R plot)
-- Usa `functions_common.R`
-- Lee de `config.yaml`
-- Logging consistente
-- Nomenclatura: `S7_*`
-- Colores consistentes
+✅ **Consistent:**
+- Uses `theme_professional` (for dendrogram base R plot)
+- Uses `functions_common.R`
+- Reads from `config.yaml`
+- Consistent logging
+- Nomenclature: `S7_*`
+- Consistent colors
 
-⚠️ **Nota:** Panel B usa `base::plot()` en lugar de ggplot2 (normal para dendrogramas)
+⚠️ **Note:** Panel B uses `base::plot()` instead of ggplot2 (normal for dendrograms)
 
 ---
 
-## 📐 FORMATO DE OUTPUT: ESTÁNDARES DEL PIPELINE
+## 📐 OUTPUT FORMAT: PIPELINE STANDARDS
 
-### 📊 **Tablas (CSV):**
+### 📊 **Tables (CSV):**
 
-**Formato estándar:**
-- **Función:** `write_csv(data, file, ...)` (readr)
-- **Ubicación:** `results/stepX/final/tables/{category}/SX_description.csv`
-- **Nomenclatura:** `S{step_number}_{descriptive_name}.csv`
+**Standard format:**
+- **Function:** `write_csv(data, file, ...)` (readr)
+- **Location:** `results/stepX/final/tables/{category}/SX_description.csv`
+- **Nomenclature:** `S{step_number}_{descriptive_name}.csv`
 - **Encoding:** UTF-8
-- **Separador:** Coma (`,`)
-- **Headers:** Siempre presentes (primera fila)
+- **Separator:** Comma (`,`)
+- **Headers:** Always present (first row)
 
-**Ejemplo estructura:**
+**Example structure:**
 ```csv
 miRNA_name,pos.mut,position,ALS_mean,Control_mean,log2_fold_change,t_test_fdr
 hsa-miR-219a-2-3p,7:GT,7,181.88,2.40,6.25,5.34e-5
 ```
 
-### 📈 **Figuras (PNG):**
+### 📈 **Figures (PNG):**
 
-**Formato estándar:**
-- **Función:** `ggsave(file, plot, width, height, dpi, bg)`
-- **Ubicación:** `results/stepX/final/figures/stepX_panel{letter}_description.png`
-- **Nomenclatura:** `step{step_number}_panel{letter}_{descriptive_name}.png`
-- **Dimensiones:** 12x10 pulgadas (configurable en config.yaml)
+**Standard format:**
+- **Function:** `ggsave(file, plot, width, height, dpi, bg)`
+- **Location:** `results/stepX/final/figures/stepX_panel{letter}_description.png`
+- **Nomenclature:** `step{step_number}_panel{letter}_{descriptive_name}.png`
+- **Dimensions:** 12x10 inches (configurable in config.yaml)
 - **DPI:** 300 (publication quality)
-- **Fondo:** Blanco (`bg="white"`)
-- **Tema:** `theme_professional` (consistente)
+- **Background:** White (`bg="white"`)
+- **Theme:** `theme_professional` (consistent)
 
-**Parámetros configurables:**
+**Configurable parameters:**
 ```yaml
 analysis:
   figure:
@@ -439,23 +439,23 @@ analysis:
     dpi: 300
 ```
 
-**Ejemplo de código:**
+**Code example:**
 ```r
 ggsave(output_figure_a, panel_a,
-       width = fig_width,      # 12 (de config)
-       height = fig_height,    # 10 (de config)
-       dpi = fig_dpi,          # 300 (de config)
+       width = fig_width,      # 12 (from config)
+       height = fig_height,    # 10 (from config)
+       dpi = fig_dpi,          # 300 (from config)
        bg = "white")
 ```
 
 ### 📝 **Logs:**
 
-**Formato estándar:**
-- **Ubicación:** `results/stepX/final/logs/{script_name}.log`
-- **Formato:** Timestamped con niveles (INFO, SUCCESS, WARNING, ERROR)
-- **Función:** `initialize_logging()`, `log_info()`, `log_success()`, etc.
+**Standard format:**
+- **Location:** `results/stepX/final/logs/{script_name}.log`
+- **Format:** Timestamped with levels (INFO, SUCCESS, WARNING, ERROR)
+- **Functions:** `initialize_logging()`, `log_info()`, `log_success()`, etc.
 
-**Ejemplo:**
+**Example:**
 ```
 2025-11-03 19:04:04 [INFO] Input statistical: /path/to/file.csv
 2025-11-03 19:04:04 [SUCCESS] Loaded: 68968 SNVs
@@ -464,33 +464,33 @@ ggsave(output_figure_a, panel_a,
 
 ---
 
-## ✅ VERIFICACIÓN DE COHERENCIA
+## ✅ COHERENCE VERIFICATION
 
-### 🎨 **Estilo Visual:**
+### 🎨 **Visual Style:**
 
-✅ **Todos los steps usan:**
-- `theme_professional` (mismo tema base)
-- Colores consistentes: `color_gt = "#D62728"` (rojo)
-- Tamaños de fuente consistentes
-- Grid styling consistente
-- Captions y subtítulos con formato estándar
+✅ **All steps use:**
+- `theme_professional` (same base theme)
+- Consistent colors: `color_gt = "#D62728"` (red)
+- Consistent font sizes
+- Consistent grid styling
+- Standard format for captions and subtitles
 
-### 📊 **Datos:**
+### 📊 **Data:**
 
-✅ **Todos los steps filtran por:**
+✅ **All steps filter by:**
 - G>T mutations (`str_detect(pos.mut, ":GT$")`)
-- Región semilla (positions 2-8)
-- Significancia estadística (FDR < alpha)
-- Log2FC threshold (configurable, pero consistente)
+- Seed region (positions 2-8)
+- Statistical significance (FDR < alpha)
+- Log2FC threshold (configurable, but consistent)
 
-⚠️ **Variaciones justificadas:**
-- **Step 3:** log2fc_threshold_step3 = 1.0 (análisis funcional más estricto)
-- **Step 4:** Usa top 50 para ROC (eficiencia computacional)
-- **Step 6:** No requiere log2FC threshold (correlación exploratoria)
+⚠️ **Justified variations:**
+- **Step 3:** log2fc_threshold_step3 = 1.0 (more stringent functional analysis)
+- **Step 4:** Uses top 50 for ROC (computational efficiency)
+- **Step 6:** Does not require log2FC threshold (exploratory correlation)
 
-### 🔧 **Configuración:**
+### 🔧 **Configuration:**
 
-✅ **Todos los steps leen de config.yaml:**
+✅ **All steps read from config.yaml:**
 - `analysis.alpha` (FDR threshold)
 - `analysis.seed_region.start` (2)
 - `analysis.seed_region.end` (8)
@@ -498,9 +498,9 @@ ggsave(output_figure_a, panel_a,
 - `analysis.colors.gt` (#D62728)
 - `analysis.figure.width/height/dpi`
 
-### 📁 **Estructura de Archivos:**
+### 📁 **File Structure:**
 
-✅ **Consistente:**
+✅ **Consistent:**
 ```
 results/
   stepX/
@@ -517,83 +517,82 @@ results/
 
 ### 🧪 **Logging:**
 
-✅ **Todos los steps:**
-- Inicializan logging con `initialize_logging()`
-- Usan `log_section()`, `log_subsection()`, `log_info()`, `log_success()`
-- Timestamps consistentes
-- Manejo de errores con `tryCatch()`
+✅ **All steps:**
+- Initialize logging with `initialize_logging()`
+- Use `log_section()`, `log_subsection()`, `log_info()`, `log_success()`
+- Consistent timestamps
+- Error handling with `tryCatch()`
 
 ---
 
-## 🚨 PROBLEMAS IDENTIFICADOS Y RECOMENDACIONES
+## 🚨 IDENTIFIED PROBLEMS AND RECOMMENDATIONS
 
-### ❌ **Problemas Críticos:**
+### ❌ **Critical Problems:**
 
-1. **Step 3: Target Prediction Simplificada**
-   - **Problema:** Usa placeholders en lugar de bases de datos reales (TargetScan, miRDB)
-   - **Impacto:** Resultados no son biológicamente válidos
-   - **Recomendación:** Integrar con `multiMiR` o `targetscan.Hs.eg.db` (R packages)
+1. **Step 3: Simplified Target Prediction**
+   - **Problem:** Uses placeholders instead of real databases (TargetScan, miRDB)
+   - **Impact:** Results are not biologically valid
+   - **Recommendation:** Integrate with `multiMiR` or `targetscan.Hs.eg.db` (R packages)
 
-2. **Step 3: Enriquecimiento GO/KEGG Simulado**
-   - **Problema:** Usa datos simulados en lugar de `clusterProfiler`
-   - **Impacto:** Enriquecimientos no son reales
-   - **Recomendación:** Implementar con `clusterProfiler::enrichGO()` y `enrichKEGG()`
+2. **Step 3: Simulated GO/KEGG Enrichment**
+   - **Problem:** Uses simulated data instead of `clusterProfiler`
+   - **Impact:** Enrichments are not real
+   - **Recommendation:** Implement with `clusterProfiler::enrichGO()` and `enrichKEGG()`
 
-3. **Step 6: Reconstrucción de Datos en Visualización**
-   - **Problema:** Script de visualización reconstruye datos dummy para boxplot
-   - **Impacto:** Boxplot puede no reflejar datos reales
-   - **Recomendación:** Pasar `combined_data_categories` como output de Step 6.1
+3. **Step 6: Data Reconstruction in Visualization**
+   - **Problem:** Visualization script reconstructs dummy data for boxplot
+   - **Impact:** Boxplot may not reflect real data
+   - **Recommendation:** Pass `combined_data_categories` as output from Step 6.1
 
-### ⚠️ **Mejoras Recomendadas:**
+### ⚠️ **Recommended Improvements:**
 
-1. **Documentación de miRNAs/SNVs Específicos:**
-   - Agregar columnas `miRNAs_analyzed` y `SNVs_analyzed` a summary tables
-   - Incluir lista de miRNAs en logs de cada step
+1. **Documentation of Specific miRNAs/SNVs:**
+   - Add `miRNAs_analyzed` and `SNVs_analyzed` columns to summary tables
+   - Include list of miRNAs in logs of each step
 
-2. **Validación de Outputs:**
-   - Agregar validación de rangos (p-values entre 0-1, log2FC razonables)
-   - Verificar que todas las figuras se generaron correctamente
+2. **Output Validation:**
+   - Add range validation (p-values between 0-1, reasonable log2FC)
+   - Verify that all figures were generated correctly
 
-3. **Coherencia en Nomenclatura:**
-   - Algunos scripts usan `pos.mut`, otros `pos:mut` → normalizar a `pos.mut`
-
----
-
-## 📋 RESUMEN DE PREGUNTAS POR STEP
-
-| Step | Pregunta Principal | miRNAs/SNVs Usados | Output Principal |
-|------|-------------------|-------------------|------------------|
-| **Step 3** | ¿Qué genes/vías son afectadas? | G>T en seed (2-8), significativos, log2FC > 1.0 | 4 figuras + 6 tablas |
-| **Step 4** | ¿Pueden usarse como biomarcadores? | Top 50 G>T en seed significativos | 2 figuras + 2 tablas |
-| **Step 5** | ¿Qué familias son más afectadas? | G>T en seed significativos, agrupados por familia | 2 figuras + 2 tablas |
-| **Step 6** | ¿Hay correlación expresión-oxidación? | G>T en seed significativos, con datos de expresión | 2 figuras + 2 tablas |
-| **Step 7** | ¿Hay clusters de patrones similares? | G>T en seed significativos, agrupados por similitud | 2 figuras + 2 tablas |
+3. **Nomenclature Coherence:**
+   - Some scripts use `pos.mut`, others `pos:mut` → normalize to `pos.mut`
 
 ---
 
-## ✅ CONCLUSIÓN
+## 📋 SUMMARY OF QUESTIONS BY STEP
 
-**Coherencia General:** ✅ **EXCELENTE**
-
-- Todos los steps usan los mismos criterios de filtrado (G>T en seed, significativos)
-- Formato de output consistente (CSV para tablas, PNG para figuras)
-- Estilo visual coherente (`theme_professional`)
-- Configuración centralizada (`config.yaml`)
-- Logging consistente
-
-**Puntos Fuertes:**
-- ✅ Filtrado correcto de datos (solo más oxidados en seed)
-- ✅ Estructura de output organizada y clara
-- ✅ Reutilización de funciones comunes
-- ✅ Configuración flexible
-
-**Áreas de Mejora:**
-- ⚠️ Implementar target prediction real (Step 3)
-- ⚠️ Implementar enriquecimiento GO/KEGG real (Step 3)
-- ⚠️ Mejorar paso de datos entre scripts (Step 6)
+| Step | Main Question | miRNAs/SNVs Used | Main Output |
+|------|--------------|------------------|-------------|
+| **Step 3** | What genes/pathways are affected? | G>T in seed (2-8), significant, log2FC > 1.0 | 5 figures + 6 tables |
+| **Step 4** | Can they be used as biomarkers? | Top 50 G>T in seed significant | 2 figures + 2 tables |
+| **Step 5** | Which families are most affected? | G>T in seed significant, grouped by family | 2 figures + 2 tables |
+| **Step 6** | Is there expression-oxidation correlation? | G>T in seed significant, with expression data | 2 figures + 2 tables |
+| **Step 7** | Are there clusters of similar patterns? | G>T in seed significant, grouped by similarity | 2 figures + 2 tables |
 
 ---
 
-**Generado:** 2025-11-03  
-**Última actualización:** Revisión exhaustiva de Steps 3-7
+## ✅ CONCLUSION
 
+**General Coherence:** ✅ **EXCELLENT**
+
+- All steps use the same filtering criteria (G>T in seed, significant)
+- Consistent output format (CSV for tables, PNG for figures)
+- Coherent visual style (`theme_professional`)
+- Centralized configuration (`config.yaml`)
+- Consistent logging
+
+**Strengths:**
+- ✅ Correct data filtering (only most oxidized in seed)
+- ✅ Organized and clear output structure
+- ✅ Reuse of common functions
+- ✅ Flexible configuration
+
+**Areas for Improvement:**
+- ⚠️ Implement real target prediction (Step 3)
+- ⚠️ Implement real GO/KEGG enrichment (Step 3)
+- ⚠️ Improve data passing between scripts (Step 6)
+
+---
+
+**Generated:** 2025-11-03  
+**Last Updated:** Exhaustive review of Steps 3-7

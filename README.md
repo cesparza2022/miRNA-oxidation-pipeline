@@ -8,89 +8,89 @@ Reproducible Snakemake pipeline for analyzing G>T oxidation patterns in miRNAs a
 
 ## 🚀 Quick Start
 
-### Opción 1: Setup Automático (Recomendado) ⚡
+### Option 1: Automated Setup (Recommended) ⚡
 
 ```bash
 # 1. Clone repository
 git clone https://github.com/cesparza2022/als-mirna-oxidation-pipeline.git
-cd als-mirna-oxidation-pipeline/final_analysis/pipeline_definitivo/snakemake_pipeline
+cd als-mirna-oxidation-pipeline
 
-# 2. Ejecutar script de setup automático
-bash setup.sh --mamba  # Usa mamba (más rápido) o --conda para conda
+# 2. Run automated setup script
+bash setup.sh --mamba  # Use mamba (faster) or --conda for conda
 
-# 3. Activar ambiente
+# 3. Activate environment
 conda activate als_mirna_pipeline
 
-# 4. Configurar datos (editar ruta a tu archivo CSV)
-nano config/config.yaml  # Actualiza la ruta a tu archivo de datos
+# 4. Configure data (edit path to your CSV file)
+nano config/config.yaml  # Update the path to your data file
 
-# 5. Ejecutar pipeline (todo se genera automáticamente)
+# 5. Run pipeline (everything is generated automatically)
 snakemake -j 4
 
-# ✅ ¡Listo! Los resultados están en results/
+# ✅ Done! Results are in results/
 ```
 
-**📁 Estructura de Output Automática:**
+**📁 Automatic Output Structure:**
 ```
 results/
-├── step1/final/figures/      # 6 figuras PNG
-├── step1/final/tables/       # 6 tablas CSV
-├── step1_5/final/figures/    # 11 figuras PNG
-├── step1_5/final/tables/     # Datos filtrados y reportes
-├── step2/final/figures/      # 2 figuras PNG
-├── step2/final/tables/       # Resultados estadísticos
-├── viewers/                  # 3 viewers HTML interactivos
-├── summary/                  # Reporte consolidado
-└── validation/              # Reportes de validación
+├── step1/final/figures/      # 6 PNG figures
+├── step1/final/tables/        # 6 CSV tables
+├── step1_5/final/figures/    # 11 PNG figures
+├── step1_5/final/tables/     # Filtered data and reports
+├── step2/final/figures/      # 2 PNG figures
+├── step2/final/tables/       # Statistical results
+├── step3/final/figures/      # Functional analysis figures
+├── step3/final/tables/       # Functional analysis tables
+├── step4/final/figures/      # Biomarker analysis figures
+├── step4/final/tables/       # Biomarker analysis tables
+├── step5/final/figures/      # Family analysis figures
+├── step5/final/tables/       # Family analysis tables
+├── step6/final/figures/      # Expression-oxidation correlation figures
+├── step6/final/tables/       # Expression-oxidation correlation tables
+├── step7/final/figures/      # Clustering analysis figures
+├── step7/final/tables/       # Clustering analysis tables
+├── summary/                  # Consolidated report
+└── validation/               # Validation reports
 ```
 
-**Ver resultados:**
-```bash
-# Abrir viewers HTML
-open viewers/step1_viewer.html
-open summary/summary_report.html
-```
-
-### Opción 2: Setup Manual
+### Option 2: Manual Setup
 
 ```bash
 # 1. Clone repository
 git clone https://github.com/cesparza2022/als-mirna-oxidation-pipeline.git
-cd als-mirna-oxidation-pipeline/final_analysis/pipeline_definitivo/snakemake_pipeline
+cd als-mirna-oxidation-pipeline
 
-# 2. Crear ambiente conda/mamba
-conda env create -f environment.yaml
-# O con mamba (más rápido):
-# mamba env create -f environment.yaml
+# 2. Create conda/mamba environment
+conda env create -f environment.yml
+# Or with mamba (faster):
+# mamba env create -f environment.yml
 
-# 3. Activar ambiente
+# 3. Activate environment
 conda activate als_mirna_pipeline
 
-# 4. Configurar datos
+# 4. Configure data
 cp config/config.yaml.example config/config.yaml
-nano config/config.yaml  # Actualiza las rutas a tus datos
+nano config/config.yaml  # Update paths to your data
 
-# 5. Ejecutar pipeline
+# 5. Run pipeline
 snakemake -j 4
 ```
-
-**📚 Para instrucciones detalladas, consulta [SETUP.md](SETUP.md)**
 
 ## 📋 Requirements
 
-### Software Requerido
+### Required Software
 
-- **Conda** (Miniconda o Anaconda) o **Mamba** - [Instalar Miniconda](https://docs.conda.io/en/latest/miniconda.html)
-  - Mamba es más rápido y recomendado: [Instalar Mamba](https://mamba.readthedocs.io/en/latest/installation.html)
+- **Conda** (Miniconda or Anaconda) or **Mamba** - [Install Miniconda](https://docs.conda.io/en/latest/miniconda.html)
+  - Mamba is faster and recommended: [Install Mamba](https://mamba.readthedocs.io/en/latest/installation.html)
 
-### Dependencias del Pipeline (instaladas automáticamente)
+### Pipeline Dependencies (installed automatically)
 
 - **Python** 3.10+
 - **Snakemake** 7.32+
-- **R** 4.3.2+ (instalado via conda)
-- **Paquetes R:** ggplot2, dplyr, pheatmap, patchwork, ggrepel, viridis, y más
+- **R** 4.3.2+ (installed via conda)
+- **R packages:** ggplot2, dplyr, pheatmap, patchwork, ggrepel, viridis, and more
 
-**Nota:** Todas las dependencias se instalan automáticamente al crear el ambiente conda/mamba.
+**Note:** All dependencies are installed automatically when creating the conda/mamba environment.
 
 ## 📊 Input Format
 
@@ -134,29 +134,53 @@ hsa-miR-1-1,2:G>A,2,95,1,75,...
 - Effect size calculations
 - Volcano plots
 
+**Outputs:**
+- 2 figures (PNG, 300 DPI)
+- Statistical results tables (CSV)
+
 ### Step 3: Functional Analysis
 - Target prediction for oxidized miRNAs
 - GO and KEGG pathway enrichment
 - ALS-relevant genes impact
+
+**Outputs:**
+- 5 figures (PNG, 300 DPI)
+- 6 tables (CSV)
 
 ### Step 4: Biomarker Analysis
 - ROC curve analysis
 - AUC calculation
 - Multi-miRNA diagnostic signatures
 
+**Outputs:**
+- 2 figures (PNG, 300 DPI)
+- 2 tables (CSV)
+
 ### Step 5: miRNA Family Analysis
 - Family identification and grouping
 - Family-level oxidation patterns
 - ALS vs Control comparison by family
 
+**Outputs:**
+- 2 figures (PNG, 300 DPI)
+- 2 tables (CSV)
+
 ### Step 6: Expression vs Oxidation Correlation
 - Correlation between RPM and G>T mutations
 - Expression category analysis
+
+**Outputs:**
+- 2 figures (PNG, 300 DPI)
+- 2 tables (CSV)
 
 ### Step 7: Clustering Analysis
 - Hierarchical clustering of miRNAs
 - Cluster identification (k=6)
 - Pattern-based grouping
+
+**Outputs:**
+- 2 figures (PNG, 300 DPI)
+- 2 tables (CSV)
 
 ## 📦 Environment Setup
 
@@ -215,15 +239,25 @@ snakemake_pipeline/
 │   ├── step1/               # Step 1 analysis scripts
 │   ├── step1_5/             # Step 1.5 VAF QC scripts
 │   ├── step2/               # Step 2 statistical scripts
+│   ├── step3/               # Step 3 functional analysis scripts
+│   ├── step4/               # Step 4 biomarker analysis scripts
+│   ├── step5/               # Step 5 family analysis scripts
+│   ├── step6/               # Step 6 expression-oxidation correlation scripts
+│   ├── step7/               # Step 7 clustering analysis scripts
 │   └── utils/                # Shared utilities & validations
 ├── rules/                    # Snakemake rule files
 │   ├── output_structure.smk  # ⚡ Auto-creates output directories
 │   ├── step1.smk
 │   ├── step1_5.smk
 │   ├── step2.smk
-│   ├── viewers.smk
-│   ├── validation.smk       # Output validation
-│   └── ...
+│   ├── step3.smk
+│   ├── step4.smk
+│   ├── step5.smk
+│   ├── step6.smk
+│   ├── step7.smk
+│   ├── pipeline_info.smk     # Pipeline metadata generation
+│   ├── summary.smk           # Consolidated summary reports
+│   └── validation.smk       # Output validation
 ├── envs/                     # Conda environment files
 │   ├── r_base.yaml
 │   └── r_analysis.yaml
@@ -231,7 +265,11 @@ snakemake_pipeline/
     ├── step1/final/         # Figures + Tables
     ├── step1_5/final/       # Figures + Tables
     ├── step2/final/         # Figures + Tables
-    ├── viewers/             # HTML interactive reports
+    ├── step3/final/         # Figures + Tables
+    ├── step4/final/         # Figures + Tables
+    ├── step5/final/         # Figures + Tables
+    ├── step6/final/         # Figures + Tables
+    ├── step7/final/         # Figures + Tables
     ├── summary/             # Consolidated summaries
     └── validation/          # Validation reports
 ```
@@ -239,7 +277,6 @@ snakemake_pipeline/
 **📊 Output Organization:**
 - **Figures**: Automatically organized by step in `results/stepX/final/figures/`
 - **Tables**: Automatically organized by step in `results/stepX/final/tables/`
-- **Viewers**: HTML reports in `results/viewers/` and `viewers/`
 - **All directories created automatically** - no manual setup needed!
 
 ## ⚙️ Configuration
@@ -255,16 +292,10 @@ See `config/config.yaml.example` for detailed documentation.
 
 ## 📚 Documentation
 
-### Para Empezar
-* **⚡ Inicio Rápido**: `QUICK_START.md` - Empieza aquí (5 minutos)
-* **🛠️ Setup Completo**: `SETUP.md` - Guía detallada de instalación
-* **📖 Guía Paso a Paso**: `GUIA_USO_PASO_A_PASO.md`
-
-### Documentación Técnica
-* **📊 Estado de Viewers**: `ESTADO_VIEWERS.md`
-* **👁️ Guía de Viewers**: `GUIA_VIEWERS.md`
-* **⚙️ Optimizaciones**: `OPTIMIZACIONES_RENDIMIENTO.md`
-* **📈 Análisis de Estado**: `ANALISIS_OBJETIVO_vs_REALIDAD.md`
+### Essential Documentation
+* **📋 Questions Answered**: [RESUMEN_PREGUNTAS_STEPS_3-7.md](RESUMEN_PREGUNTAS_STEPS_3-7.md) - Executive summary of questions answered by Steps 3-7
+* **📖 Detailed Review**: [REVIEW_STEPS_3-7.md](REVIEW_STEPS_3-7.md) - Exhaustive review of Steps 3-7
+* **🔧 Software Versions**: [SOFTWARE_VERSIONS.md](SOFTWARE_VERSIONS.md) - All software and package versions
 
 ## 🔧 Troubleshooting
 
@@ -274,37 +305,37 @@ See `config/config.yaml.example` for detailed documentation.
 
 ### Error: "R package not found"
 - Activate conda environment: `conda activate als_mirna_pipeline`
-- Reinstall: `conda env update -f environment.yaml --prune`
+- Reinstall: `conda env update -f environment.yml --prune`
 
 ### Error: "Snakemake not found"
 
-* Verifica que el ambiente esté activado: `conda activate als_mirna_pipeline`
-* Si aún no está instalado:
+* Verify that the environment is activated: `conda activate als_mirna_pipeline`
+* If still not installed:
   ```bash
   conda install -c bioconda -c conda-forge snakemake
-  # o con mamba (más rápido):
+  # or with mamba (faster):
   mamba install -c bioconda -c conda-forge snakemake
   ```
 
 ### Error: "Conda/Mamba not found"
 
-**Instalar Miniconda (recomendado):**
+**Install Miniconda (recommended):**
 * **macOS**: `curl -O https://repo.anaconda.com/miniconda/Miniconda3-latest-MacOSX-arm64.sh && bash Miniconda3-latest-MacOSX-arm64.sh`
 * **Linux**: `wget https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh && bash Miniconda3-latest-Linux-x86_64.sh`
-* Reinicia tu terminal después de la instalación
+* Restart your terminal after installation
 
-**Instalar Mamba (opcional, más rápido):**
+**Install Mamba (optional, faster):**
 ```bash
 conda install mamba -n base -c conda-forge
 ```
 
-### Verificar Instalación
+### Verify Installation
 
 ```bash
-# Ejecutar script de verificación
+# Run verification script
 bash setup.sh --check
 
-# O manualmente
+# Or manually
 conda activate als_mirna_pipeline
 snakemake --version
 R --version
