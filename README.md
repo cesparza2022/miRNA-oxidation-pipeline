@@ -129,8 +129,11 @@ hsa-miR-1-1,2:G>A,2,95,1,75,...
 - 7 tables (CSV)
 
 ### Step 2: Statistical Comparisons
+- **Statistical assumptions validation** (normality, variance homogeneity)
+- **Batch effect analysis** (PCA, statistical testing, correction)
+- **Confounder analysis** (group balance assessment: age, sex)
 - ALS vs Control comparisons
-- Statistical testing (t-test, Wilcoxon)
+- Statistical testing (t-test, Wilcoxon) with automatic test selection
 - Effect size calculations
 - Volcano plots
 
@@ -293,9 +296,11 @@ See `config/config.yaml.example` for detailed documentation.
 ## 📚 Documentation
 
 ### Essential Documentation
+* **📊 Statistical Methodology**: [docs/METHODOLOGY.md](docs/METHODOLOGY.md) - Comprehensive documentation of statistical methods, assumptions validation, batch effects, and confounders
 * **📋 Questions Answered**: [SUMMARY_QUESTIONS_STEPS_3-7.md](SUMMARY_QUESTIONS_STEPS_3-7.md) - Executive summary of questions answered by Steps 3-7
 * **📖 Detailed Review**: [REVIEW_STEPS_3-7.md](REVIEW_STEPS_3-7.md) - Exhaustive review of Steps 3-7
 * **🔧 Software Versions**: [SOFTWARE_VERSIONS.md](SOFTWARE_VERSIONS.md) - All software and package versions
+* **🔬 Critical Expert Review**: [CRITICAL_EXPERT_REVIEW.md](CRITICAL_EXPERT_REVIEW.md) - Expert bioinformatics and statistical review
 
 ## 🔧 Troubleshooting
 
