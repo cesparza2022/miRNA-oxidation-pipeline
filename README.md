@@ -271,11 +271,19 @@ See `config/config.yaml.example` for detailed documentation.
 
 ## 📚 Documentation
 
-### Essential Documentation
+### Getting Started
+* **[Quick Start Guide](QUICK_START.md)** - Get running in 5 minutes
+* **[User Guide](docs/USER_GUIDE.md)** - Comprehensive usage instructions
+* **[Pipeline Overview](docs/PIPELINE_OVERVIEW.md)** - Scientific background and step descriptions
+* **[Documentation Index](docs/INDEX.md)** - Complete documentation index
+
+### Core Documentation
 * **🔄 Flexible Group System**: [docs/FLEXIBLE_GROUP_SYSTEM.md](docs/FLEXIBLE_GROUP_SYSTEM.md) - How to use any group names via metadata file
 * **🔧 How It Works**: [docs/HOW_IT_WORKS.md](docs/HOW_IT_WORKS.md) - Technical explanation of the flexible group system
 * **📊 Data Format**: [docs/DATA_FORMAT_AND_FLEXIBILITY.md](docs/DATA_FORMAT_AND_FLEXIBILITY.md) - Input data format and parsing details
 * **📊 Statistical Methodology**: [docs/METHODOLOGY.md](docs/METHODOLOGY.md) - Comprehensive documentation of statistical methods, assumptions validation, batch effects, and confounders
+
+### Reference Documents
 * **🧪 Testing Plan**: [TESTING_PLAN.md](TESTING_PLAN.md) - Step-by-step testing plan
 * **🔧 Software Versions**: [SOFTWARE_VERSIONS.md](SOFTWARE_VERSIONS.md) - All software and package versions
 * **🔬 Critical Expert Review**: [CRITICAL_EXPERT_REVIEW.md](CRITICAL_EXPERT_REVIEW.md) - Expert bioinformatics and statistical review
