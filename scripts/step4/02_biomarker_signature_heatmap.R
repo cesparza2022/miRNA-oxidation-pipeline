@@ -27,6 +27,17 @@ suppressPackageStartupMessages({
 # Load common functions
 source(snakemake@params[["functions"]], local = TRUE)
 
+# Load group comparison utilities for dynamic group detection
+group_functions_path <- if (!is.null(snakemake@params[["group_functions"]])) {
+  snakemake@params[["group_functions"]]
+} else {
+  "scripts/utils/group_comparison.R"
+}
+
+if (file.exists(group_functions_path)) {
+  source(group_functions_path, local = TRUE)
+}
+
 # Initialize logging
 log_file <- if (length(snakemake@log) > 0) snakemake@log[[1]] else {
   file.path(dirname(snakemake@output[[1]]), "biomarker_signature_heatmap.log")
@@ -70,15 +81,34 @@ if ("pos:mut" %in% names(vaf_data)) {
 
 # Extract sample groups
 sample_cols <- setdiff(names(vaf_data), c("miRNA_name", "pos.mut", "miRNA name", "pos:mut"))
-sample_groups <- tibble(sample_id = sample_cols) %>%
-  mutate(
-    group = case_when(
-      str_detect(sample_id, regex("ALS", ignore_case = TRUE)) ~ "ALS",
-      str_detect(sample_id, regex("control|Control|CTRL", ignore_case = TRUE)) ~ "Control",
-      TRUE ~ NA_character_
-    )
-  ) %>%
-  filter(!is.na(group))
+# Get metadata file path from Snakemake params if available
+metadata_file <- if (!is.null(snakemake@params[["metadata_file"]])) {
+  metadata_path <- snakemake@params[["metadata_file"]]
+  if (metadata_path != "" && file.exists(metadata_path)) {
+    log_info(paste("Using metadata file:", metadata_path))
+    metadata_path
+  } else {
+    NULL
+  }
+} else {
+  NULL
+}
+
+# Use flexible group extraction
+sample_groups <- tryCatch({
+  extract_sample_groups(vaf_data, metadata_file = metadata_file)
+}, error = function(e) {
+  handle_error(e, context = "Step 4.2 - Group Identification", exit_code = 1, log_file = log_file)
+})
+
+# Get dynamic group names
+unique_groups <- sort(unique(sample_groups$group))
+if (length(unique_groups) < 2) {
+  stop("Need at least 2 groups for heatmap. Found:", paste(unique_groups, collapse = ", "))
+}
+
+group1_name <- unique_groups[1]
+group2_name <- unique_groups[2]
 
 # Select top 15 biomarkers (or all if AUC < 0.7)
 # Since AUCs are low, we'll use top performers regardless of threshold
@@ -301,7 +331,15 @@ if (length(heatmap_matrix_list) > 0) {
     }
     
     # Color schemes (move inside the if block)
-    group_colors <- c("ALS" = color_gt, "Control" = color_control)
+    # Dynamic group colors
+    group_colors <- setNames(c(color_gt, color_control), c(group1_name, group2_name))
+    # For backward compatibility, also include ALS/Control if they exist
+    if ("ALS" %in% unique_groups) {
+      group_colors <- c(group_colors, "ALS" = color_gt)
+    }
+    if ("Control" %in% unique_groups) {
+      group_colors <- c(group_colors, "Control" = color_control)
+    }
     auc_colors <- colorRampPalette(c("white", color_gt))(100)
   
     # ============================================================================
@@ -313,9 +351,9 @@ if (length(heatmap_matrix_list) > 0) {
     if (nrow(heatmap_matrix_norm) > 0 && ncol(heatmap_matrix_norm) > 0 && nrow(biomarker_annotation) > 0) {
       png(output_heatmap, width = 16, height = 12, units = "in", res = 300)
       
-      # Calculate gap position (between Control and ALS groups)
-      n_control <- sum(sample_annotation$Group == "Control")
-      gap_pos <- if (n_control > 0 && n_control < nrow(sample_annotation)) n_control else NULL
+      # Calculate gap position (between groups)
+      n_group2 <- sum(sample_annotation$Group == group2_name)
+      gap_pos <- if (n_group2 > 0 && n_group2 < nrow(sample_annotation)) n_group2 else NULL
       
       pheatmap(
         heatmap_matrix_norm,
