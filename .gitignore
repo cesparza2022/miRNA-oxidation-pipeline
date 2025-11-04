@@ -160,3 +160,24 @@ test_*.sh
 test_*.md
 .taskmaster/
 .cursor/
+
+# Additional files to ignore
+*.pdf
+*.docx
+*.xlsx
+*.pptx
+*.jpeg
+*.jpg
+*.fasta
+*.fasta.f
+*.sam
+*.zip
+*.tgz
+*.pkg
+*.dmg
+PRD_*.txt
+config.yaml
+.Rprofile
+*.csv
+!sample_metadata_template*.tsv
+!example_data/*.csv
