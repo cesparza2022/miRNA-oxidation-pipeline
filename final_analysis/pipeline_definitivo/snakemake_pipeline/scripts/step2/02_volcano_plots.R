@@ -37,7 +37,7 @@ output_figure <- snakemake@output[["figure"]]
 # Get config parameters
 config <- snakemake@config
 alpha <- if (!is.null(config$analysis$alpha)) config$analysis$alpha else 0.05
-log2fc_threshold <- if (!is.null(config$analysis$log2fc_threshold)) config$analysis$log2fc_threshold else 0.58  # 1.5x fold change
+log2fc_threshold <- if (!is.null(config$analysis$log2fc_threshold_step2)) config$analysis$log2fc_threshold_step2 else 0.58  # 1.5x fold change (exploratory)
 color_gt <- if (!is.null(config$analysis$colors$gt)) config$analysis$colors$gt else "#D62728"
 
 log_info(paste("Input table:", input_table))
@@ -202,7 +202,7 @@ output_figure <- snakemake@output[["figure"]]
 # Get config parameters
 config <- snakemake@config
 alpha <- if (!is.null(config$analysis$alpha)) config$analysis$alpha else 0.05
-log2fc_threshold <- if (!is.null(config$analysis$log2fc_threshold)) config$analysis$log2fc_threshold else 0.58  # 1.5x fold change
+log2fc_threshold <- if (!is.null(config$analysis$log2fc_threshold_step2)) config$analysis$log2fc_threshold_step2 else 0.58  # 1.5x fold change (exploratory)
 color_gt <- if (!is.null(config$analysis$colors$gt)) config$analysis$colors$gt else "#D62728"
 
 log_info(paste("Input table:", input_table))
@@ -367,7 +367,7 @@ output_figure <- snakemake@output[["figure"]]
 # Get config parameters
 config <- snakemake@config
 alpha <- if (!is.null(config$analysis$alpha)) config$analysis$alpha else 0.05
-log2fc_threshold <- if (!is.null(config$analysis$log2fc_threshold)) config$analysis$log2fc_threshold else 0.58  # 1.5x fold change
+log2fc_threshold <- if (!is.null(config$analysis$log2fc_threshold_step2)) config$analysis$log2fc_threshold_step2 else 0.58  # 1.5x fold change (exploratory)
 color_gt <- if (!is.null(config$analysis$colors$gt)) config$analysis$colors$gt else "#D62728"
 
 log_info(paste("Input table:", input_table))
