@@ -2,22 +2,34 @@
 outputs/
 .snakemake/
 
+# Ignore results/ but allow specific subdirectories for GitHub
+results/*
+!results/pipeline_info/
+!results/pipeline_info/**
+!results/summary/
+!results/summary/**
+
 # Logs
 *.log
 logs/
+**/logs/
 
-# HTML viewers (generados automáticamente)
-viewers/*.html
+# HTML viewers (automatically generated)
+viewers/
+*.html
+!results/summary/*.html
 
 # Python cache
 __pycache__/
 *.pyc
 *.pyo
 
-# R cache
+# R cache and environment
 .Rhistory
 .RData
 .Rproj.user/
+renv/
+renv.lock
 
 # OS files
 .DS_Store
@@ -30,7 +42,7 @@ Thumbs.db
 *.tmp
 *.temp
 
-# Conda environments (si se crean localmente)
+# Conda environments (if created locally)
 .env
 .conda/
 
@@ -41,11 +53,12 @@ config/config.yaml
 *.csv
 *.txt
 !example_data/*.csv  # Keep example data small
+!sample_metadata_template*.tsv  # Keep templates
 
 # Large output files
 *.png
 *.pdf
-*.html
+!docs/figures/*.png  # Keep documentation figures if needed
 
 # IDE files
 .vscode/
@@ -56,3 +69,123 @@ config/config.yaml
 *.bak
 *.backup
 *_old.*
+
+# Remove all temporary/development documentation files
+ACTUALIZACION_*.md
+ADAPTACION_*.md
+ALS_Neuronal_miRNAs.md
+ANALISIS_*.md
+COMMITS_*.md
+COMO_FUNCIONA_*.md
+CONECTAR_*.md
+CORRECCIONES_*.md
+DIAGRAMA_*.md
+ESTADO_*.md
+EXPLICACION_*.md
+FASE*.md
+GUIA_*.md
+IMPLEMENTACION_*.md
+INSTALACION_*.md
+INVENTARIO_*.md
+MISSING_ITEMS.md
+OPCIONES_*.md
+OPTIMIZACIONES_*.md
+ORGANIZACION_*.md
+PASO*.md
+PASOS_*.md
+PLAN_*.md
+PREPARACION_*.md
+PROPUESTA_*.md
+PROXIMOS_*.md
+PRUEBAS_*.md
+PUSH_*.md
+README_SIMPLE.md
+RESUMEN_*.md
+REVISION_*.md
+SETUP.md
+STEP*.md
+SUMMARY_QUESTIONS_STEPS_3-7.md
+TAREA_*.md
+TESTING_RESULTS.md
+VALIDACIONES_*.md
+VALIDACION_*.md
+VERIFICACION_*.md
+
+# Keep essential documentation (explicit exceptions)
+!README.md
+!QUICK_START.md
+!DOCUMENTATION_SUMMARY.md
+!COMPREHENSIVE_PIPELINE_REVIEW.md
+!CRITICAL_EXPERT_REVIEW.md
+!SOFTWARE_VERSIONS.md
+!TESTING_PLAN.md
+!REVIEW_STEPS_3-7.md
+!docs/**/*.md
+
+# Remove duplicate/old documentation files
+COMPREHENSIVE_REVIEW.md
+README_SIMPLE.md
+TESTING_RESULTS.md
+
+# Remove duplicate/old directories
+final_analysis/
+first_step/
+fastqc_reports/
+Mapping_miRNA/
+R/
+renv/
+
+# Remove data files
+*.fasta
+*.sam
+*.xlsx
+*.docx
+*.pdf
+*.png
+*.zip
+*.pkg
+*.tgz
+*.json
+!data_schema.json
+!package.json
+!nx.json
+!tsconfig*.json
+!results/summary/*.json
+
+# Remove scripts (keep only essential)
+*.sh
+!setup.sh
+!run.sh
+
+# Remove temporary files
+control.sam
+oxidation.sam
+mat*.csv
+all_matches*.csv
+
+# Remove test files
+test_*.sh
+test_*.md
+.taskmaster/
+.cursor/
+
+# Additional files to ignore
+*.pdf
+*.docx
+*.xlsx
+*.pptx
+*.jpeg
+*.jpg
+*.fasta
+*.fasta.f
+*.sam
+*.zip
+*.tgz
+*.pkg
+*.dmg
+PRD_*.txt
+config.yaml
+.Rprofile
+*.csv
+!sample_metadata_template*.tsv
+!example_data/*.csv

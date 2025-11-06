@@ -17,21 +17,61 @@ suppressPackageStartupMessages({
 
 source(snakemake@params[["functions"]], local = TRUE)
 
-cat("\n═══════════════════════════════════════════════════════════════════\n")
-cat("  PANEL E: G-Content Landscape - FINAL BUBBLE PLOT\n")
-cat("═══════════════════════════════════════════════════════════════════\n\n")
+# Load configuration
+config <- snakemake@config
+fig_width <- if (!is.null(config$analysis$figure$width)) config$analysis$figure$width else 12
+fig_height <- if (!is.null(config$analysis$figure$height)) config$analysis$figure$height else 10
+fig_dpi <- if (!is.null(config$analysis$figure$dpi)) config$analysis$figure$dpi else 300
+
+# Initialize logging
+log_file <- if (length(snakemake@log) > 0) snakemake@log[[1]] else {
+  file.path(dirname(snakemake@output[[1]]), "..", "logs", "panel_e.log")
+}
+initialize_logging(log_file, context = "Panel E")
+
+log_section("PANEL E: G-Content Landscape - Bubble Plot")
 
 input_file <- snakemake@input[["data"]]
 output_figure <- snakemake@output[["figure"]]
 output_table <- snakemake@output[["table"]]
 
+log_info(paste("Input file:", input_file))
+log_info(paste("Output figure:", output_figure))
+log_info(paste("Output table:", output_table))
+
 ensure_output_dir(dirname(output_figure))
 ensure_output_dir(dirname(output_table))
 
-data <- load_processed_data(input_file)
+# ============================================================================
+# VALIDATE INPUT
+# ============================================================================
+
+if (exists("validate_processed_clean")) {
+  validate_processed_clean(input_file)
+} else if (exists("validate_input")) {
+  validate_input(input_file, 
+                expected_format = "csv",
+                required_columns = c("miRNA name", "pos:mut"))
+}
+
+# ============================================================================
+# LOAD DATA
+# ============================================================================
+
+log_subsection("Loading data")
+data <- tryCatch({
+  result <- load_processed_data(input_file)
+  log_success(paste("Data loaded:", nrow(result), "rows,", ncol(result), "columns"))
+  result
+}, error = function(e) {
+  handle_error(e, context = "Panel E - Data Loading", exit_code = 1, log_file = log_file)
+})
+
 sample_cols <- setdiff(names(data), c("miRNA_name", "pos.mut"))
 
-cat("📊 MÉTRICA 1: Total copias de miRNAs con G en cada posición...\n")
+log_subsection("Calculating metrics")
+
+log_info("Metric 1: Total copies of miRNAs with G at each position")
 
 mirnas_with_G_by_pos <- data %>%
   filter(str_detect(pos.mut, "^\\d+:G[TCAG]")) %>%
@@ -52,7 +92,7 @@ total_copies_by_position <- mirnas_with_G_by_pos %>%
     .groups = 'drop'
   )
 
-cat("🔴 MÉTRICA 2: Suma de SNVs G>T en posición específica...\n")
+log_info("Metric 2: Sum of G>T SNVs at specific positions")
 
 gt_counts_specific <- data %>%
   filter(str_detect(pos.mut, "^\\d+:GT$")) %>%
@@ -63,7 +103,7 @@ gt_counts_specific <- data %>%
     .groups = 'drop'
   )
 
-cat("🧬 MÉTRICA 3: Número de miRNAs únicos con G...\n")
+log_info("Metric 3: Number of unique miRNAs with G")
 
 unique_mirnas_by_pos <- data %>%
   filter(str_detect(pos.mut, "^\\d+:G[TCAG]")) %>%
@@ -83,6 +123,7 @@ panel_e_final <- total_copies_by_position %>%
   )
 
 write_csv(panel_e_final, output_table)
+log_success(paste("Table exported:", output_table))
 
 COLOR_SEED <- "#FFF9C4"
 
@@ -124,25 +165,15 @@ panel_e <- ggplot(panel_e_final, aes(x = Position, y = total_G_copies)) +
     y = "Total copies of miRNAs with G at position (log scale)",
     caption = "Each bubble represents a position. Y-position = total G substrate availability (sum of all miRNA copies with G).\nBubble size = miRNA diversity (how many different miRNAs). Bubble color intensity = G>T oxidation burden (darker red = more G>T).\nSeed region (2-8) highlighted in yellow. Log scale for better visualization of wide value ranges."
   ) +
-  theme_classic(base_size = 14) +
+  theme_professional +
   theme(
-    plot.title = element_text(face = "bold", size = 16, hjust = 0.5, color = "#2c3e50"),
-    plot.subtitle = element_text(size = 11, hjust = 0.5, color = "gray40", lineheight = 1.3),
-    plot.caption = element_text(size = 9.5, hjust = 0, color = "gray50", lineheight = 1.4, margin = margin(t = 15)),
-    axis.title = element_text(face = "bold", size = 12),
-    axis.title.y = element_text(size = 11),
-    axis.text = element_text(size = 10),
-    legend.position = "right",
-    legend.title = element_text(face = "bold", size = 10),
-    legend.text = element_text(size = 9),
-    legend.box = "vertical",
-    legend.spacing.y = unit(0.4, "cm"),
-    panel.grid.major = element_line(color = "grey92", linewidth = 0.3),
-    panel.grid.minor = element_blank(),
-    panel.border = element_rect(color = "gray60", linewidth = 1.2, fill = NA)
+    legend.position = "right"
   )
 
-ggsave(output_figure, panel_e, width = 14, height = 9, dpi = 300, bg = "white")
+log_subsection("Generating figure")
+ggsave(output_figure, panel_e, width = fig_width, height = fig_height, dpi = fig_dpi, bg = "white")
+log_success(paste("Figure saved:", output_figure))
 
-cat("✅ PANEL E COMPLETE\n\n")
+log_success("Panel E completed successfully")
+log_info(paste("Execution completed at", get_timestamp()))
 

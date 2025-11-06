@@ -1,7 +1,7 @@
 # Configuration file for Snakemake Pipeline
 # miRNA Oxidation Analysis Pipeline
 #
-# COPY THIS FILE TO config.yaml AND UPDATE PATHS TO YOUR DATA
+# Test configuration with actual data files
 
 # Project information
 project:
@@ -9,39 +9,48 @@ project:
   version: "1.0.0"
   description: "Reproducible pipeline for analyzing G>T oxidation patterns in miRNAs"
 
-# Paths (update these to your data locations)
+# Paths (updated for test run)
 paths:
-  project_root: "/path/to/your/project"
-  snakemake_dir: "/path/to/your/project/snakemake_pipeline"
+  project_root: "/Users/cesaresparza/New_Desktop/UCSD/8OG/final_analysis/pipeline_definitivo"
+  snakemake_dir: "/Users/cesaresparza/New_Desktop/UCSD/8OG/final_analysis/pipeline_definitivo/snakemake_pipeline"
   
-  # Input data - UPDATE THESE PATHS
+  # Input data - Using actual data files
   data:
     # Raw data file (original miRNA_count.Q33.txt format)
-    raw: "/path/to/your/data/miRNA_count.Q33.txt"
+    raw: "/Users/cesaresparza/New_Desktop/UCSD/8OG/organized/02_data/Magen_ALS-bloodplasma/miRNA_count.Q33.txt"
     
     # Processed data (after split-collapse, for Step 1)
-    processed_clean: "/path/to/your/processed_data.csv"
+    # Using the raw data file (will be processed by pipeline)
+    processed_clean: "/Users/cesaresparza/New_Desktop/UCSD/8OG/organized/02_data/Magen_ALS-bloodplasma/miRNA_count.Q33.txt"
     
     # Original data for Step 1.5 (VAF filtering - needs SNV + total counts)
-    step1_original: "/path/to/your/step1_original_data.csv"
+    # Using the same file (it has both SNV and total counts in the format)
+    step1_original: "/Users/cesaresparza/New_Desktop/UCSD/8OG/organized/02_data/Magen_ALS-bloodplasma/miRNA_count.Q33.txt"
     
-    # Sample metadata file (OPTIONAL but RECOMMENDED for flexible group assignment)
-    # Format: TSV with columns: sample_id, group (and optionally: batch, age, sex, etc.)
-    # If not provided, pipeline will use pattern matching on column names as fallback
-    # See: sample_metadata_template.tsv for format
-    metadata: null  # e.g., "/path/to/your/sample_metadata.tsv"
+    # Sample metadata file (OPTIONAL - will use pattern matching if not provided)
+    metadata: null  # Pattern matching will identify ALS vs Control from sample names
   
   # Output directories (relative to snakemake_dir - usually no need to change)
   outputs:
     step1: "outputs/step1"
     step1_5: "outputs/step1_5"
     step2: "outputs/step2"
+    step3: "outputs/step3"
+    step4: "outputs/step4"
+    step5: "outputs/step5"
+    step6: "outputs/step6"
+    step7: "outputs/step7"
   
   # Scripts directories (relative to snakemake_dir - usually no need to change)
   scripts:
     step1: "scripts/step1"
     step1_5: "scripts/step1_5"
     step2: "scripts/step2"
+    step3: "scripts/step3"
+    step4: "scripts/step4"
+    step5: "scripts/step5"
+    step6: "scripts/step6"
+    step7: "scripts/step7"
     utils: "scripts/utils"
   
   # Viewers directory (relative to snakemake_dir)
@@ -56,22 +65,17 @@ analysis:
   alpha: 0.05  # Significance threshold
   fdr_method: "BH"  # FDR correction method
   
+  # Seed region definition
+  seed_region:
+    start: 2
+    end: 8
+  
   # Statistical assumptions validation
   assumptions:
     check_normality: true  # Perform normality tests (Shapiro-Wilk, KS)
     check_variance_homogeneity: true  # Perform variance homogeneity tests (Levene's, Bartlett's)
     generate_diagnostic_plots: true  # Generate Q-Q plots and histograms
     auto_select_test: true  # Automatically select parametric vs non-parametric test
-  
-  # Batch effect analysis and correction
-  batch_correction:
-    method: "none"  # Options: "none", "mean_centering", "combat", "limma"
-    pvalue_threshold: 0.05  # p-value threshold for detecting batch effects
-  
-  # Confounder analysis and control
-  confounders:
-    adjust: true  # Whether to adjust for confounders in models
-    variables: ["age", "sex"]  # List of confounders to analyze/adjust for
   
   # Batch effect analysis and correction
   batch_correction:
@@ -108,4 +112,3 @@ resources:
 conda_envs:
   r_base: "envs/r_base.yaml"
   r_analysis: "envs/r_analysis.yaml"
-

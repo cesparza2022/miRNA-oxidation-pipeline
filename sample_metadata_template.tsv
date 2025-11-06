@@ -1,18 +1,40 @@
-# Sample Metadata Template for ALS miRNA Oxidation Research
-# This file serves as a template for sample metadata
-# Replace the example data with your actual sample information
-
-# Required columns:
-# - sample_id: Unique identifier for each sample
-# - group: Sample group (ALS, Control, Treatment)
+# Sample Metadata Template for miRNA Oxidation Research
+# ============================================================================
+# This file defines sample groups and metadata for flexible pipeline analysis
+# ============================================================================
+# 
+# REQUIRED COLUMNS:
+# - sample_id: Must exactly match column names in your data file
+# - group: Condition/group name (e.g., "Disease", "Control", "Treatment", "ALS", etc.)
+#           You can use ANY group names - pipeline is flexible!
+#
+# OPTIONAL COLUMNS (for advanced analyses):
+# - batch: Batch or run identifier (for batch effect analysis)
+# - age: Age of the subject (for confounder analysis)
+# - sex: Sex of the subject (M/F or Male/Female, for confounder analysis)
 # - timepoint: Time point (e.g., 0d, 7d, 14d, 1m, 3m, 6m, 1y)
 # - subject_id: Unique identifier for each subject
-# - batch: Batch or run identifier
-# - age: Age of the subject (optional)
-# - sex: Sex of the subject (optional)
-# - diagnosis: Clinical diagnosis (optional)
-# - treatment: Treatment received (optional)
-# - notes: Additional notes (optional)
+# - diagnosis: Clinical diagnosis
+# - treatment: Treatment received
+# - notes: Additional notes
+#
+# IMPORTANT:
+# - sample_id must EXACTLY match the column names in your data CSV file
+# - You need at least 2 groups for comparison
+# - Each group needs at least 2 samples
+# - Group names can be anything (not limited to "ALS"/"Control")
+#
+# EXAMPLE FOR ALS vs CONTROL:
+# sample_id,group,batch,age,sex
+# Magen-ALS-enrolment-bloodplasma-SRR13934430,ALS,Batch1,65,M
+# Magen-control-control-bloodplasma-SRR14631747,Control,Batch1,62,F
+#
+# EXAMPLE FOR ANY DISEASE:
+# sample_id,group,batch,age,sex
+# Sample1,Parkinson,Batch1,70,M
+# Sample2,Healthy,Batch1,68,F
+# Sample3,Alzheimer,Batch1,75,F
+# ============================================================================
 
 sample_id	group	timepoint	subject_id	batch	age	sex	diagnosis	treatment	notes
 sample_001	ALS	0d	ALS_001	batch_1	65	M	ALS	None	Baseline sample

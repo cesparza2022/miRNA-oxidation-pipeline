@@ -24,6 +24,22 @@ output_table <- snakemake@output[["table"]]
 ensure_output_dir(dirname(output_figure))
 ensure_output_dir(dirname(output_table))
 
+# ============================================================================
+# VALIDATE INPUT
+# ============================================================================
+
+if (exists("validate_raw_data")) {
+  validate_raw_data(input_raw)
+} else if (exists("validate_input")) {
+  validate_input(input_raw, 
+                expected_format = "tsv",
+                required_columns = c("pos:mut"))
+}
+
+# ============================================================================
+# LOAD AND PROCESS DATA
+# ============================================================================
+
 processed_data <- load_and_process_raw_data(input_raw)
 
 COLOR_GC <- "#2E86AB"

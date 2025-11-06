@@ -9,12 +9,18 @@
 #   output: 11 figures PNG + 3 tables CSV
 # ============================================================================
 
-library(ggplot2)
-library(dplyr)
-library(tidyr)
-library(patchwork)
-library(tibble)
-library(scales)
+suppressPackageStartupMessages({
+  library(ggplot2)
+  library(dplyr)
+  library(tidyr)
+  library(patchwork)
+  library(tibble)
+  library(scales)
+})
+
+# Load common functions and theme
+source(snakemake@params[["functions"]], local = TRUE)
+# Theme is loaded via functions_common.R
 
 cat("╔══════════════════════════════════════════════════════════════════════╗\n")
 cat("║     🎯 STEP 1.5: DIAGNOSTIC FIGURES - VAF-FILTERED DATA            ║\n")
@@ -46,10 +52,19 @@ output_sample_metrics <- snakemake@output[["sample_metrics"]]
 output_position_metrics <- snakemake@output[["position_metrics"]]
 output_mutation_summary <- snakemake@output[["mutation_summary"]]
 
+# Load configuration
+config <- snakemake@config
+color_gt <- if (!is.null(config$analysis$colors$gt)) config$analysis$colors$gt else "#D62728"
+fig_width <- if (!is.null(config$analysis$figure$width)) config$analysis$figure$width else 12
+fig_height <- if (!is.null(config$analysis$figure$height)) config$analysis$figure$height else 10
+fig_dpi <- if (!is.null(config$analysis$figure$dpi)) config$analysis$figure$dpi else 300
+
 cat("📋 Parameters:\n")
 cat("   Input filtered data:", input_filtered_data, "\n")
 cat("   Input filter report:", input_filter_report, "\n")
-cat("   Outputs: 11 figures + 3 tables\n\n")
+cat("   Outputs: 11 figures + 3 tables\n")
+cat("   Figure dimensions:", fig_width, "x", fig_height, "inches, DPI:", fig_dpi, "\n")
+cat("   G>T color:", color_gt, "\n\n")
 
 # Ensure output directories exist
 dir.create(dirname(output_qc_fig1), showWarnings = FALSE, recursive = TRUE)
@@ -130,18 +145,16 @@ cat("\n🎨 Generating QC Figures...\n")
 cat("   [1/4] VAF distribution...\n")
 
 qc_fig1 <- ggplot(filter_report, aes(x = VAF)) +
-  geom_histogram(bins = 50, fill = "#D62728", alpha = 0.7, color = "white") +
+  geom_histogram(bins = 50, fill = color_gt, alpha = 0.7, color = "white") +
   geom_vline(xintercept = 0.5, linetype = "dashed", color = "#2c3e50", linewidth = 1.2) +
   annotate("rect", xmin = 0.5, xmax = 1, ymin = -Inf, ymax = Inf, 
-           fill = "#D62728", alpha = 0.15) +
+           fill = color_gt, alpha = 0.15) +
   annotate("text", x = 0.75, y = Inf, label = "FILTERED\n(Artifacts)", 
-           vjust = 1.5, fontface = "bold", size = 5, color = "#D62728") +
+           vjust = 1.5, fontface = "bold", size = 5, color = color_gt) +
   scale_x_continuous(labels = percent) +
-  theme_classic(base_size = 14) +
+  theme_professional +
   theme(
-    axis.title = element_text(face = "bold", size = 15),
-    plot.title = element_text(face = "bold", hjust = 0.5, size = 17),
-    plot.subtitle = element_text(hjust = 0.5, size = 13, color = "gray40")
+    legend.position = "none"
   ) +
   labs(
     title = "QC FIGURE 1: VAF Distribution of Filtered Values",
@@ -151,7 +164,7 @@ qc_fig1 <- ggplot(filter_report, aes(x = VAF)) +
     y = "Count"
   )
 
-ggsave(output_qc_fig1, qc_fig1, width = 14, height = 9, dpi = 150)
+ggsave(output_qc_fig1, qc_fig1, width = fig_width, height = fig_height, dpi = fig_dpi)
 
 # QC FIG 2: Filter impact by mutation type
 cat("   [2/4] Filter impact by type...\n")
@@ -162,12 +175,9 @@ qc_fig2 <- ggplot(stats_by_type, aes(x = reorder(Mutation_Type, -N_Filtered), y 
   geom_bar(stat = "identity", fill = "#667eea", alpha = 0.85) +
   geom_text(aes(label = format(N_Filtered, big.mark = ",")), 
             vjust = -0.5, fontface = "bold", size = 4) +
-  theme_classic(base_size = 14) +
+  theme_professional +
   theme(
-    axis.text.x = element_text(angle = 45, hjust = 1, face = "bold"),
-    axis.title = element_text(face = "bold", size = 15),
-    plot.title = element_text(face = "bold", hjust = 0.5, size = 17),
-    plot.subtitle = element_text(hjust = 0.5, size = 13, color = "gray40")
+    axis.text.x = element_text(angle = 45, hjust = 1)
   ) +
   labs(
     title = "QC FIGURE 2: Filter Impact by Mutation Type",
@@ -176,7 +186,7 @@ qc_fig2 <- ggplot(stats_by_type, aes(x = reorder(Mutation_Type, -N_Filtered), y 
     y = "# Filtered Values"
   )
 
-ggsave(output_qc_fig2, qc_fig2, width = 14, height = 9, dpi = 150)
+ggsave(output_qc_fig2, qc_fig2, width = fig_width, height = fig_height, dpi = fig_dpi)
 
 # QC FIG 3: Top affected miRNAs
 cat("   [3/4] Top affected miRNAs...\n")
@@ -190,12 +200,7 @@ qc_fig3 <- stats_by_mirna %>%
   geom_bar(stat = "identity", fill = "#764ba2", alpha = 0.85) +
   geom_text(aes(label = N_Filtered), hjust = -0.3, fontface = "bold", size = 3.5) +
   coord_flip() +
-  theme_classic(base_size = 13) +
-  theme(
-    axis.title = element_text(face = "bold", size = 14),
-    plot.title = element_text(face = "bold", hjust = 0.5, size = 16),
-    plot.subtitle = element_text(hjust = 0.5, size = 12, color = "gray40")
-  ) +
+  theme_professional +
   labs(
     title = "QC FIGURE 3: Top 20 Most Affected miRNAs",
     subtitle = "miRNAs with most filtered values",
@@ -203,7 +208,7 @@ qc_fig3 <- stats_by_mirna %>%
     y = "# Filtered Values"
   )
 
-ggsave(output_qc_fig3, qc_fig3, width = 12, height = 10, dpi = 150)
+ggsave(output_qc_fig3, qc_fig3, width = fig_width, height = fig_height, dpi = fig_dpi)
 
 # QC FIG 4: Before/After comparison
 cat("   [4/4] Before/After comparison...\n")
@@ -226,11 +231,8 @@ qc_fig4 <- ggplot(comparison_data, aes(x = Dataset, y = Total_Values / 1e6, fill
             vjust = -0.5, fontface = "bold", size = 5) +
   scale_fill_manual(values = c("Original (Step 1)" = "gray60", 
                                "VAF-Filtered (Step 1.5)" = "#2CA02C")) +
-  theme_classic(base_size = 14) +
+  theme_professional +
   theme(
-    axis.title = element_text(face = "bold", size = 15),
-    plot.title = element_text(face = "bold", hjust = 0.5, size = 17),
-    plot.subtitle = element_text(hjust = 0.5, size = 13, color = "gray40"),
     legend.position = "none"
   ) +
   labs(
@@ -242,7 +244,7 @@ qc_fig4 <- ggplot(comparison_data, aes(x = Dataset, y = Total_Values / 1e6, fill
     y = "Total Valid Values (Millions)"
   )
 
-ggsave(output_qc_fig4, qc_fig4, width = 12, height = 9, dpi = 150)
+ggsave(output_qc_fig4, qc_fig4, width = fig_width, height = fig_height, dpi = fig_dpi)
 
 cat("   ✅ 4 QC figures saved\n")
 
@@ -274,19 +276,17 @@ fig1 <- ggplot(position_all, aes(x = factor(Position), y = Mutation_Type, fill =
   geom_text(aes(label = ifelse(N_SNVs > 200, round(N_SNVs, 0), "")), 
             color = "white", fontface = "bold", size = 3) +
   scale_fill_gradient2(
-    low = "white", mid = "#FF7F0E", high = "#D62728",
+    low = "white", mid = "#FF7F0E", high = color_gt,
     midpoint = median(position_all$N_SNVs[position_all$N_SNVs > 0]),
     name = "# SNVs",
     labels = comma
   ) +
-  theme_minimal(base_size = 13) +
+  theme_professional +
   theme(
-    axis.text.x = element_text(angle = 0, hjust = 0.5, face = "bold", size = 12),
-    axis.text.y = element_text(face = "bold", size = 13, 
-                              color = ifelse(levels(position_all$Mutation_Type) == "GT", "#D62728", "black")),
-    axis.title = element_text(face = "bold", size = 15),
-    plot.title = element_text(face = "bold", hjust = 0.5, size = 17),
-    plot.subtitle = element_text(hjust = 0.5, size = 13, color = "gray40"),
+    axis.text.x = element_text(angle = 0, hjust = 0.5),
+    axis.text.y = element_text(
+      color = ifelse(levels(position_all$Mutation_Type) == "GT", color_gt, "black")
+    ),
     panel.grid = element_blank(),
     legend.position = "right"
   ) +
@@ -297,7 +297,7 @@ fig1 <- ggplot(position_all, aes(x = factor(Position), y = Mutation_Type, fill =
     y = "Mutation Type"
   )
 
-ggsave(output_diag_fig1, fig1, width = 16, height = 10, dpi = 150)
+ggsave(output_diag_fig1, fig1, width = fig_width, height = fig_height, dpi = fig_dpi)
 
 # FIG 2: Heatmap Counts
 cat("   [2/7] Heatmap Counts...\n")
@@ -305,19 +305,17 @@ cat("   [2/7] Heatmap Counts...\n")
 fig2 <- ggplot(position_all, aes(x = factor(Position), y = Mutation_Type, fill = log10(Total_Counts + 1))) +
   geom_tile(color = "white", size = 0.8) +
   scale_fill_gradient2(
-    low = "white", mid = "#9467BD", high = "#D62728",
+    low = "white", mid = "#9467BD", high = color_gt,
     midpoint = median(log10(position_all$Total_Counts[position_all$Total_Counts > 0] + 1)),
     name = "log10(Counts)",
     labels = comma
   ) +
-  theme_minimal(base_size = 13) +
+  theme_professional +
   theme(
-    axis.text.x = element_text(angle = 0, hjust = 0.5, face = "bold", size = 12),
-    axis.text.y = element_text(face = "bold", size = 13,
-                              color = ifelse(levels(position_all$Mutation_Type) == "GT", "#D62728", "black")),
-    axis.title = element_text(face = "bold", size = 15),
-    plot.title = element_text(face = "bold", hjust = 0.5, size = 17),
-    plot.subtitle = element_text(hjust = 0.5, size = 13, color = "gray40"),
+    axis.text.x = element_text(angle = 0, hjust = 0.5),
+    axis.text.y = element_text(
+      color = ifelse(levels(position_all$Mutation_Type) == "GT", color_gt, "black")
+    ),
     panel.grid = element_blank(),
     legend.position = "right"
   ) +
@@ -328,7 +326,7 @@ fig2 <- ggplot(position_all, aes(x = factor(Position), y = Mutation_Type, fill =
     y = "Mutation Type"
   )
 
-ggsave(output_diag_fig2, fig2, width = 16, height = 10, dpi = 150)
+ggsave(output_diag_fig2, fig2, width = fig_width, height = fig_height, dpi = fig_dpi)
 
 # FIG 3 & 4: G Transversions
 cat("   [3/7] G transversions - SNVs...\n")
@@ -342,16 +340,13 @@ fig3 <- ggplot(g_only, aes(x = factor(Position), y = N_SNVs, fill = Mutation_Typ
             position = position_dodge(width = 0.8), vjust = -0.5, 
             fontface = "bold", size = 3) +
   scale_fill_manual(
-    values = c("GT" = "#D62728", "GA" = "#1F77B4", "GC" = "#2CA02C"),
+    values = c("GT" = color_gt, "GA" = "#1F77B4", "GC" = "#2CA02C"),
     labels = c("GT" = "G>T (Oxidation)", "GA" = "G>A", "GC" = "G>C"),
     name = "Mutation Type"
   ) +
-  theme_classic(base_size = 14) +
+  theme_professional +
   theme(
-    axis.text.x = element_text(angle = 45, hjust = 1, face = "bold"),
-    axis.title = element_text(face = "bold", size = 15),
-    plot.title = element_text(face = "bold", hjust = 0.5, size = 17),
-    plot.subtitle = element_text(hjust = 0.5, size = 13, color = "gray40"),
+    axis.text.x = element_text(angle = 45, hjust = 1),
     legend.position = "bottom"
   ) +
   labs(
@@ -361,24 +356,21 @@ fig3 <- ggplot(g_only, aes(x = factor(Position), y = N_SNVs, fill = Mutation_Typ
     y = "Number of SNVs"
   )
 
-ggsave(output_diag_fig3, fig3, width = 16, height = 9, dpi = 150)
+ggsave(output_diag_fig3, fig3, width = fig_width, height = fig_height, dpi = fig_dpi)
 
 cat("   [4/7] G transversions - Counts...\n")
 
 fig4 <- ggplot(g_only, aes(x = factor(Position), y = Total_Counts, fill = Mutation_Type)) +
   geom_bar(stat = "identity", position = "dodge", alpha = 0.85, width = 0.8) +
   scale_fill_manual(
-    values = c("GT" = "#D62728", "GA" = "#1F77B4", "GC" = "#2CA02C"),
+    values = c("GT" = color_gt, "GA" = "#1F77B4", "GC" = "#2CA02C"),
     labels = c("GT" = "G>T (Oxidation)", "GA" = "G>A", "GC" = "G>C"),
     name = "Mutation Type"
   ) +
   scale_y_continuous(labels = comma) +
-  theme_classic(base_size = 14) +
+  theme_professional +
   theme(
-    axis.text.x = element_text(angle = 45, hjust = 1, face = "bold"),
-    axis.title = element_text(face = "bold", size = 15),
-    plot.title = element_text(face = "bold", hjust = 0.5, size = 17),
-    plot.subtitle = element_text(hjust = 0.5, size = 13, color = "gray40"),
+    axis.text.x = element_text(angle = 45, hjust = 1),
     legend.position = "bottom"
   ) +
   labs(
@@ -388,7 +380,7 @@ fig4 <- ggplot(g_only, aes(x = factor(Position), y = Total_Counts, fill = Mutati
     y = "Total Counts"
   )
 
-ggsave(output_diag_fig4, fig4, width = 16, height = 9, dpi = 150)
+ggsave(output_diag_fig4, fig4, width = fig_width, height = fig_height, dpi = fig_dpi)
 
 # FIG 5: Bubble Plot
 cat("   [5/7] Bubble plot...\n")
@@ -417,17 +409,14 @@ fig5 <- ggplot(bubble_data, aes(x = Mean_SNVs, y = Mean_Counts,
   geom_text(aes(label = Mutation_Type), vjust = -2, fontface = "bold", size = 5, show.legend = FALSE) +
   scale_size_continuous(range = c(8, 30), name = "SD of SNVs\n(Variability)") +
   scale_color_manual(
-    values = c("G>T (Oxidation)" = "#D62728", "Other G transv." = "#FF7F0E", "Other mutations" = "gray50"),
+    values = c("G>T (Oxidation)" = color_gt, "Other G transv." = "#FF7F0E", "Other mutations" = "gray50"),
     name = "Category"
   ) +
   scale_shape_manual(values = c("TRUE" = 18, "FALSE" = 16), guide = "none") +
   scale_x_continuous(labels = comma) +
   scale_y_continuous(labels = comma) +
-  theme_classic(base_size = 14) +
+  theme_professional +
   theme(
-    axis.title = element_text(face = "bold", size = 15),
-    plot.title = element_text(face = "bold", hjust = 0.5, size = 17),
-    plot.subtitle = element_text(hjust = 0.5, size = 13, color = "gray40"),
     legend.position = "bottom",
     legend.box = "vertical"
   ) +
@@ -438,7 +427,7 @@ fig5 <- ggplot(bubble_data, aes(x = Mean_SNVs, y = Mean_Counts,
     y = "Mean Total Counts per Sample"
   )
 
-ggsave(output_diag_fig5, fig5, width = 14, height = 11, dpi = 150)
+ggsave(output_diag_fig5, fig5, width = fig_width, height = fig_height, dpi = fig_dpi)
 
 # FIG 6: Violin Plots
 cat("   [6/7] Violin plots...\n")
@@ -461,14 +450,12 @@ p_viol_snvs <- ggplot(sample_top8, aes(x = Mutation_Type, y = N_SNVs, fill = Cat
   geom_boxplot(width = 0.2, alpha = 0.8, outlier.size = 0.5) +
   stat_summary(fun = mean, geom = "point", shape = 23, size = 3.5, fill = "white", color = "black") +
   scale_fill_manual(
-    values = c("G>T (Oxidation)" = "#D62728", "Other G transv." = "#FF7F0E", "Other mutations" = "gray60"),
+    values = c("G>T (Oxidation)" = color_gt, "Other G transv." = "#FF7F0E", "Other mutations" = "gray60"),
     name = ""
   ) +
   coord_flip() +
-  theme_classic(base_size = 13) +
+  theme_professional +
   theme(
-    axis.title = element_text(face = "bold", size = 14),
-    plot.title = element_text(face = "bold", hjust = 0.5, size = 15),
     legend.position = "top"
   ) +
   labs(
@@ -482,15 +469,13 @@ p_viol_counts <- ggplot(sample_top8, aes(x = Mutation_Type, y = Total_Counts, fi
   geom_boxplot(width = 0.2, alpha = 0.8, outlier.size = 0.5) +
   stat_summary(fun = mean, geom = "point", shape = 23, size = 3.5, fill = "white", color = "black") +
   scale_fill_manual(
-    values = c("G>T (Oxidation)" = "#D62728", "Other G transv." = "#FF7F0E", "Other mutations" = "gray60"),
+    values = c("G>T (Oxidation)" = color_gt, "Other G transv." = "#FF7F0E", "Other mutations" = "gray60"),
     name = ""
   ) +
   scale_y_log10(labels = comma) +
   coord_flip() +
-  theme_classic(base_size = 13) +
+  theme_professional +
   theme(
-    axis.title = element_text(face = "bold", size = 14),
-    plot.title = element_text(face = "bold", hjust = 0.5, size = 15),
     legend.position = "top"
   ) +
   labs(
@@ -507,7 +492,7 @@ fig6 <- p_viol_snvs / p_viol_counts +
     )
   )
 
-ggsave(output_diag_fig6, fig6, width = 14, height = 11, dpi = 150)
+ggsave(output_diag_fig6, fig6, width = fig_width, height = fig_height, dpi = fig_dpi)
 
 # FIG 7: Fold Change
 cat("   [7/7] Fold Change...\n")
@@ -536,16 +521,13 @@ fold_long <- fold_data %>%
 
 fig7 <- ggplot(fold_long, aes(x = reorder(Mutation_Type, -Fold), y = Fold, fill = Metric)) +
   geom_bar(stat = "identity", position = "dodge", alpha = 0.85, width = 0.75) +
-  geom_hline(yintercept = 1, linetype = "dashed", color = "#D62728", size = 1.3) +
+  geom_hline(yintercept = 1, linetype = "dashed", color = color_gt, size = 1.3) +
   annotate("text", x = 8.5, y = 1.2, label = "G>T level", 
-           color = "#D62728", fontface = "bold", size = 5) +
+           color = color_gt, fontface = "bold", size = 5) +
   scale_fill_manual(values = c("Fold SNVs" = "#667eea", "Fold Counts" = "#764ba2"), name = "") +
-  theme_classic(base_size = 14) +
+  theme_professional +
   theme(
-    axis.text.x = element_text(angle = 45, hjust = 1, face = "bold"),
-    axis.title = element_text(face = "bold", size = 15),
-    plot.title = element_text(face = "bold", hjust = 0.5, size = 17),
-    plot.subtitle = element_text(hjust = 0.5, size = 13, color = "gray40"),
+    axis.text.x = element_text(angle = 45, hjust = 1),
     legend.position = "top"
   ) +
   labs(
@@ -555,7 +537,7 @@ fig7 <- ggplot(fold_long, aes(x = reorder(Mutation_Type, -Fold), y = Fold, fill 
     y = "Fold Change (relative to G>T)"
   )
 
-ggsave(output_diag_fig7, fig7, width = 16, height = 9, dpi = 150)
+ggsave(output_diag_fig7, fig7, width = fig_width, height = fig_height, dpi = fig_dpi)
 
 cat("   ✅ 7 diagnostic figures saved\n")
 
@@ -601,4 +583,3 @@ cat("   • STEP1.5_FIG6_VIOLIN_DISTRIBUTIONS.png\n")
 cat("   • STEP1.5_FIG7_FOLD_CHANGE.png\n\n")
 
 cat("✅ TOTAL: 11 figures + 3 tables generated\n\n")
-

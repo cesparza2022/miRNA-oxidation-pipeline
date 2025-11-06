@@ -9,10 +9,80 @@ suppressPackageStartupMessages({
   library(stringr)
 })
 
+# Source logging functions (robust method)
+if (!exists("log_info")) {
+  script_dir <- getwd()
+  utils_dir <- file.path(script_dir, "scripts", "utils")
+  
+  logging_paths <- c(
+    file.path(utils_dir, "logging.R"),
+    "scripts/utils/logging.R",
+    "./scripts/utils/logging.R"
+  )
+  
+  for (log_path in logging_paths) {
+    if (file.exists(log_path)) {
+      source(log_path, local = TRUE)
+      break
+    }
+  }
+}
+
+# Source validation functions (robust method that works with Rscript/Snakemake)
+# Try multiple methods to find validate_input.R
+if (!exists("validate_input")) {
+  # Get the directory where functions_common.R is located
+  # When sourced from Snakemake, we can infer the path
+  script_dir <- getwd()  # Snakemake sets working directory to pipeline root
+  utils_dir <- file.path(script_dir, "scripts", "utils")
+  
+  # Try multiple possible paths
+  possible_paths <- c(
+    file.path(utils_dir, "validate_input.R"),           # Most common case
+    "scripts/utils/validate_input.R",                    # Relative from any location
+    file.path(dirname(sys.frame(1)$ofile %||% "."), "validate_input.R"),  # Same dir as this file
+    "./scripts/utils/validate_input.R"                   # From root
+  )
+  
+  # Try each path
+  for (validate_path in possible_paths) {
+    if (file.exists(validate_path)) {
+      source(validate_path, local = TRUE)
+      cat("✅ Loaded validation functions from:", validate_path, "\n")
+      break
+    }
+  }
+  
+  # If still not found, warn but don't fail (validation is optional)
+  if (!exists("validate_input")) {
+    cat("⚠️  Warning: validate_input.R not found. Validation functions unavailable.\n")
+    cat("   Searched in:", paste(possible_paths, collapse = ", "), "\n")
+    cat("   Continuing without input validation...\n")
+  }
+}
+
 # Professional colors (consistent across pipeline)
 COLOR_GT <- "#D62728"  # Red for G>T (oxidation)
 COLOR_CONTROL <- "grey60"
 COLOR_ALS <- "#D62728"
+
+# Load professional theme if available
+if (file.exists("scripts/utils/theme_professional.R")) {
+  source("scripts/utils/theme_professional.R", local = TRUE)
+} else if (file.exists(file.path(dirname(getwd()), "scripts/utils/theme_professional.R"))) {
+  source(file.path(dirname(getwd()), "scripts/utils/theme_professional.R"), local = TRUE)
+} else {
+  # Fallback theme
+  theme_professional <- theme_minimal(base_size = 11) +
+    theme(
+      plot.title = element_text(size = 13, face = "bold", hjust = 0.5),
+      plot.subtitle = element_text(size = 10, color = "grey40", hjust = 0.5),
+      axis.title = element_text(size = 11, face = "bold"),
+      axis.text = element_text(size = 10, color = "grey30"),
+      panel.grid.major = element_line(color = "grey90", linewidth = 0.5),
+      panel.grid.minor = element_line(color = "grey95", linewidth = 0.25)
+    )
+}
 
 # ============================================================================
 # DATA LOADING FUNCTIONS

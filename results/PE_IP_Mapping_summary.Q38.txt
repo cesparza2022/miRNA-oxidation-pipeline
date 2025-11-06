@@ -1,2 +1,0 @@
-File name	Total read	PM read	%	1MM read	%	2MM read	%
-rCMC_PE_IP	16247262	7066620	43.49	183790	1.13	246286	1.52

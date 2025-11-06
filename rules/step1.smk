@@ -18,6 +18,7 @@ INPUT_DATA_RAW = config["paths"]["data"]["raw"]
 OUTPUT_STEP1 = config["paths"]["outputs"]["step1"]
 OUTPUT_FIGURES = OUTPUT_STEP1 + "/figures"
 OUTPUT_TABLES = OUTPUT_STEP1 + "/tables"
+OUTPUT_TABLES_SUMMARY = OUTPUT_TABLES + "/summary"
 OUTPUT_LOGS = OUTPUT_STEP1 + "/logs"
 
 # Scripts directory (already relative to snakemake_dir from config)
@@ -38,9 +39,11 @@ rule panel_b_gt_count_by_position:
         functions = FUNCTIONS_COMMON
     output:
         figure = OUTPUT_FIGURES + "/step1_panelB_gt_count_by_position.png",
-        table = OUTPUT_TABLES + "/TABLE_1.B_gt_counts_by_position.csv"
+        table = OUTPUT_TABLES_SUMMARY + "/S1_B_gt_counts_by_position.csv"
     params:
         functions = FUNCTIONS_COMMON
+    benchmark:
+        OUTPUT_LOGS + "/benchmarks/panel_b.txt"
     # conda:
     #     "envs/r_analysis.yaml"  # Disabled - using local R
     log:
@@ -58,7 +61,7 @@ rule panel_c_gx_spectrum:
         functions = FUNCTIONS_COMMON
     output:
         figure = OUTPUT_FIGURES + "/step1_panelC_gx_spectrum.png",
-        table = OUTPUT_TABLES + "/TABLE_1.C_gx_spectrum_by_position.csv"
+        table = OUTPUT_TABLES_SUMMARY + "/S1_C_gx_spectrum_by_position.csv"
     params:
         functions = FUNCTIONS_COMMON
     log:
@@ -78,7 +81,7 @@ rule panel_d_positional_fraction:
         functions = FUNCTIONS_COMMON
     output:
         figure = OUTPUT_FIGURES + "/step1_panelD_positional_fraction.png",
-        table = OUTPUT_TABLES + "/TABLE_1.D_positional_fractions.csv"
+        table = OUTPUT_TABLES_SUMMARY + "/S1_D_positional_fractions.csv"
     params:
         functions = FUNCTIONS_COMMON
     log:
@@ -98,7 +101,7 @@ rule panel_e_gcontent:
         functions = FUNCTIONS_COMMON
     output:
         figure = OUTPUT_FIGURES + "/step1_panelE_gcontent.png",
-        table = OUTPUT_TABLES + "/TABLE_1.E_gcontent_landscape.csv"
+        table = OUTPUT_TABLES_SUMMARY + "/S1_E_gcontent_landscape.csv"
     params:
         functions = FUNCTIONS_COMMON
     log:
@@ -118,7 +121,7 @@ rule panel_f_seed_vs_nonseed:
         functions = FUNCTIONS_COMMON
     output:
         figure = OUTPUT_FIGURES + "/step1_panelF_seed_interaction.png",
-        table = OUTPUT_TABLES + "/TABLE_1.F_seed_vs_nonseed.csv"
+        table = OUTPUT_TABLES_SUMMARY + "/S1_F_seed_vs_nonseed.csv"
     params:
         functions = FUNCTIONS_COMMON
     log:
@@ -138,7 +141,7 @@ rule panel_g_gt_specificity:
         functions = FUNCTIONS_COMMON
     output:
         figure = OUTPUT_FIGURES + "/step1_panelG_gt_specificity.png",
-        table = OUTPUT_TABLES + "/TABLE_1.G_gt_specificity.csv"
+        table = OUTPUT_TABLES_SUMMARY + "/S1_G_gt_specificity.csv"
     params:
         functions = FUNCTIONS_COMMON
     log:

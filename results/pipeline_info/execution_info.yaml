@@ -1,0 +1,30 @@
+pipeline:
+  name: miRNA Oxidation Analysis
+  version: 1.0.0
+  description: Reproducible pipeline for analyzing G>T oxidation patterns in miRNAs
+execution:
+  date: '2025-11-04'
+  time: '10:57:29'
+  datetime: 2025-11-04 10:57:29 PST
+  status: completed
+  steps_completed:
+  - step1
+  - step1_5
+  - step2
+parameters:
+  vaf_threshold: 0.5
+  alpha: 0.05
+  fdr_method: BH
+  log2fc_threshold: 0.58
+  threads: 4
+  memory_gb: 8
+inputs:
+  raw_data: /Users/cesaresparza/New_Desktop/UCSD/8OG/organized/02_data/Magen_ALS-bloodplasma/miRNA_count.Q33.txt
+  processed_data: /Users/cesaresparza/New_Desktop/UCSD/8OG/organized/02_data/Magen_ALS-bloodplasma/miRNA_count.Q33.txt
+outputs:
+  step1: outputs/step1
+  step1_5: outputs/step1_5
+  step2: outputs/step2
+  total_figures: 19.0
+  total_tables: 25.0
+  total_logs: 14.0

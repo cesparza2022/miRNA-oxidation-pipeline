@@ -21,11 +21,13 @@ suppressPackageStartupMessages({
 # Load common functions
 source(snakemake@params[["functions"]], local = TRUE)
 
-cat("\n")
-cat("═══════════════════════════════════════════════════════════════════\n")
-cat("  PANEL B: G>T Count by Position\n")
-cat("═══════════════════════════════════════════════════════════════════\n")
-cat("\n")
+# Initialize logging
+log_file <- if (length(snakemake@log) > 0) snakemake@log[[1]] else {
+  file.path(dirname(snakemake@output[[1]]), "..", "logs", "panel_b.log")
+}
+initialize_logging(log_file, context = "Panel B")
+
+log_section("PANEL B: G>T Count by Position")
 
 # ============================================================================
 # GET SNAKEMAKE PARAMETERS
@@ -35,27 +37,48 @@ input_file <- snakemake@input[["data"]]
 output_figure <- snakemake@output[["figure"]]
 output_table <- snakemake@output[["table"]]
 
-cat("📋 Parameters:\n")
-cat("   Input:", input_file, "\n")
-cat("   Output figure:", output_figure, "\n")
-cat("   Output table:", output_table, "\n\n")
+log_info(paste("Input file:", input_file))
+log_info(paste("Output figure:", output_figure))
+log_info(paste("Output table:", output_table))
 
 # Ensure output directories exist
 ensure_output_dir(dirname(output_figure))
 ensure_output_dir(dirname(output_table))
 
 # ============================================================================
+# VALIDATE INPUT
+# ============================================================================
+
+# Validate input (handles both column name formats: with dots and with spaces)
+if (exists("validate_processed_clean")) {
+  validate_processed_clean(input_file)
+} else if (exists("validate_input")) {
+  # Try both possible column name formats
+  validate_input(input_file, 
+                expected_format = "csv",
+                required_columns = c("miRNA name", "pos:mut"))
+}
+
+# ============================================================================
 # LOAD DATA
 # ============================================================================
 
-data <- load_processed_data(input_file)
+log_subsection("Loading data")
+data <- tryCatch({
+  result <- load_processed_data(input_file)
+  log_success(paste("Data loaded:", nrow(result), "rows,", ncol(result), "columns"))
+  result
+}, error = function(e) {
+  handle_error(e, context = "Panel B - Data Loading", exit_code = 1, log_file = log_file)
+})
+
 sample_cols <- setdiff(names(data), c("miRNA_name", "pos.mut"))
 
 # ============================================================================
 # PROCESS DATA: Extract G>T mutations by position
 # ============================================================================
 
-cat("📊 Processing G>T mutations...\n")
+log_subsection("Processing G>T mutations")
 
 # Filter G>T mutations only
 gt_data <- data %>%
@@ -65,7 +88,7 @@ gt_data <- data %>%
   ) %>%
   filter(!is.na(position), position >= 1, position <= 23)
 
-cat("   ✅ G>T mutations found:", nrow(gt_data), "SNVs\n")
+log_info(paste("G>T mutations found:", format(nrow(gt_data), big.mark = ","), "SNVs"))
 
 # Calculate total counts per position (sum across all samples)
 position_counts <- gt_data %>%
@@ -83,21 +106,21 @@ position_counts <- gt_data %>%
   ) %>%
   arrange(position)
 
-cat("   ✅ Positions analyzed:", nrow(position_counts), "\n")
-cat("   ✅ Total G>T counts:", sum(position_counts$total_GT_count), "\n\n")
+log_info(paste("Positions analyzed:", nrow(position_counts)))
+log_info(paste("Total G>T counts:", format(sum(position_counts$total_GT_count), big.mark = ",")))
 
 # ============================================================================
 # EXPORT TABLE
 # ============================================================================
 
 write_csv(position_counts, output_table)
-cat("   💾 Exported:", output_table, "\n\n")
+log_success(paste("Table exported:", output_table))
 
 # ============================================================================
 # GENERATE FIGURE
 # ============================================================================
 
-cat("🎨 Generating Panel B figure...\n")
+log_subsection("Generating figure")
 
 # Seed region annotation
 seed_min <- 2
@@ -140,23 +163,21 @@ ggsave(
   bg = "white"
 )
 
-cat("   ✅ Figure saved:", output_figure, "\n\n")
+log_success(paste("Figure saved:", output_figure))
 
 # ============================================================================
 # SUMMARY
 # ============================================================================
 
-cat("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n")
-cat("📊 PANEL B SUMMARY:\n\n")
+log_subsection("Summary Statistics")
 
-cat("TOP 5 POSITIONS (highest G>T count):\n")
+log_info("TOP 5 POSITIONS (highest G>T count):")
 top5 <- position_counts %>% 
   arrange(desc(total_GT_count)) %>% 
   head(5)
 print(top5)
-cat("\n")
 
-cat("SEED vs NON-SEED:\n")
+log_info("SEED vs NON-SEED:")
 seed_stats <- position_counts %>%
   mutate(region = ifelse(position >= seed_min & position <= seed_max, "Seed", "Non-seed")) %>%
   group_by(region) %>%
@@ -166,8 +187,7 @@ seed_stats <- position_counts %>%
     .groups = "drop"
   )
 print(seed_stats)
-cat("\n")
 
-cat("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n")
-cat("✅ PANEL B COMPLETE\n\n")
+log_success("Panel B completed successfully")
+log_info(paste("Execution completed at", get_timestamp()))
 

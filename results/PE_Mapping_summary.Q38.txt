@@ -1,2 +1,0 @@
-File name	Total read	PM read	%	1MM read	%	2MM read	%
-rCMC_PE	10229993	2904828	28.4	112808	1.1	133780	1.31
