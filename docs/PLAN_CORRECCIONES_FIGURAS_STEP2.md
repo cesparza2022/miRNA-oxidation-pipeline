@@ -7,7 +7,7 @@
 
 ## Resumen de Correcciones
 
-### 1. **Figure 2.4: Heatmap - Top 50 miRNAs** ✅ **COMPLETADO**
+### 1. **Figure 2.4: Raw VAF Heatmap (Threshold-based Filtering)** ✅ **COMPLETADO**
 **Problemas identificados:**
 - ❌ Usa "top 50" arbitrario → debe usar **umbrales ajustables**
 - ❌ Escala de colores incorrecta → debe ser **blanco a rojo** para VAF (oxidación)
@@ -21,9 +21,18 @@
 
 **Archivos modificados:**
 - `scripts/step2_figures/original_scripts/generate_FIG_2.4_HEATMAP_RAW.R` ✅
+  - Implementa filtrado por umbrales configurables usando `filter_mirnas_for_heatmap()`
+  - Escala de colores: blanco→rojo para VAF
+  - Carga `config.yaml` y `functions_common.R` con detección robusta de paths
 - `scripts/utils/create_step2_viewer.py` ✅ (descripción actualizada)
+  - Título cambiado: "Raw VAF Heatmap (Threshold-based Filtering)"
+  - Descripción actualizada para reflejar umbrales configurables
 - `scripts/utils/create_step2_viewer_embed.py` ✅ (nuevo script para viewer con base64)
+  - Script Python para generar viewer HTML con imágenes embedidas en base64
+  - Descripción actualizada para FIG_2.4
 - `viewers/step2_EMBED.html` ✅ (regenerado con descripción corregida)
+  - Todas las figuras embedidas con base64 (no depende de rutas externas)
+  - Descripción de FIG_2.4 actualizada
 - `config/config.yaml` (ya tiene `heatmap_filtering` section)
 
 **Estado: COMPLETADO (2025-11-05)**
