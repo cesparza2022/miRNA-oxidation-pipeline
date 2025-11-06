@@ -189,3 +189,5 @@ config.yaml
 *.csv
 !sample_metadata_template*.tsv
 !example_data/*.csv
+*.save
+*.txt.save
