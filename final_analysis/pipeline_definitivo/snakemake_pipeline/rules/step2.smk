@@ -7,6 +7,9 @@
 # Load configuration
 configfile: "config/config.yaml"
 
+# Import os for path checking
+import os
+
 # ============================================================================
 # COMMON PATHS AND PARAMETERS
 # ============================================================================
@@ -192,6 +195,48 @@ rule step2_position_specific_analysis:
         SCRIPTS_STEP2 + "/05_position_specific_analysis.R"
 
 # ============================================================================
+# RULE: Hierarchical Clustering - ALL G>T SNVs (Step 2.6)
+# ============================================================================
+
+rule step2_hierarchical_clustering_all_gt:
+    input:
+        vaf_filtered_data = INPUT_DATA_VAF_FILTERED,
+        fallback_data = INPUT_DATA_FALLBACK,
+        functions = FUNCTIONS_COMMON
+    output:
+        clustering_figure = OUTPUT_FIGURES + "/step2_clustering_all_gt.png",
+        cluster_assignments = OUTPUT_TABLES_STATISTICAL + "/S2_clustering_all_gt_assignments.csv",
+        clustering_table = OUTPUT_TABLES_STATISTICAL + "/S2_clustering_all_gt_summary.csv"
+    params:
+        functions = FUNCTIONS_COMMON,
+        data_file = lambda wildcards: INPUT_DATA_VAF_FILTERED if os.path.exists(INPUT_DATA_VAF_FILTERED) else INPUT_DATA_FALLBACK
+    log:
+        OUTPUT_LOGS + "/hierarchical_clustering_all_gt.log"
+    script:
+        SCRIPTS_STEP2 + "/06_hierarchical_clustering_all_gt.R"
+
+# ============================================================================
+# RULE: Hierarchical Clustering - SEED REGION G>T SNVs ONLY (Step 2.7)
+# ============================================================================
+
+rule step2_hierarchical_clustering_seed_gt:
+    input:
+        vaf_filtered_data = INPUT_DATA_VAF_FILTERED,
+        fallback_data = INPUT_DATA_FALLBACK,
+        functions = FUNCTIONS_COMMON
+    output:
+        clustering_figure = OUTPUT_FIGURES + "/step2_clustering_seed_gt.png",
+        cluster_assignments = OUTPUT_TABLES_STATISTICAL + "/S2_clustering_seed_gt_assignments.csv",
+        clustering_table = OUTPUT_TABLES_STATISTICAL + "/S2_clustering_seed_gt_summary.csv"
+    params:
+        functions = FUNCTIONS_COMMON,
+        data_file = lambda wildcards: INPUT_DATA_VAF_FILTERED if os.path.exists(INPUT_DATA_VAF_FILTERED) else INPUT_DATA_FALLBACK
+    log:
+        OUTPUT_LOGS + "/hierarchical_clustering_seed_gt.log"
+    script:
+        SCRIPTS_STEP2 + "/07_hierarchical_clustering_seed_gt.R"
+
+# ============================================================================
 # AGGREGATE RULE: All Step 2 outputs
 # ============================================================================
 
@@ -212,6 +257,13 @@ rule all_step2:
         # NEW: Position-specific analysis
         OUTPUT_TABLES_STATISTICAL + "/S2_position_specific_statistics.csv",
         OUTPUT_FIGURES + "/step2_position_specific_distribution.png",
+        # NEW: Hierarchical clustering analyses
+        OUTPUT_FIGURES + "/step2_clustering_all_gt.png",
+        OUTPUT_TABLES_STATISTICAL + "/S2_clustering_all_gt_assignments.csv",
+        OUTPUT_TABLES_STATISTICAL + "/S2_clustering_all_gt_summary.csv",
+        OUTPUT_FIGURES + "/step2_clustering_seed_gt.png",
+        OUTPUT_TABLES_STATISTICAL + "/S2_clustering_seed_gt_assignments.csv",
+        OUTPUT_TABLES_STATISTICAL + "/S2_clustering_seed_gt_summary.csv",
         # Figures
         OUTPUT_FIGURES + "/step2_volcano_plot.png",
         OUTPUT_FIGURES + "/step2_effect_size_distribution.png",

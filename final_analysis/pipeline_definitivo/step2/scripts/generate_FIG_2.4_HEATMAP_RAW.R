@@ -248,10 +248,12 @@ theme_prof <- theme_minimal(base_size = 12) +
   )
 
 # Heatmap con facet por grupo
+# Escala blanco→rojo para VAF (oxidación)
 fig_2_4 <- ggplot(heatmap_data, aes(x = position, y = miRNA_name, fill = Mean_VAF)) +
   geom_tile(color = NA) +
-  scale_fill_viridis_c(
-    option = "plasma",
+  scale_fill_gradient(
+    low = "white",
+    high = COLOR_ALS,  # Red (#D62728) for oxidation/VAF
     na.value = "gray90",
     name = "Mean VAF",
     trans = "sqrt",

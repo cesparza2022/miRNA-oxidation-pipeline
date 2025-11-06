@@ -4,6 +4,69 @@ Registro cronológico de modificaciones, mejoras y ajustes realizados en el pipe
 
 ---
 
+## 2025-11-04 - Implementación de Step 8: Sequence-Based Analysis (Paper Reference Methods)
+
+### Cambios realizados:
+
+✅ **Nuevo Step 8 creado:**
+- Creado `step8/` con estructura completa: `scripts/`, `results/` (tables, figures, logs)
+- Implementado análisis de contexto trinucleótido (XGY) - enriquecimiento de contextos GG, CG, AG, UG
+- Implementado sequence logos por posición (hotspots: posiciones 2, 3, 5)
+- Implementado análisis temporal (acumulación de G>T en timepoints, si disponibles)
+- Agregado a `rules/step8.smk` y `Snakefile` (comentado por defecto, opcional)
+
+✅ **Scripts creados:**
+- `scripts/step8/01_trinucleotide_context.R`: Análisis de contexto XGY con tests de enriquecimiento
+- `scripts/step8/02_position_specific_logos.R`: Generación de sequence logos usando `ggseqlogo`
+- `scripts/step8/03_temporal_patterns.R`: Análisis de acumulación temporal
+
+✅ **Mejoras en Step 6:**
+- Agregado `scripts/step6/03_direct_target_prediction.R`: Comparación directa de targets canónicos vs oxidados
+- Actualizado `rules/step6.smk` con nueva regla `step6_direct_target_prediction`
+- Nuevas salidas: 3 tablas + 1 figura de comparación de targets
+
+✅ **Configuración actualizada:**
+- Agregado `step8` a `config.yaml` (paths y scripts)
+- Agregado `step8` a `Snakefile` (opcional, comentado por defecto)
+- Actualizado `README.md` del pipeline con Step 8
+
+✅ **Documentación actualizada:**
+- Actualizado `README.md` con descripción de Step 8
+- Actualizado `BITACORA_PIPELINE.md` (esta entrada)
+- Creado `PLAN_AGREGAR_ANALISIS_PAPER_REFERENCIA.md` con plan de implementación
+- Actualizado `COMPARACION_ENFOQUES_METODOLOGICOS.md` (marcando análisis implementados)
+
+### Motivo del cambio:
+- Agregar métodos del paper de referencia: "Widespread 8-oxoguanine modifications of miRNA seeds..."
+- Implementar análisis de contexto trinucleótido para validar mecanismo de oxidación
+- Generar sequence logos para identificar motivos conservados
+- Mejorar Step 6 con predicción directa de targets (comparación canónicos vs oxidados)
+
+### Impacto:
+- **Nuevos outputs Step 8:**
+  - 4 figuras: trinucleotide context, logos (pos 2, 3, 5), temporal patterns
+  - 3 tablas: enrichment, context summary, temporal accumulation
+- **Nuevos outputs Step 6:**
+  - 1 figura: target comparison (canonical vs oxidized)
+  - 3 tablas: canonical targets, oxidized targets, detailed comparison
+- **Dependencias:** Step 8 requiere Step 1.5 (VAF-filtered data) y Step 2 (statistical results)
+
+### Uso:
+```bash
+# Ejecutar Step 8 (opcional)
+snakemake -j 1 all_step8
+
+# O incluir en pipeline completo (descomentar en Snakefile)
+```
+
+### Notas:
+- Step 8 es opcional por defecto (comentado en Snakefile)
+- Sequence logos requieren `ggseqlogo` y `Biostrings` (instalados automáticamente)
+- Target prediction usa simulación (en producción, usar TargetScan/miRDB)
+- Análisis temporal requiere timepoints en nombres de muestras (patrón: T0, T6, etc.)
+
+---
+
 ## 2025-01-28 - Consolidación y Automatización del Pipeline
 
 ### Cambios en Paso 2:

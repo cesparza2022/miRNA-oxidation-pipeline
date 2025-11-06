@@ -258,12 +258,13 @@ theme_prof <- theme_minimal(base_size = 12) +
   )
 
 # Heatmap con facet por grupo
+# Escala divergente azul→blanco→rojo para z-scores (centrado en 0)
 fig_2_5 <- ggplot(heatmap_data, aes(x = position, y = miRNA_name, fill = Z_score)) +
   geom_tile(color = NA) +
   scale_fill_gradient2(
-    low = COLOR_CONTROL,
-    mid = "white",
-    high = COLOR_ALS,
+    low = "#1E88E5",  # Blue for negative z-scores
+    mid = "white",    # White at zero (midpoint)
+    high = COLOR_ALS, # Red (#D62728) for positive z-scores
     midpoint = 0,
     na.value = "gray90",
     limits = c(-3, 3),

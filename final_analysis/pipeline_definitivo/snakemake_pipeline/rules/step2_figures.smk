@@ -1,11 +1,15 @@
 # ============================================================================
-# SNAKEMAKE RULES: STEP 2 - CORRECT FIGURES (16 figures)
+# SNAKEMAKE RULES: STEP 2 - CORRECT FIGURES (15 figures + 2 clustering = 17 total)
 # ============================================================================
-# Rules for generating the 16 correct Step 2 figures using original scripts
+# Rules for generating the 15 correct Step 2 figures using original scripts
+# Note: FIG_2.8 removed (redundant with FIG_2.16 which uses ALL G>T SNVs)
 # ============================================================================
 
 # Load configuration
 configfile: "config/config.yaml"
+
+# Import os for path checking
+import os
 
 # ============================================================================
 # COMMON PATHS AND PARAMETERS
@@ -72,7 +76,7 @@ rule step2_generate_all_figures:
         fig_2_4 = OUTPUT_FIGURES + "/FIG_2.4_HEATMAP_TOP50_CLEAN.png",
         fig_2_5 = OUTPUT_FIGURES + "/FIG_2.5_HEATMAP_ZSCORE_CLEAN.png",
         fig_2_6 = OUTPUT_FIGURES + "/FIG_2.6_POSITIONAL_CLEAN.png",
-        fig_2_8 = OUTPUT_FIGURES + "/FIG_2.8_CLUSTERING_CLEAN.png",
+        # fig_2_8 = OUTPUT_FIGURES + "/FIG_2.8_CLUSTERING_CLEAN.png",  # REMOVED: Redundant with FIG_2.16
         fig_2_9 = OUTPUT_FIGURES + "/FIG_2.9_CV_CLEAN.png",
         fig_2_10 = OUTPUT_FIGURES + "/FIG_2.10_RATIO_CLEAN.png",
         fig_2_11 = OUTPUT_FIGURES + "/FIG_2.11_MUTATION_TYPES_CLEAN.png",
@@ -98,7 +102,50 @@ rule step2_generate_all_figures:
         """
 
 # ============================================================================
-# AGGREGATE RULE: All Step 2 Correct Figures
+# RULE: Hierarchical Clustering - ALL G>T SNVs (Step 2.16)
+# ============================================================================
+
+rule step2_clustering_all_gt:
+    input:
+        vaf_filtered_data = INPUT_DATA_VAF_FILTERED,
+        fallback_data = INPUT_DATA_FALLBACK,
+        functions = FUNCTIONS_COMMON
+    output:
+        clustering_figure = OUTPUT_FIGURES + "/FIG_2.16_CLUSTERING_ALL_GT.png",
+        cluster_assignments = OUTPUT_TABLES + "/S2_clustering_all_gt_assignments.csv",
+        clustering_table = OUTPUT_TABLES + "/S2_clustering_all_gt_summary.csv"
+    params:
+        functions = FUNCTIONS_COMMON,
+        data_file = lambda wildcards: INPUT_DATA_VAF_FILTERED if os.path.exists(INPUT_DATA_VAF_FILTERED) else INPUT_DATA_FALLBACK
+    log:
+        OUTPUT_LOGS + "/clustering_all_gt.log"
+    script:
+        "../scripts/step2/06_hierarchical_clustering_all_gt.R"
+
+# ============================================================================
+# RULE: Hierarchical Clustering - SEED REGION G>T SNVs ONLY (Step 2.17)
+# ============================================================================
+
+rule step2_clustering_seed_gt:
+    input:
+        vaf_filtered_data = INPUT_DATA_VAF_FILTERED,
+        fallback_data = INPUT_DATA_FALLBACK,
+        functions = FUNCTIONS_COMMON
+    output:
+        clustering_figure = OUTPUT_FIGURES + "/FIG_2.17_CLUSTERING_SEED_GT.png",
+        cluster_assignments = OUTPUT_TABLES + "/S2_clustering_seed_gt_assignments.csv",
+        clustering_table = OUTPUT_TABLES + "/S2_clustering_seed_gt_summary.csv"
+    params:
+        functions = FUNCTIONS_COMMON,
+        data_file = lambda wildcards: INPUT_DATA_VAF_FILTERED if os.path.exists(INPUT_DATA_VAF_FILTERED) else INPUT_DATA_FALLBACK
+    log:
+        OUTPUT_LOGS + "/clustering_seed_gt.log"
+    script:
+        "../scripts/step2/07_hierarchical_clustering_seed_gt.R"
+
+# ============================================================================
+# AGGREGATE RULE: All Step 2 Correct Figures (15 original + 2 clustering = 17 total)
+# Note: FIG_2.8 removed (redundant with FIG_2.16)
 # ============================================================================
 
 rule all_step2_figures:
@@ -107,19 +154,26 @@ rule all_step2_figures:
         rules.all_step1_5.output,
         # Metadata
         OUTPUT_TABLES + "/S2_metadata.csv",
-        # All 14 figures (2.7 will be handled separately if needed)
+        # All 15 original figures (2.7 is optional - will be handled separately if needed)
         OUTPUT_FIGURES + "/FIG_2.1_VAF_GLOBAL_CLEAN.png",
         OUTPUT_FIGURES + "/FIG_2.2_DISTRIBUTIONS_CLEAN.png",
         OUTPUT_FIGURES + "/FIG_2.3_VOLCANO_PER_SAMPLE_METHOD.png",
         OUTPUT_FIGURES + "/FIG_2.4_HEATMAP_TOP50_CLEAN.png",
         OUTPUT_FIGURES + "/FIG_2.5_HEATMAP_ZSCORE_CLEAN.png",
         OUTPUT_FIGURES + "/FIG_2.6_POSITIONAL_CLEAN.png",
-        OUTPUT_FIGURES + "/FIG_2.8_CLUSTERING_CLEAN.png",
+        # OUTPUT_FIGURES + "/FIG_2.8_CLUSTERING_CLEAN.png",  # REMOVED: Redundant with FIG_2.16
         OUTPUT_FIGURES + "/FIG_2.9_CV_CLEAN.png",
         OUTPUT_FIGURES + "/FIG_2.10_RATIO_CLEAN.png",
         OUTPUT_FIGURES + "/FIG_2.11_MUTATION_TYPES_CLEAN.png",
         OUTPUT_FIGURES + "/FIG_2.12_ENRICHMENT_CLEAN.png",
         OUTPUT_FIGURES + "/FIG_2.13_DENSITY_HEATMAP_ALS.png",
         OUTPUT_FIGURES + "/FIG_2.14_DENSITY_HEATMAP_CONTROL.png",
-        OUTPUT_FIGURES + "/FIG_2.15_DENSITY_COMBINED.png"
+        OUTPUT_FIGURES + "/FIG_2.15_DENSITY_COMBINED.png",
+        # NEW: Hierarchical clustering analyses (guía para el análisis)
+        OUTPUT_FIGURES + "/FIG_2.16_CLUSTERING_ALL_GT.png",
+        OUTPUT_TABLES + "/S2_clustering_all_gt_assignments.csv",
+        OUTPUT_TABLES + "/S2_clustering_all_gt_summary.csv",
+        OUTPUT_FIGURES + "/FIG_2.17_CLUSTERING_SEED_GT.png",
+        OUTPUT_TABLES + "/S2_clustering_seed_gt_assignments.csv",
+        OUTPUT_TABLES + "/S2_clustering_seed_gt_summary.csv"
 

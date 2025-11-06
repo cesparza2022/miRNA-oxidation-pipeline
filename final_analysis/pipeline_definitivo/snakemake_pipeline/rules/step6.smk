@@ -14,6 +14,7 @@ configfile: "config/config.yaml"
 # ============================================================================
 
 # Input data (from Step 2 - Statistical comparisons and Step 3 - Clustering)
+STEP1_5_DATA_DIR = config["paths"]["snakemake_dir"] + "/" + config["paths"]["outputs"]["step1_5"]
 STEP2_DATA_DIR = config["paths"]["snakemake_dir"] + "/" + config["paths"]["outputs"]["step2"]
 STEP3_DATA_DIR = config["paths"]["snakemake_dir"] + "/" + config["paths"]["outputs"]["step3"]
 INPUT_STATISTICAL = STEP2_DATA_DIR + "/tables/statistical_results/S2_statistical_comparisons.csv"
@@ -77,6 +78,27 @@ rule step6_pathway_enrichment:
         SCRIPTS_STEP6_SCRIPT + "/02_pathway_enrichment_analysis.R"
 
 # ============================================================================
+# RULE: Direct Target Prediction (Canonical vs Oxidized)
+# ============================================================================
+
+rule step6_direct_target_prediction:
+    input:
+        targets = OUTPUT_TABLES_FUNCTIONAL + "/S6_target_analysis.csv",
+        vaf_filtered = STEP1_5_DATA_DIR + "/tables/filtered_data/ALL_MUTATIONS_VAF_FILTERED.csv",
+        functions = FUNCTIONS_COMMON
+    output:
+        canonical_targets = OUTPUT_TABLES_FUNCTIONAL + "/S6_canonical_targets.csv",
+        oxidized_targets = OUTPUT_TABLES_FUNCTIONAL + "/S6_oxidized_targets.csv",
+        target_comparison = OUTPUT_TABLES_FUNCTIONAL + "/S6_target_comparison_detailed.csv",
+        target_comparison_figure = OUTPUT_FIGURES + "/step6_target_comparison.png"
+    params:
+        functions = FUNCTIONS_COMMON
+    log:
+        OUTPUT_LOGS + "/direct_target_prediction.log"
+    script:
+        SCRIPTS_STEP6_SCRIPT + "/03_direct_target_prediction.R"
+
+# ============================================================================
 # RULE: Complex Functional Visualization
 # ============================================================================
 
@@ -116,6 +138,11 @@ rule all_step6:
         OUTPUT_TABLES_FUNCTIONAL + "/S6_go_enrichment.csv",
         OUTPUT_TABLES_FUNCTIONAL + "/S6_kegg_enrichment.csv",
         OUTPUT_TABLES_FUNCTIONAL + "/S6_als_pathways.csv",
+        # Direct target prediction (new)
+        OUTPUT_TABLES_FUNCTIONAL + "/S6_canonical_targets.csv",
+        OUTPUT_TABLES_FUNCTIONAL + "/S6_oxidized_targets.csv",
+        OUTPUT_TABLES_FUNCTIONAL + "/S6_target_comparison_detailed.csv",
+        OUTPUT_FIGURES + "/step6_target_comparison.png",
         # Figures
         OUTPUT_FIGURES + "/step6_pathway_enrichment_heatmap.png",
         OUTPUT_FIGURES + "/step6_panelA_pathway_enrichment.png",

@@ -103,16 +103,35 @@ rule generate_step1_5_viewer:
 
 rule generate_step2_viewer:
     input:
+        # Statistical results
         comparisons = OUTPUT_STEP2_TABLES + "/statistical_results/S2_statistical_comparisons.csv",
-        volcano = OUTPUT_STEP2_FIGURES + "/step2_volcano_plot.png",
         effect_sizes = OUTPUT_STEP2_TABLES + "/statistical_results/S2_effect_sizes.csv",
-        effect_size_plot = OUTPUT_STEP2_FIGURES + "/step2_effect_size_distribution.png"
+        # All Step 2 figures (FIG_2.1 to FIG_2.17)
+        fig_2_1 = OUTPUT_STEP2_FIGURES + "/FIG_2.1_VAF_GLOBAL_CLEAN.png",
+        fig_2_2 = OUTPUT_STEP2_FIGURES + "/FIG_2.2_DISTRIBUTIONS_CLEAN.png",
+        fig_2_3 = OUTPUT_STEP2_FIGURES + "/FIG_2.3_VOLCANO_PER_SAMPLE_METHOD.png",
+        fig_2_4 = OUTPUT_STEP2_FIGURES + "/FIG_2.4_HEATMAP_TOP50_CLEAN.png",
+        fig_2_5 = OUTPUT_STEP2_FIGURES + "/FIG_2.5_HEATMAP_ZSCORE_CLEAN.png",
+        fig_2_6 = OUTPUT_STEP2_FIGURES + "/FIG_2.6_POSITIONAL_CLEAN.png",
+        fig_2_8 = OUTPUT_STEP2_FIGURES + "/FIG_2.8_CLUSTERING_CLEAN.png",
+        fig_2_9 = OUTPUT_STEP2_FIGURES + "/FIG_2.9_CV_CLEAN.png",
+        fig_2_10 = OUTPUT_STEP2_FIGURES + "/FIG_2.10_RATIO_CLEAN.png",
+        fig_2_11 = OUTPUT_STEP2_FIGURES + "/FIG_2.11_MUTATION_TYPES_CLEAN.png",
+        fig_2_12 = OUTPUT_STEP2_FIGURES + "/FIG_2.12_ENRICHMENT_CLEAN.png",
+        fig_2_13 = OUTPUT_STEP2_FIGURES + "/FIG_2.13_DENSITY_HEATMAP_ALS.png",
+        fig_2_14 = OUTPUT_STEP2_FIGURES + "/FIG_2.14_DENSITY_HEATMAP_CONTROL.png",
+        fig_2_15 = OUTPUT_STEP2_FIGURES + "/FIG_2.15_DENSITY_COMBINED.png",
+        fig_2_16 = OUTPUT_STEP2_FIGURES + "/FIG_2.16_CLUSTERING_ALL_GT.png",
+        fig_2_17 = OUTPUT_STEP2_FIGURES + "/FIG_2.17_CLUSTERING_SEED_GT.png",
+        # Clustering summaries
+        clustering_all_summary = OUTPUT_STEP2_TABLES + "/S2_clustering_all_gt_summary.csv",
+        clustering_seed_summary = OUTPUT_STEP2_TABLES + "/S2_clustering_seed_gt_summary.csv"
     output:
         viewer = OUTPUT_VIEWERS + "/step2.html"
     log:
         OUTPUT_STEP2 + "/logs/viewer_step2.log"
     script:
-        SCRIPTS_UTILS + "/build_step2_viewer.R"
+        "../scripts/utils/build_step2_viewer.R"
 
 # ============================================================================
 # RULE: Generate Step 3 HTML Viewer

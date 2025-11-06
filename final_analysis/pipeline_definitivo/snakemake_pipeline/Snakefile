@@ -26,9 +26,12 @@ include: "rules/step5.smk"
 include: "rules/step6.smk"
 # Step 7 depends on step6, so it runs after the parallel steps
 include: "rules/step7.smk"
+# Step 8 (sequence-based analysis) is optional and can run after Step 7
+include: "rules/step8.smk"
 include: "rules/pipeline_info.smk"
 include: "rules/summary.smk"
 include: "rules/validation.smk"
+include: "rules/viewers.smk"  # HTML viewers for each step
 
 # ============================================================================
 # CONFIGURATION VALIDATION (runs first)
@@ -86,7 +89,7 @@ rule all:
         rules.create_output_structure.output,
         rules.all_step1.output,
         rules.all_step1_5.output,
-        rules.all_step2.output,
+        rules.all_step2_figures.output,  # Step 2 correct figures (16 figures: FIG_2.1 to FIG_2.17)
         # Step 3 (clustering) runs first after step2
         rules.all_step3.output,
         # Steps 4, 5, 6 run in parallel after step3
@@ -95,6 +98,8 @@ rule all:
         rules.all_step6.output,
         # Step 7 depends on step6
         rules.all_step7.output,
+        # Step 8 (sequence-based analysis) is optional
+        # rules.all_step8.output,  # Commented out by default, uncomment to include
         rules.generate_pipeline_info.output,
         rules.generate_summary_report.output,
         rules.validate_pipeline_completion.output

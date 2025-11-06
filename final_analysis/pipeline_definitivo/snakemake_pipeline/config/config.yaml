@@ -45,6 +45,7 @@ paths:
     step5: "results/step5"  # Expression-Oxidation Correlation
     step6: "results/step6"  # Functional Analysis
     step7: "results/step7"  # Biomarker Analysis (Final Integration)
+    step8: "results/step8"  # Sequence-Based Analysis (Paper Reference Methods)
   
   # Scripts directories (relative to snakemake_dir - usually no need to change)
   scripts:
@@ -56,6 +57,7 @@ paths:
     step5: "scripts/step5"  # Expression-Oxidation Correlation
     step6: "scripts/step6"  # Functional Analysis
     step7: "scripts/step7"  # Biomarker Analysis (Final Integration)
+    step8: "scripts/step8"  # Sequence-Based Analysis (Paper Reference Methods)
     utils: "scripts/utils"
   
   # Viewers directory (relative to snakemake_dir)
@@ -110,6 +112,14 @@ analysis:
     # Additional filters
     min_total_gt_count: null  # Minimum total G>T counts across all samples (if available)
     min_log2_fold_change: null  # Minimum log2 fold change (if doing differential analysis)
+  
+  # Enrichment analysis filtering (for Figure 2.12 - replaces "top 20/10" arbitrary thresholds)
+  enrichment_filtering:
+    # G>T burden threshold (total sum of VAF across all samples)
+    min_gt_burden: 0.0  # Minimum total G>T burden (sum of VAF)
+    min_mean_vaf: 0.0   # Minimum mean VAF across samples
+    min_samples_detected: 1  # Minimum number of samples where G>T is detected
+    max_cv: null  # Maximum coefficient of variation (null = no CV filter, or value like 1000)
   
   # Statistical assumptions validation
   assumptions:

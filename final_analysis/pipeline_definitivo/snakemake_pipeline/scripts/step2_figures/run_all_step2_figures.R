@@ -35,7 +35,7 @@ if (length(args) >= 4) {
 
 cat("\n")
 cat("═══════════════════════════════════════════════════════════════════\n")
-cat("  RUNNING ALL STEP 2 FIGURES (16 figures)\n")
+cat("  RUNNING ALL STEP 2 FIGURES (15 figures - 2.8 removed, redundant with 2.16)\n")
 cat("═══════════════════════════════════════════════════════════════════\n")
 cat("\n")
 
@@ -219,7 +219,7 @@ if (file.exists(master_script)) {
       "generate_FIG_2.5_ZSCORE_ALL301.R",
       "generate_FIG_2.6_POSITIONAL.R",
       "generate_FIG_2.7_IMPROVED.R",
-      "generate_FIG_2.8_CLUSTERING.R",
+      # "generate_FIG_2.8_CLUSTERING.R",  # REMOVED: Redundant with FIG_2.16 (uses ALL G>T SNVs)
       "generate_FIG_2.9_IMPROVED.R",
       "generate_FIG_2.10_GT_RATIO.R",
       "generate_FIG_2.11_IMPROVED.R",
@@ -255,7 +255,7 @@ if (file.exists(master_script)) {
     "generate_FIG_2.5_ZSCORE_ALL301.R",
     "generate_FIG_2.6_POSITIONAL.R",
     "generate_FIG_2.7_IMPROVED.R",
-    "generate_FIG_2.8_CLUSTERING.R",
+    # "generate_FIG_2.8_CLUSTERING.R",  # REMOVED: Redundant with FIG_2.16 (uses ALL G>T SNVs)
     "generate_FIG_2.9_IMPROVED.R",
     "generate_FIG_2.10_GT_RATIO.R",
     "generate_FIG_2.11_IMPROVED.R",
@@ -336,12 +336,12 @@ figure_mapping <- list(
                file.path(figures_dir, "FIG_2.7A_PCA_MAIN_IMPROVED.png")),
     target = file.path(output_figures_dir, "FIG_2.7_PCA_CLEAN.png")
   ),
-  # Figure 2.8: Use CLUSTERING_CLEAN or CLUSTERING
-  list(
-    source = c(file.path(figures_dir, "FIG_2.8_CLUSTERING_CLEAN.png"),
-               file.path(figures_dir, "FIG_2.8_CLUSTERING.png")),
-    target = file.path(output_figures_dir, "FIG_2.8_CLUSTERING_CLEAN.png")
-  ),
+  # Figure 2.8: REMOVED - Redundant with FIG_2.16 (uses ALL G>T SNVs)
+  # list(
+  #   source = c(file.path(figures_dir, "FIG_2.8_CLUSTERING_CLEAN.png"),
+  #              file.path(figures_dir, "FIG_2.8_CLUSTERING.png")),
+  #   target = file.path(output_figures_dir, "FIG_2.8_CLUSTERING_CLEAN.png")
+  # ),
   # Figure 2.9: Use CV_CLEAN or COMBINED_IMPROVED
   list(
     source = c(file.path(figures_dir, "FIG_2.9_CV_CLEAN.png"),

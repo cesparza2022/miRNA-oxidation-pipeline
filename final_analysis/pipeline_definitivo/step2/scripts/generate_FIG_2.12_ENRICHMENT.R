@@ -39,6 +39,51 @@ output_dir <- "figures_paso2_CLEAN"
 
 dir.create(output_dir, showWarnings = FALSE, recursive = TRUE)
 
+# Load configuration if available (for configurable thresholds)
+config <- NULL
+config_paths <- c(
+  "../../snakemake_pipeline/config/config.yaml",
+  "../snakemake_pipeline/config/config.yaml",
+  "config/config.yaml",
+  "../../../snakemake_pipeline/config/config.yaml"
+)
+
+library(yaml)
+for (cp in config_paths) {
+  if (file.exists(cp)) {
+    config <- yaml::read_yaml(cp)
+    cat("📋 Configuration loaded from:", cp, "\n")
+    break
+  }
+}
+
+# Set configurable thresholds (from config.yaml or defaults)
+if (!is.null(config) && "analysis" %in% names(config) && 
+    "enrichment_filtering" %in% names(config$analysis)) {
+  enrichment_config <- config$analysis$enrichment_filtering
+  min_gt_burden <- ifelse(is.null(enrichment_config$min_gt_burden), 0.0, enrichment_config$min_gt_burden)
+  min_mean_vaf <- ifelse(is.null(enrichment_config$min_mean_vaf), 0.0, enrichment_config$min_mean_vaf)
+  min_samples_detected <- ifelse(is.null(enrichment_config$min_samples_detected), 1, enrichment_config$min_samples_detected)
+  # Handle null max_cv (convert to Inf)
+  if (is.null(enrichment_config$max_cv) || is.na(enrichment_config$max_cv)) {
+    max_cv <- Inf
+  } else {
+    max_cv <- enrichment_config$max_cv
+  }
+} else {
+  # Default thresholds (conservative, will show most miRNAs)
+  min_gt_burden <- 0.0  # Minimum total G>T burden
+  min_mean_vaf <- 0.0   # Minimum mean VAF
+  min_samples_detected <- 1  # Minimum samples with detection
+  max_cv <- Inf  # Maximum CV (coefficient of variation)
+}
+
+cat("📋 Enrichment filtering thresholds:\n")
+cat(sprintf("   • min_gt_burden: %.2f\n", min_gt_burden))
+cat(sprintf("   • min_mean_vaf: %.4f\n", min_mean_vaf))
+cat(sprintf("   • min_samples_detected: %d\n", min_samples_detected))
+cat(sprintf("   • max_cv: %s\n\n", ifelse(is.infinite(max_cv), "Inf", as.character(max_cv))))
+
 # Colors
 COLOR_ALS <- "#d32f2f"
 COLOR_CONTROL <- "#1976d2"
@@ -132,12 +177,30 @@ mirna_stats <- gt_long %>%
 
 cat(sprintf("✅ Analyzed %d miRNAs\n\n", nrow(mirna_stats)))
 
-# Top 20 by burden
-top20_burden <- head(mirna_stats, 20)
+# Filter miRNAs by configurable thresholds (not arbitrary "top 20")
+mirnas_filtered <- mirna_stats %>%
+  filter(
+    Total_burden >= min_gt_burden,
+    Mean_VAF >= min_mean_vaf,
+    N_samples >= min_samples_detected,
+    CV <= max_cv
+  )
 
-cat("📊 Top 20 miRNAs by total G>T burden:\n")
-cat(paste("   ", 1:5, ". ", top20_burden$miRNA_name[1:5], 
-          " (burden = ", round(top20_burden$Total_burden[1:5], 2), ")", 
+cat(sprintf("📊 Filtered miRNAs: %d (of %d total) passing thresholds\n", 
+            nrow(mirnas_filtered), nrow(mirna_stats)))
+cat(sprintf("   Thresholds: burden ≥ %.2f, mean VAF ≥ %.4f, N samples ≥ %d, CV ≤ %s\n\n",
+            min_gt_burden, min_mean_vaf, min_samples_detected,
+            ifelse(is.infinite(max_cv), "Inf", as.character(max_cv))))
+
+# For visualization, show top miRNAs by burden (from filtered set)
+# Limit to reasonable number for visualization (max 50)
+max_mirnas_plot <- min(50, nrow(mirnas_filtered))
+top_mirnas_burden <- head(mirnas_filtered, max_mirnas_plot)
+
+cat(sprintf("📊 Top %d miRNAs by total G>T burden (from filtered set):\n", max_mirnas_plot))
+cat(paste("   ", 1:min(5, nrow(top_mirnas_burden)), ". ", 
+          top_mirnas_burden$miRNA_name[1:min(5, nrow(top_mirnas_burden))], 
+          " (burden = ", round(top_mirnas_burden$Total_burden[1:min(5, nrow(top_mirnas_burden))], 2), ")", 
           sep = "", collapse = "\n"), "\n\n")
 
 # ============================================================================
@@ -168,12 +231,26 @@ family_stats <- mirna_stats %>%
 
 cat(sprintf("✅ Identified %d miRNA families (≥2 members)\n\n", nrow(family_stats)))
 
-top10_families <- head(family_stats, 10)
+# Filter families by configurable thresholds (not arbitrary "top 10")
+families_filtered <- family_stats %>%
+  filter(
+    Total_burden >= min_gt_burden,
+    N_miRNAs >= 2  # Still require at least 2 members
+  )
 
-cat("📊 Top 10 miRNA families by G>T burden:\n")
-cat(paste("   ", 1:5, ". ", top10_families$Family[1:5],
-          " (n=", top10_families$N_miRNAs[1:5], 
-          ", burden=", round(top10_families$Total_burden[1:5], 2), ")",
+cat(sprintf("📊 Filtered families: %d (of %d total) passing thresholds\n",
+            nrow(families_filtered), nrow(family_stats)))
+
+# For visualization, show top families by burden (from filtered set)
+# Limit to reasonable number for visualization (max 30)
+max_families_plot <- min(30, nrow(families_filtered))
+top_families_burden <- head(families_filtered, max_families_plot)
+
+cat(sprintf("📊 Top %d miRNA families by G>T burden (from filtered set):\n", max_families_plot))
+cat(paste("   ", 1:min(5, nrow(top_families_burden)), ". ", 
+          top_families_burden$Family[1:min(5, nrow(top_families_burden))],
+          " (n=", top_families_burden$N_miRNAs[1:min(5, nrow(top_families_burden))], 
+          ", burden=", round(top_families_burden$Total_burden[1:min(5, nrow(top_families_burden))], 2), ")",
           sep = "", collapse = "\n"), "\n\n")
 
 # ============================================================================
@@ -238,9 +315,9 @@ if (nrow(biomarker_candidates) > 0) {
 # FIGURE 2.12A: TOP 20 miRNAs BY BURDEN
 # ============================================================================
 
-cat("📊 Creating Figure 2.12A: Top 20 miRNAs...\n")
+cat("📊 Creating Figure 2.12A: miRNAs by burden (filtered by thresholds)...\n")
 
-fig_2_12a <- ggplot(top20_burden, 
+fig_2_12a <- ggplot(top_mirnas_burden, 
                     aes(x = reorder(miRNA_name, Total_burden), 
                         y = Total_burden, 
                         fill = Reliability)) +
@@ -254,8 +331,9 @@ fig_2_12a <- ggplot(top20_burden,
   ) +
   
   labs(
-    title = "A. Top 20 miRNAs by G>T Burden",
-    subtitle = "Ranked by total VAF across all samples",
+    title = paste0("A. miRNAs by G>T Burden (n=", nrow(top_mirnas_burden), " passing thresholds)"),
+    subtitle = paste0("Filtered: burden ≥ ", min_gt_burden, ", mean VAF ≥ ", min_mean_vaf, 
+                     ", N samples ≥ ", min_samples_detected, " | Ranked by total burden"),
     x = "miRNA",
     y = "Total G>T Burden (sum of VAF)",
     caption = "Color indicates reliability: High (CV<500), Medium (500-1000), Low (>1000)"
@@ -272,9 +350,9 @@ cat("✅ Figure 2.12A saved\n\n")
 # FIGURE 2.12B: TOP 10 miRNA FAMILIES
 # ============================================================================
 
-cat("📊 Creating Figure 2.12B: Top miRNA families...\n")
+cat("📊 Creating Figure 2.12B: miRNA families by burden (filtered by thresholds)...\n")
 
-fig_2_12b <- ggplot(top10_families, 
+fig_2_12b <- ggplot(top_families_burden, 
                     aes(x = reorder(Family, Total_burden), 
                         y = Total_burden, 
                         fill = N_miRNAs)) +
@@ -293,8 +371,8 @@ fig_2_12b <- ggplot(top10_families,
   scale_y_continuous(expand = expansion(mult = c(0, 0.15))) +
   
   labs(
-    title = "B. Top 10 miRNA Families by G>T Burden",
-    subtitle = "Families with ≥2 members | Ranked by total burden",
+    title = paste0("B. miRNA Families by G>T Burden (n=", nrow(top_families_burden), " passing thresholds)"),
+    subtitle = paste0("Filtered: burden ≥ ", min_gt_burden, ", ≥2 members | Ranked by total burden"),
     x = "miRNA Family",
     y = "Total G>T Burden (sum of VAF)"
   ) +
@@ -374,7 +452,7 @@ if (nrow(biomarker_candidates) > 0) {
     
     scale_size_continuous(
       range = c(3, 12),
-      name = "N samples"
+      name = "N samples\nwith G>T"
     ) +
     
     scale_x_log10() +
@@ -382,7 +460,8 @@ if (nrow(biomarker_candidates) > 0) {
     
     labs(
       title = "D. Biomarker Candidates",
-      subtitle = "High burden + Low CV + Sufficient samples | Top 15 shown",
+      subtitle = paste0("High burden + Low CV + Sufficient samples | ", 
+                        nrow(top_candidates_plot), " candidates shown"),
       x = "Mean VAF (log scale)",
       y = "Total Burden (log scale)",
       caption = "Green = reliable (low CV). Larger = more samples. Top 5 labeled."

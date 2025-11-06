@@ -187,14 +187,15 @@ Sample2	Control	Batch1	62	F
 
 ### Step 6: Functional Analysis
 - Target prediction for oxidized miRNAs
+- **Direct target prediction**: Comparison of canonical vs oxidized miRNA targets ⭐ NEW
 - GO and KEGG pathway enrichment
 - Disease-relevant genes impact
 - Analyzes functional implications with clustering context from Step 3
 - **Runs after Step 3**, in parallel with Steps 4 and 5
 
 **Outputs:**
-- 5 figures (PNG, 300 DPI)
-- 6 tables (CSV)
+- 6 figures (PNG, 300 DPI) ⭐ Updated: +1 target comparison figure
+- 9 tables (CSV) ⭐ Updated: +3 target prediction tables
 
 ### Step 7: Biomarker Analysis (Final Integration)
 - ROC curve analysis
@@ -207,7 +208,18 @@ Sample2	Control	Batch1	62	F
 - 2 figures (PNG, 300 DPI)
 - 2 tables (CSV)
 
-**Note:** Step 3 (Clustering) runs FIRST after Step 2 to discover data structure. Then Steps 4, 5, and 6 run in parallel using clustering results. Step 7 depends on Step 6 and runs last.
+### Step 8: Sequence-Based Analysis (Paper Reference Methods) ⭐ NEW
+- **Trinucleotide context analysis (XGY)**: Enrichment of GG, CG, AG, UG contexts around G>T mutations
+- **Position-specific sequence logos**: Sequence conservation patterns at hotspot positions (2, 3, 5)
+- **Temporal pattern analysis**: Accumulation of G>T mutations over time (if timepoints available)
+- Implements methods from reference paper: "Widespread 8-oxoguanine modifications of miRNA seeds..."
+- **Optional step** - can be enabled in Snakefile
+
+**Outputs:**
+- 4 figures (PNG, 300 DPI)
+- 3 tables (CSV)
+
+**Note:** Step 3 (Clustering) runs FIRST after Step 2 to discover data structure. Then Steps 4, 5, and 6 run in parallel using clustering results. Step 7 depends on Step 6 and runs last. Step 8 is optional and can run after Step 7.
 
 ## 📁 Output Structure
 
@@ -237,6 +249,9 @@ results/
 ├── step7/final/
 │   ├── figures/      # Biomarker analysis figures
 │   └── tables/        # Biomarker analysis tables
+├── step8/final/
+│   ├── figures/      # Sequence-based analysis figures (logos, contexts)
+│   └── tables/        # Sequence-based analysis tables
 ├── summary/          # Consolidated summary reports
 └── validation/        # Validation reports
 ```
@@ -257,6 +272,9 @@ snakemake -j 1 all_step1_5
 
 # Run only Step 2
 snakemake -j 4 all_step2
+
+# Run Step 8 (sequence-based analysis - optional)
+snakemake -j 1 all_step8
 
 # Dry-run (see what would execute)
 snakemake -j 4 -n
