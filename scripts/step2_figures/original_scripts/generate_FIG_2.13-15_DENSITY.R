@@ -124,11 +124,33 @@ save_heatmap_png(ht_ctrl, "figures_paso2_CLEAN/FIG_2.14_DENSITY_HEATMAP_CONTROL.
 cat("   ✅ Saved FIG_2.14_DENSITY_HEATMAP_CONTROL.png\n\n")
 
 cat("🎨 Generating Figure 2.15 (Combined)...\n")
-ht_combined <- ht_als + ht_ctrl
-png("figures_paso2_CLEAN/FIG_2.15_DENSITY_COMBINED.png",
-    width = 20, height = 12, units = "in", res = 300, bg = "white")
-draw(ht_combined, heatmap_legend_side = "bottom")
-dev.off()
-cat("   ✅ Saved FIG_2.15_DENSITY_COMBINED.png\n\n")
+# Combine heatmaps vertically (not horizontally) to avoid row mismatch
+# Use %v% operator to stack them vertically (ComplexHeatmap >= 2.0)
+tryCatch({
+  ht_combined <- ht_als %v% ht_ctrl
+  png("figures_paso2_CLEAN/FIG_2.15_DENSITY_COMBINED.png",
+      width = 16, height = 20, units = "in", res = 300, bg = "white")
+  draw(ht_combined, heatmap_legend_side = "bottom", 
+       annotation_legend_side = "right", merge_legend = TRUE)
+  dev.off()
+  cat("   ✅ Saved FIG_2.15_DENSITY_COMBINED.png\n\n")
+}, error = function(e) {
+  cat("   ⚠️  Error combining heatmaps:", conditionMessage(e), "\n")
+  cat("   ⚠️  Creating side-by-side layout instead...\n")
+  # Fallback: Create a simple side-by-side layout using grid
+  png("figures_paso2_CLEAN/FIG_2.15_DENSITY_COMBINED.png",
+      width = 20, height = 12, units = "in", res = 300, bg = "white")
+  grid.newpage()
+  pushViewport(viewport(layout = grid.layout(nrow = 1, ncol = 2, 
+                                             widths = unit(c(1, 1), "null"))))
+  pushViewport(viewport(layout.pos.row = 1, layout.pos.col = 1))
+  draw(ht_als, newpage = FALSE)
+  popViewport()
+  pushViewport(viewport(layout.pos.row = 1, layout.pos.col = 2))
+  draw(ht_ctrl, newpage = FALSE)
+  popViewport()
+  dev.off()
+  cat("   ✅ Saved FIG_2.15_DENSITY_COMBINED.png (side-by-side layout)\n\n")
+})
 
 cat("✅ ALL DENSITY HEATMAPS GENERATED SUCCESSFULLY\n\n")

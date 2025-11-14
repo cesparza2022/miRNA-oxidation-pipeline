@@ -52,12 +52,12 @@ rule panel_b_gt_count_by_position:
         SCRIPTS_STEP1 + "/01_panel_b_gt_count_by_position.R"
 
 # ============================================================================
-# RULE: Panel C - G>X Mutation Spectrum by Position (uses RAW data)
+# RULE: Panel C - G>X Mutation Spectrum by Position (uses processed_clean for consistency)
 # ============================================================================
 
 rule panel_c_gx_spectrum:
     input:
-        raw_data = INPUT_DATA_RAW,
+        data = INPUT_DATA_CLEAN,  # ✅ CORREGIDO: Usa processed_clean para consistencia
         functions = FUNCTIONS_COMMON
     output:
         figure = OUTPUT_FIGURES + "/step1_panelC_gx_spectrum.png",
@@ -72,12 +72,12 @@ rule panel_c_gx_spectrum:
         SCRIPTS_STEP1 + "/02_panel_c_gx_spectrum.R"
 
 # ============================================================================
-# RULE: Panel D - Positional Fraction of Mutations (uses RAW data)
+# RULE: Panel D - Positional Fraction of Mutations (uses processed_clean for consistency)
 # ============================================================================
 
 rule panel_d_positional_fraction:
     input:
-        raw_data = INPUT_DATA_RAW,
+        data = INPUT_DATA_CLEAN,  # ✅ CORREGIDO: Usa processed_clean para consistencia
         functions = FUNCTIONS_COMMON
     output:
         figure = OUTPUT_FIGURES + "/step1_panelD_positional_fraction.png",

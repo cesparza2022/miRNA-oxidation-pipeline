@@ -17,7 +17,7 @@ cat("\n════════════════════════�
 cat("  PANEL C: G>X Mutation Spectrum by Position\n")
 cat("═══════════════════════════════════════════════════════════════════\n\n")
 
-input_raw <- snakemake@input[["raw_data"]]
+input_data <- snakemake@input[["data"]]
 output_figure <- snakemake@output[["figure"]]
 output_table <- snakemake@output[["table"]]
 
@@ -28,19 +28,33 @@ ensure_output_dir(dirname(output_table))
 # VALIDATE INPUT
 # ============================================================================
 
-if (exists("validate_raw_data")) {
-  validate_raw_data(input_raw)
+if (exists("validate_processed_clean")) {
+  validate_processed_clean(input_data)
 } else if (exists("validate_input")) {
-  validate_input(input_raw, 
-                expected_format = "tsv",
-                required_columns = c("pos:mut"))
+  validate_input(input_data, 
+                expected_format = "csv",
+                required_columns = c("miRNA_name", "pos.mut"))
 }
 
 # ============================================================================
 # LOAD AND PROCESS DATA
 # ============================================================================
 
-processed_data <- load_and_process_raw_data(input_raw)
+# Load processed_clean data (same as other panels for consistency)
+data <- load_processed_data(input_data)
+
+# Extract position and mutation_type from pos.mut (format: "18:TC")
+processed_data <- data %>%
+  mutate(
+    position = as.numeric(str_extract(pos.mut, "^\\d+")),
+    mutation_type_raw = str_extract(pos.mut, "(?<=:)[A-Z]+"),
+    mutation_type = str_replace_all(mutation_type_raw, c(
+      "TC" = "T>C", "AG" = "A>G", "GA" = "G>A", "CT" = "C>T",
+      "TA" = "T>A", "GT" = "G>T", "TG" = "T>G", "AT" = "A>T",
+      "CA" = "C>A", "CG" = "C>G", "GC" = "G>C", "AC" = "A>C"
+    ))
+  ) %>%
+  filter(!is.na(position), position >= 1, position <= 22, !is.na(mutation_type))
 
 COLOR_GC <- "#2E86AB"
 COLOR_GA <- "#7D3C98"
@@ -77,7 +91,7 @@ p <- ggplot(gx_spectrum_data, aes(x = position_label, y = percentage, fill = mut
     subtitle = sprintf("G>T represents %.1f%% of all G>X mutations", gt_percentage_overall),
     x = "Position in miRNA", 
     y = "Percentage of G>X mutations (%)",
-    caption = "Combined analysis (ALS + Control, no VAF filtering)"
+    caption = "Shows percentage of G>X SNVs (unique events) at each position, not read counts.\nCombined analysis (ALS + Control, no VAF filtering)"  # ✅ CORREGIDO: Clarificar que cuenta SNVs, no suma reads
   ) +
   theme_professional +
   theme(axis.text.x = element_text(angle = 45, hjust = 1), legend.position = "right")

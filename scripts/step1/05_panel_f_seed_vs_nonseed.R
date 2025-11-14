@@ -81,8 +81,8 @@ snv <- data %>%
 summary_tbl <- snv %>%
   group_by(region) %>%
   summarise(
-    total_mutations = sum(total_row_count, na.rm = TRUE),
-    n_SNVs = n(),
+    total_mutations = sum(total_row_count, na.rm = TRUE),  # Suma de reads (usado en figura)
+    # n_SNVs se calcula pero no se usa en la figura - eliminado para evitar confusión
     .groups = 'drop'
   ) %>%
   mutate(fraction = total_mutations / sum(total_mutations) * 100)
@@ -94,10 +94,10 @@ p <- ggplot(summary_tbl, aes(x = region, y = total_mutations, fill = region)) +
   geom_col(width = 0.6, alpha = 0.9) +
   scale_fill_manual(values = c("Seed" = "#FFD700", "Non-seed" = "#6c757d")) +
   scale_y_continuous(labels = scales::comma) +
-  labs(title = "Seed vs Non-seed: Mutation Burden",
-       subtitle = "Absolute burden (summed counts across samples)",
-       x = "Region", y = "Total Mutation Burden (counts)",
-       caption = "Combined analysis (ALS + Control, no VAF filtering)") +
+  labs(title = "Seed vs Non-seed: Total Read Counts",
+       subtitle = "Sum of sequencing reads supporting mutations in seed vs non-seed regions",
+       x = "Region", y = "Total Read Counts",
+       caption = "Shows sum of sequencing reads (not number of unique SNVs). Combined analysis (ALS + Control, no VAF filtering)") +
   theme_professional
 
 log_subsection("Generating figure")

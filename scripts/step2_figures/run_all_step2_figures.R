@@ -118,10 +118,10 @@ cat("   ✅ ALS:", n_als, "samples\n")
 cat("   ✅ Control:", n_ctrl, "samples\n\n")
 
 # ============================================================================
-# CREATE DATA COPY WITH FIXED COLUMN NAMES
+# CREATE DATA COPY WITH VAF CALCULATED AND FIXED COLUMN NAMES
 # ============================================================================
 
-cat("📂 Creating data copy with fixed column names...\n")
+cat("📂 Creating data copy with VAF calculated and fixed column names...\n")
 data_link <- "final_processed_data_CLEAN.csv"
 if (file.exists(data_link)) {
   unlink(data_link)
@@ -144,9 +144,77 @@ if ("miRNA name" %in% colnames(data_original) && !"miRNA_name" %in% colnames(dat
   cat("   ✅ Added miRNA_name column (from miRNA name)\n")
 }
 
-# Write fixed data
+# ============================================================================
+# CALCULATE VAF IF NEEDED (for scripts that expect VAF directly)
+# ============================================================================
+
+# Identify metadata columns
+metadata_cols <- c("miRNA_name", "miRNA name", "pos.mut", "pos:mut", 
+                   "mutation_type", "position")
+
+# Get all sample columns
+all_cols <- colnames(data_original)
+sample_cols_raw <- all_cols[!all_cols %in% metadata_cols]
+
+# Identify SNV columns and Total columns
+snv_cols <- sample_cols_raw[!grepl("\\(PM\\+1MM\\+2MM\\)|Total|TOTAL", sample_cols_raw, ignore.case = TRUE)]
+total_cols <- sample_cols_raw[grepl("\\(PM\\+1MM\\+2MM\\)", sample_cols_raw, ignore.case = TRUE)]
+
+cat("   📊 Found", length(snv_cols), "SNV columns and", length(total_cols), "Total columns\n")
+
+# If we have Total columns, calculate VAF and replace SNV counts with VAF
+if (length(total_cols) > 0 && length(snv_cols) > 0) {
+  cat("   🔢 Calculating VAF (SNV_Count / Total_Count) and filtering VAF >= 0.5...\n")
+  
+  # Create a mapping from SNV column to Total column
+  snv_to_total <- setNames(character(length(snv_cols)), snv_cols)
+  for (snv_col in snv_cols) {
+    # Try exact match: "Sample (PM+1MM+2MM)"
+    total_col <- paste0(snv_col, " (PM+1MM+2MM)")
+    if (total_col %in% total_cols) {
+      snv_to_total[snv_col] <- total_col
+    } else {
+      # Try to find by base name
+      base_name <- gsub(" \\(PM\\+1MM\\+2MM\\)$", "", snv_col)
+      candidates <- grep(paste0("^", base_name, ".*\\(PM\\+1MM\\+2MM\\)$"), total_cols, value = TRUE)
+      if (length(candidates) > 0) {
+        snv_to_total[snv_col] <- candidates[1]
+      }
+    }
+  }
+  
+  # Calculate VAF for each SNV column and replace counts with VAF
+  for (snv_col in snv_cols) {
+    if (snv_to_total[snv_col] != "" && snv_to_total[snv_col] %in% colnames(data_original)) {
+      snv_counts <- as.numeric(data_original[[snv_col]])
+      total_counts <- as.numeric(data_original[[snv_to_total[snv_col]]])
+      
+      # Calculate VAF: VAF = SNV_Count / Total_Count
+      vaf_values <- ifelse(!is.na(total_counts) & total_counts > 0,
+                          snv_counts / total_counts,
+                          NA_real_)
+      
+      # Filter VAF >= 0.5 (artifacts) - set to NA
+      vaf_values <- ifelse(!is.na(vaf_values) & vaf_values <= 0.5, vaf_values, NA_real_)
+      
+      # Replace SNV counts with VAF values
+      data_original[[snv_col]] <- vaf_values
+    }
+  }
+  
+  # Remove Total columns (scripts don't need them, they have VAF now)
+  data_original <- data_original %>% select(-all_of(total_cols))
+  
+  cat("   ✅ VAF calculated and filtered (VAF >= 0.5 set to NA)\n")
+  cat("   ✅ Total columns removed (scripts use VAF directly)\n")
+} else {
+  cat("   ⚠️  No Total columns found - scripts will use counts directly\n")
+  cat("   ⚠️  Note: Scripts expect VAF, but will receive counts\n")
+}
+
+# Write fixed data with VAF calculated
 write_csv(data_original, data_link)
-cat("   ✅ Data copy created with fixed column names:", data_link, "\n\n")
+cat("   ✅ Data copy created with VAF calculated and fixed column names:", data_link, "\n\n")
 
 # ============================================================================
 # EXECUTE ALL FIGURE SCRIPTS

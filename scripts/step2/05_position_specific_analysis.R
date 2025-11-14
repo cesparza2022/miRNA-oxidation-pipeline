@@ -389,7 +389,7 @@ p <- ggplot(plot_data, aes(x = position, y = positional_fraction, fill = group))
             position = position_dodge(width = 0.7),
             vjust = 0, size = 5, color = "black", fontface = "bold") +
   # Colors (matching provided figure)
-  scale_fill_manual(values = group_colors, name = "Grupo") +
+  scale_fill_manual(values = group_colors, name = "Group") +
   # Axes
   scale_x_continuous(breaks = seq(position_range[1], position_range[2], by = 1),
                      expand = expansion(mult = c(0.01, 0.01))) +

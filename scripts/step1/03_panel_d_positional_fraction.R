@@ -18,7 +18,7 @@ cat("\n════════════════════════�
 cat("  PANEL D: Positional Fraction of Mutations\n")
 cat("═══════════════════════════════════════════════════════════════════\n\n")
 
-input_raw <- snakemake@input[["raw_data"]]
+input_data <- snakemake@input[["data"]]
 output_figure <- snakemake@output[["figure"]]
 output_table <- snakemake@output[["table"]]
 
@@ -29,19 +29,27 @@ ensure_output_dir(dirname(output_table))
 # VALIDATE INPUT
 # ============================================================================
 
-if (exists("validate_raw_data")) {
-  validate_raw_data(input_raw)
+if (exists("validate_processed_clean")) {
+  validate_processed_clean(input_data)
 } else if (exists("validate_input")) {
-  validate_input(input_raw, 
-                expected_format = "tsv",
-                required_columns = c("pos:mut"))
+  validate_input(input_data, 
+                expected_format = "csv",
+                required_columns = c("miRNA_name", "pos.mut"))
 }
 
 # ============================================================================
 # LOAD AND PROCESS DATA
 # ============================================================================
 
-processed_data <- load_and_process_raw_data(input_raw)
+# Load processed_clean data (same as other panels for consistency)
+data <- load_processed_data(input_data)
+
+# Extract position from pos.mut (format: "18:TC")
+processed_data <- data %>%
+  mutate(
+    position = as.numeric(str_extract(pos.mut, "^\\d+"))
+  ) %>%
+  filter(!is.na(position), position >= 1, position <= 22)
 
 # COUNT SNVs by position (NOT sum counts) - ALL mutations
 pos_counts <- processed_data %>%

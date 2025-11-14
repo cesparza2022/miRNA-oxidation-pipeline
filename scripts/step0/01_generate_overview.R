@@ -71,6 +71,13 @@ if (length(missing_cols) > 0) {
 }
 
 # Separate counts vs VAF columns --------------------------------------------
+# ✅ DOCUMENTADO: processed_clean.csv contains:
+#   - miRNA_name, pos.mut: Identification columns
+#   - Sample columns: SNV counts (number of reads supporting each specific SNV)
+#   - VAF_* columns: Variant Allele Frequency (if present)
+# IMPORTANT: Sample columns contain SNV counts (not total miRNA counts)
+# Each row represents one unique SNV event, and sample columns contain read counts for that specific SNV
+
 count_cols <- names(processed)[
   !(names(processed) %in% required_cols) &
     !str_detect(names(processed), "^VAF_")
@@ -84,6 +91,7 @@ if (length(count_cols) == 0) {
 }
 
 log_info(paste("Detected", length(count_cols), "count columns and", length(vaf_cols), "VAF columns"))
+log_info("NOTE: Count columns contain SNV counts (reads supporting each specific SNV), not total miRNA counts")
 
 counts_matrix <- as.matrix(processed[count_cols])
 counts_matrix[is.na(counts_matrix)] <- 0
@@ -146,6 +154,7 @@ sample_summary_long <- sample_summary %>%
 fig_samples <- ggplot(sample_summary_long, aes(x = value, fill = group)) +
   geom_histogram(alpha = 0.75, bins = 40, position = "identity") +
   scale_x_log10(labels = scales::comma) +
+  scale_fill_brewer(palette = "Set2") +  # ✅ CORREGIDO: Usar Set2 para consistencia con fig_samples_group
   facet_wrap(~metric, scales = "free_y", ncol = 1) +
   labs(
     title = "Sample-level Distribution",
@@ -168,6 +177,7 @@ fig_samples_box <- sample_summary %>%
   ggplot(aes(x = group, y = n_snvs_plot, fill = group)) +
   geom_boxplot(alpha = 0.75, outlier.alpha = 0.4) +
   scale_y_log10(labels = scales::comma) +
+  scale_fill_brewer(palette = "Set2") +  # ✅ CORREGIDO: Usar Set2 para consistencia con fig_samples_group
   labs(
     title = "Number of SNVs per Sample (by Group)",
     subtitle = "Number of unique SNV events detected per sample (log10 scale)",
@@ -185,9 +195,12 @@ log_success(paste("Sample boxplot figure saved:", output_fig_samples_box))
 
 # Pie chart: Sample distribution by group
 fig_samples_group <- sample_group_summary %>%
-  mutate(prop = n_samples / sum(n_samples)) %>%
+  mutate(prop = n_samples / sum(n_samples),
+         label = sprintf("%.1f%%\n(n=%s)", prop * 100, comma(n_samples))) %>%  # ✅ CORREGIDO: Agregar porcentajes y conteos
   ggplot(aes(x = "", y = prop, fill = group)) +
   geom_col(width = 1, color = "white", linewidth = 0.5) +
+  geom_text(aes(label = label), position = position_stack(vjust = 0.5), 
+            color = "white", fontface = "bold", size = 4.5) +  # ✅ CORREGIDO: Agregar porcentajes en segmentos
   coord_polar(theta = "y") +
   scale_fill_brewer(palette = "Set2") +
   labs(
@@ -228,7 +241,7 @@ log_success(paste("miRNA summary table written:", output_table_miRNA))
 fig_miRNA <- mirna_summary %>%
   mutate(n_snvs_plot = n_snvs + 1) %>%
   ggplot(aes(x = n_snvs_plot)) +
-  geom_histogram(fill = COLOR_GT, alpha = 0.8, bins = 40) +
+  geom_histogram(fill = "#6c757d", alpha = 0.8, bins = 40) +  # ✅ CORREGIDO: Color neutro (gris) en lugar de rojo, ya que no es específico de G>T
   scale_x_log10(breaks = scales::trans_breaks("log10", function(x) 10^x),
                 labels = scales::trans_format("log10", scales::math_format(10^.x))) +
   labs(
@@ -392,9 +405,9 @@ fig_ratio_analysis <- mutation_summary_ratio %>%
   geom_col(alpha = 0.85) +
   geom_hline(yintercept = mean(mutation_summary_ratio$ratio_counts_per_snv), 
              linetype = "dashed", color = "grey40", linewidth = 1) +
-  annotate("text", x = nrow(mutation_summary_ratio) * 0.7, 
-           y = mean(mutation_summary_ratio$ratio_counts_per_snv) * 1.1,
-           label = "Overall average", color = "grey30", fontface = "bold", size = 4) +
+  annotate("text", x = nrow(mutation_summary_ratio) * 0.75,  # ✅ CORREGIDO: Mejorar posición (0.75 en lugar de 0.7)
+           y = mean(mutation_summary_ratio$ratio_counts_per_snv) * 1.15,  # ✅ CORREGIDO: Mejorar posición vertical (1.15 en lugar de 1.1)
+           label = "Overall average", color = "grey30", fontface = "bold", size = 4, hjust = 0) +  # ✅ CORREGIDO: Agregar hjust = 0 para mejor alineación
   scale_fill_manual(values = mutation_palette) +
   scale_y_continuous(labels = comma) +
   coord_flip() +
@@ -419,7 +432,8 @@ log_subsection("Computing dataset coverage")
 
 # Calculate coverage metrics
 total_unique_mirnas <- length(unique(processed$miRNA_name))
-mirnas_with_snvs <- length(unique(processed$miRNA_name))  # All miRNAs in dataset have SNVs by definition
+# Count miRNAs that actually have SNVs detected (n_snvs > 0)
+mirnas_with_snvs <- sum(mirna_summary$n_snvs > 0)
 
 # Sample coverage
 samples_with_snvs <- sum(sample_summary$n_snvs_detected > 0)

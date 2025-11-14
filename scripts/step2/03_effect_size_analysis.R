@@ -205,11 +205,11 @@ log_subsection("Generating effect size visualization")
 effect_plot <- effect_size_data %>%
   filter(!is.na(cohens_d)) %>%
   ggplot(aes(x = cohens_d, fill = effect_size_category)) +
-  geom_histogram(bins = 50, alpha = 0.8, color = "white", linewidth = 0.3) +
+  geom_histogram(bins = 50, alpha = 0.8, color = "white", linewidth = 0.5) +
   
   # Reference lines
   geom_vline(xintercept = c(-0.8, -0.5, -0.2, 0, 0.2, 0.5, 0.8),
-             linetype = "dashed", color = "grey60", linewidth = 0.3) +
+             linetype = "dashed", color = "grey60", linewidth = 0.5) +
   
   # Color scale
   scale_fill_manual(

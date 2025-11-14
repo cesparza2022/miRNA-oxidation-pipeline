@@ -171,8 +171,13 @@ cat("   [2/4] Filter impact by type...\n")
 
 stats_by_type <- read.csv(input_stats_by_type)
 
-qc_fig2 <- ggplot(stats_by_type, aes(x = reorder(Mutation_Type, -N_Filtered), y = N_Filtered)) +
-  geom_bar(stat = "identity", fill = "#667eea", alpha = 0.85) +
+# ✅ CORREGIDO: Destacar G>T en rojo para consistencia con estándar
+qc_fig2_colors <- ifelse(stats_by_type$Mutation_Type == "GT", color_gt, "#667eea")
+names(qc_fig2_colors) <- stats_by_type$Mutation_Type
+
+qc_fig2 <- ggplot(stats_by_type, aes(x = reorder(Mutation_Type, -N_Filtered), y = N_Filtered, fill = Mutation_Type)) +
+  geom_bar(stat = "identity", alpha = 0.85) +
+  scale_fill_manual(values = qc_fig2_colors, guide = "none") +  # ✅ CORREGIDO: Destacar G>T en rojo
   geom_text(aes(label = format(N_Filtered, big.mark = ",")), 
             vjust = -0.5, fontface = "bold", size = 4) +
   theme_professional +
@@ -181,7 +186,7 @@ qc_fig2 <- ggplot(stats_by_type, aes(x = reorder(Mutation_Type, -N_Filtered), y 
   ) +
   labs(
     title = "QC FIGURE 2: Filter Impact by Mutation Type",
-    subtitle = "Number of filtered values (VAF >= 0.5) per mutation type",
+    subtitle = "Number of filtered values (VAF >= 0.5) per mutation type | G>T highlighted in red",
     x = "Mutation Type",
     y = "# Filtered Values"
   )
@@ -213,10 +218,14 @@ ggsave(output_qc_fig3, qc_fig3, width = fig_width, height = fig_height, dpi = fi
 # QC FIG 4: Before/After comparison
 cat("   [4/4] Before/After comparison...\n")
 
+# ✅ DOCUMENTADO: El cálculo de Total_Values para "Original" es una aproximación
+# Se calcula como nrow(data_clean) * length(sample_cols), asumiendo que todas las
+# celdas tienen valores (sin NAs). En realidad, el dataset original puede tener NAs,
+# por lo que este es un valor aproximado. El valor real sería menor si hay NAs.
 comparison_data <- data.frame(
   Dataset = c("Original (Step 1)", "VAF-Filtered (Step 1.5)"),
   Total_Values = c(
-    nrow(data_clean) * length(sample_cols),  # Approximate original
+    nrow(data_clean) * length(sample_cols),  # ⚠️ APROXIMACIÓN: Asume todas las celdas tienen valores (sin NAs)
     nrow(data_long)  # After filtering (NAs removed)
   )
 ) %>%
@@ -237,11 +246,12 @@ qc_fig4 <- ggplot(comparison_data, aes(x = Dataset, y = Total_Values / 1e6, fill
   ) +
   labs(
     title = "QC FIGURE 4: Data Quality Before vs After VAF Filter",
-    subtitle = sprintf("%s values filtered (%.1f%% of original)", 
+    subtitle = sprintf("%s values filtered (%.1f%% of original - NOTE: Original is approximate)", 
                       format(nrow(filter_report), big.mark = ","),
-                      nrow(filter_report) / (comparison_data$Total_Values[1]) * 100),
+                      nrow(filter_report) / (comparison_data$Total_Values[1]) * 100),  # ✅ CORREGIDO: Documentar que es aproximación
     x = NULL,
-    y = "Total Valid Values (Millions)"
+    y = "Total Valid Values (Millions)",
+    caption = "NOTE: Original value is an approximation (assumes all cells have values).\nActual original value may be lower if there are NAs in the original dataset."  # ✅ CORREGIDO: Agregar caption explicando aproximación
   )
 
 ggsave(output_qc_fig4, qc_fig4, width = fig_width, height = fig_height, dpi = fig_dpi)
@@ -272,7 +282,7 @@ position_all$Mutation_Type <- factor(position_all$Mutation_Type, levels = type_o
 cat("   [1/7] Heatmap SNVs...\n")
 
 fig1 <- ggplot(position_all, aes(x = factor(Position), y = Mutation_Type, fill = N_SNVs)) +
-  geom_tile(color = "white", size = 0.8) +
+  geom_tile(color = "white", linewidth = 0.8) +
   geom_text(aes(label = ifelse(N_SNVs > 200, round(N_SNVs, 0), "")), 
             color = "white", fontface = "bold", size = 3) +
   scale_fill_gradient2(
@@ -303,7 +313,7 @@ ggsave(output_diag_fig1, fig1, width = fig_width, height = fig_height, dpi = fig
 cat("   [2/7] Heatmap Counts...\n")
 
 fig2 <- ggplot(position_all, aes(x = factor(Position), y = Mutation_Type, fill = log10(Total_Counts + 1))) +
-  geom_tile(color = "white", size = 0.8) +
+  geom_tile(color = "white", linewidth = 0.8) +
   scale_fill_gradient2(
     low = "white", mid = "#9467BD", high = color_gt,
     midpoint = median(log10(position_all$Total_Counts[position_all$Total_Counts > 0] + 1)),
@@ -447,7 +457,7 @@ sample_top8 <- sample_metrics %>%
 
 p_viol_snvs <- ggplot(sample_top8, aes(x = Mutation_Type, y = N_SNVs, fill = Category)) +
   geom_violin(alpha = 0.7, trim = FALSE) +
-  geom_boxplot(width = 0.2, alpha = 0.8, outlier.size = 0.5) +
+  geom_boxplot(width = 0.2, alpha = 0.8, outlier.size = 1.0) +
   stat_summary(fun = mean, geom = "point", shape = 23, size = 3.5, fill = "white", color = "black") +
   scale_fill_manual(
     values = c("G>T (Oxidation)" = color_gt, "Other G transv." = "#FF7F0E", "Other mutations" = "gray60"),
@@ -466,7 +476,7 @@ p_viol_snvs <- ggplot(sample_top8, aes(x = Mutation_Type, y = N_SNVs, fill = Cat
 
 p_viol_counts <- ggplot(sample_top8, aes(x = Mutation_Type, y = Total_Counts, fill = Category)) +
   geom_violin(alpha = 0.7, trim = FALSE) +
-  geom_boxplot(width = 0.2, alpha = 0.8, outlier.size = 0.5) +
+  geom_boxplot(width = 0.2, alpha = 0.8, outlier.size = 1.0) +
   stat_summary(fun = mean, geom = "point", shape = 23, size = 3.5, fill = "white", color = "black") +
   scale_fill_manual(
     values = c("G>T (Oxidation)" = color_gt, "Other G transv." = "#FF7F0E", "Other mutations" = "gray60"),
@@ -521,7 +531,7 @@ fold_long <- fold_data %>%
 
 fig7 <- ggplot(fold_long, aes(x = reorder(Mutation_Type, -Fold), y = Fold, fill = Metric)) +
   geom_bar(stat = "identity", position = "dodge", alpha = 0.85, width = 0.75) +
-  geom_hline(yintercept = 1, linetype = "dashed", color = color_gt, size = 1.3) +
+  geom_hline(yintercept = 1, linetype = "dashed", color = color_gt, linewidth = 1.3) +
   annotate("text", x = 8.5, y = 1.2, label = "G>T level", 
            color = color_gt, fontface = "bold", size = 5) +
   scale_fill_manual(values = c("Fold SNVs" = "#667eea", "Fold Counts" = "#764ba2"), name = "") +

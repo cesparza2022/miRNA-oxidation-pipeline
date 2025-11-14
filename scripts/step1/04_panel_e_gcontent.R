@@ -71,24 +71,18 @@ sample_cols <- setdiff(names(data), c("miRNA_name", "pos.mut"))
 
 log_subsection("Calculating metrics")
 
-log_info("Metric 1: Total copies of miRNAs with G at each position")
+log_info("Metric 1: Total copies of miRNAs with G at each position (CORRECTED: only counts from that specific position)")
 
-mirnas_with_G_by_pos <- data %>%
+# ✅ CORREGIDO: Sumar solo los reads de esa posición específica, no todos los reads del miRNA
+total_copies_by_position <- data %>%
   filter(str_detect(pos.mut, "^\\d+:G[TCAG]")) %>%
   mutate(Position = as.numeric(str_extract(pos.mut, "^\\d+"))) %>%
-  select(Position, miRNA_name) %>%
-  distinct()
-
-total_copies_by_position <- mirnas_with_G_by_pos %>%
-  left_join(
-    data %>% 
-      group_by(miRNA_name) %>%
-      summarise(total_miRNA_counts = sum(across(all_of(sample_cols)), na.rm = TRUE)),
-    by = "miRNA_name"
-  ) %>%
+  rowwise() %>%
+  mutate(position_specific_counts = sum(c_across(all_of(sample_cols)), na.rm = TRUE)) %>%
+  ungroup() %>%
   group_by(Position) %>%
   summarise(
-    total_G_copies = sum(total_miRNA_counts, na.rm = TRUE),
+    total_G_copies = sum(position_specific_counts, na.rm = TRUE),  # ✅ Solo reads de esa posición
     .groups = 'drop'
   )
 
@@ -160,10 +154,10 @@ panel_e <- ggplot(panel_e_final, aes(x = Position, y = total_G_copies)) +
   ) +
   labs(
     title = "E. G-Content Landscape: Substrate, Diversity, and Oxidation Burden",
-    subtitle = "Y-axis: Total miRNA copies with G | Bubble size: Unique miRNAs | Bubble color: G>T mutation counts",
+    subtitle = "Y-axis: Total read counts for G mutations at position | Bubble size: Unique miRNAs | Bubble color: G>T mutation counts",
     x = "Position in miRNA (1-23)",
-    y = "Total copies of miRNAs with G at position (log scale)",
-    caption = "Each bubble represents a position. Y-position = total G substrate availability (sum of all miRNA copies with G).\nBubble size = miRNA diversity (how many different miRNAs). Bubble color intensity = G>T oxidation burden (darker red = more G>T).\nSeed region (2-8) highlighted in yellow. Log scale for better visualization of wide value ranges."
+    y = "Total read counts for G mutations at position (log scale)",
+    caption = "Each bubble represents a position. Y-position = total read counts for G mutations at that SPECIFIC position (not all reads from miRNAs with G).\nBubble size = miRNA diversity (how many different miRNAs have G at that position). Bubble color intensity = G>T oxidation burden (darker red = more G>T).\nSeed region (2-8) highlighted in yellow. Log scale for better visualization of wide value ranges."
   ) +
   theme_professional +
   theme(

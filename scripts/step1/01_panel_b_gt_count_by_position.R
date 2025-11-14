@@ -99,9 +99,8 @@ position_counts <- gt_data %>%
   ungroup() %>%
   group_by(position) %>%
   summarise(
-    total_GT_count = sum(total_count, na.rm = TRUE),
-    n_SNVs = n(),
-    n_miRNAs = n_distinct(miRNA_name),
+    total_GT_count = sum(total_count, na.rm = TRUE),  # Suma de reads (usado en figura)
+    # n_SNVs y n_miRNAs se calculan pero no se usan en la figura - eliminados para evitar confusión
     .groups = "drop"
   ) %>%
   arrange(position)
@@ -145,11 +144,11 @@ fig_panelB <- ggplot(position_counts, aes(x = position, y = total_GT_count)) +
   
   # Labels
   labs(
-    title = "G>T Mutation Count by Position",
-    subtitle = "Absolute count of G>T mutations across miRNA positions | Shaded region = seed (2-8)",
+    title = "G>T Read Counts by Position",
+    subtitle = "Total read counts supporting G>T mutations across miRNA positions | Shaded region = seed (2-8)",
     x = "Position in miRNA",
-    y = "Total G>T Count",
-    caption = "Combined analysis (ALS + Control, no VAF filtering)"
+    y = "Total G>T Read Counts",
+    caption = "Shows sum of sequencing reads (not number of unique SNVs). Combined analysis (ALS + Control, no VAF filtering)"
   ) +
   theme_professional
 

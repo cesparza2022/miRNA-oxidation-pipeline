@@ -252,11 +252,13 @@ family_annotation <- heatmap_families %>%
 # Generate heatmap
 png(output_figure_b, width = 14, height = 12, units = "in", res = 300)
 
+# ✅ NOTA: cluster_rows = TRUE y cluster_cols = TRUE reordenan los datos para descubrimiento de patrones
+# Si se necesita un orden específico (ej. por significancia), estos pueden desactivarse
 pheatmap(
   heatmap_matrix,
   color = colorRampPalette(c("#2E86AB", "white", color_gt))(100),
-  cluster_rows = TRUE,
-  cluster_cols = TRUE,
+  cluster_rows = TRUE,  # Reordena familias por similitud
+  cluster_cols = TRUE,  # Reordena muestras por similitud
   show_colnames = TRUE,
   show_rownames = TRUE,
   annotation_row = family_annotation %>% select(Significance_Category),

@@ -15,12 +15,14 @@ import os
 # COMMON PATHS AND PARAMETERS
 # ============================================================================
 
-# Input data (from Step 1.5 - VAF filtered)
-STEP1_5_DATA_DIR = config["paths"]["outputs"]["step1_5"]
-INPUT_DATA_VAF_FILTERED = STEP1_5_DATA_DIR + "/tables/filtered_data/ALL_MUTATIONS_VAF_FILTERED.csv"
+# Input data: Use processed_clean.csv (has Total columns needed for VAF calculation)
+# Step 1.5 output (ALL_MUTATIONS_VAF_FILTERED.csv) only has SNV counts, not Total counts
+# We need Total counts to calculate VAF for the detailed figure scripts
+INPUT_DATA_PRIMARY = config["paths"]["data"]["processed_clean"]
 
-# Alternative: use processed clean data if VAF filtered not available
-INPUT_DATA_FALLBACK = config["paths"]["data"]["processed_clean"]
+# Alternative: use VAF filtered data if processed_clean not available (will warn about missing Total columns)
+STEP1_5_DATA_DIR = config["paths"]["outputs"]["step1_5"]
+INPUT_DATA_FALLBACK = STEP1_5_DATA_DIR + "/tables/filtered_data/ALL_MUTATIONS_VAF_FILTERED.csv"
 
 # Output directories
 OUTPUT_STEP2 = config["paths"]["outputs"]["step2"]
@@ -42,12 +44,12 @@ FUNCTIONS_COMMON = "scripts/utils/functions_common.R"  # For input: (resolved fr
 
 rule step2_generate_metadata:
     input:
-        data = INPUT_DATA_VAF_FILTERED,
+        data = INPUT_DATA_PRIMARY,
         fallback = INPUT_DATA_FALLBACK
     output:
         metadata = OUTPUT_TABLES + "/S2_metadata.csv"
     params:
-        data_file = lambda wildcards: INPUT_DATA_VAF_FILTERED if os.path.exists(INPUT_DATA_VAF_FILTERED) else INPUT_DATA_FALLBACK
+        data_file = lambda wildcards: INPUT_DATA_PRIMARY if os.path.exists(INPUT_DATA_PRIMARY) else INPUT_DATA_FALLBACK
     log:
         OUTPUT_LOGS + "/generate_metadata.log"
     shell:
@@ -64,7 +66,7 @@ rule step2_generate_metadata:
 
 rule step2_generate_all_figures:
     input:
-        data = INPUT_DATA_VAF_FILTERED,
+        data = INPUT_DATA_PRIMARY,
         fallback = INPUT_DATA_FALLBACK,
         metadata = OUTPUT_TABLES + "/S2_metadata.csv"
     output:
@@ -84,7 +86,7 @@ rule step2_generate_all_figures:
         fig_2_14 = OUTPUT_FIGURES + "/FIG_2.14_DENSITY_HEATMAP_CONTROL.png",
         fig_2_15 = OUTPUT_FIGURES + "/FIG_2.15_DENSITY_COMBINED.png"
     params:
-        data_file = lambda wildcards: INPUT_DATA_VAF_FILTERED if os.path.exists(INPUT_DATA_VAF_FILTERED) else INPUT_DATA_FALLBACK,
+        data_file = lambda wildcards: INPUT_DATA_PRIMARY if os.path.exists(INPUT_DATA_PRIMARY) else INPUT_DATA_FALLBACK,
         metadata_file = OUTPUT_TABLES + "/S2_metadata.csv",
         output_dir = OUTPUT_FIGURES,
         scripts_dir = ORIGINAL_SCRIPTS_DIR
@@ -106,7 +108,7 @@ rule step2_generate_all_figures:
 
 rule step2_clustering_all_gt:
     input:
-        vaf_filtered_data = INPUT_DATA_VAF_FILTERED,
+        vaf_filtered_data = INPUT_DATA_PRIMARY,
         fallback_data = INPUT_DATA_FALLBACK,
         functions = FUNCTIONS_COMMON
     output:
@@ -115,7 +117,7 @@ rule step2_clustering_all_gt:
         clustering_table = OUTPUT_TABLES + "/S2_clustering_all_gt_summary.csv"
     params:
         functions = FUNCTIONS_COMMON,
-        data_file = lambda wildcards: INPUT_DATA_VAF_FILTERED if os.path.exists(INPUT_DATA_VAF_FILTERED) else INPUT_DATA_FALLBACK
+        data_file = lambda wildcards: INPUT_DATA_PRIMARY if os.path.exists(INPUT_DATA_PRIMARY) else INPUT_DATA_FALLBACK
     log:
         OUTPUT_LOGS + "/clustering_all_gt.log"
     script:
@@ -127,7 +129,7 @@ rule step2_clustering_all_gt:
 
 rule step2_clustering_seed_gt:
     input:
-        vaf_filtered_data = INPUT_DATA_VAF_FILTERED,
+        vaf_filtered_data = INPUT_DATA_PRIMARY,
         fallback_data = INPUT_DATA_FALLBACK,
         functions = FUNCTIONS_COMMON
     output:
@@ -136,7 +138,7 @@ rule step2_clustering_seed_gt:
         clustering_table = OUTPUT_TABLES + "/S2_clustering_seed_gt_summary.csv"
     params:
         functions = FUNCTIONS_COMMON,
-        data_file = lambda wildcards: INPUT_DATA_VAF_FILTERED if os.path.exists(INPUT_DATA_VAF_FILTERED) else INPUT_DATA_FALLBACK
+        data_file = lambda wildcards: INPUT_DATA_PRIMARY if os.path.exists(INPUT_DATA_PRIMARY) else INPUT_DATA_FALLBACK
     log:
         OUTPUT_LOGS + "/clustering_seed_gt.log"
     script:
