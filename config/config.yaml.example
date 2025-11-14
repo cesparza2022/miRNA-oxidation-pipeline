@@ -33,6 +33,7 @@ paths:
   
   # Output directories (relative to snakemake_dir - usually no need to change)
   outputs:
+    step0: "results/step0/final"
     step1: "results/step1/final"
     step1_5: "results/step1_5/final"
     step2: "results/step2/final"
@@ -47,6 +48,7 @@ paths:
   
   # Scripts directories (relative to snakemake_dir - usually no need to change)
   scripts:
+    step0: "scripts/step0"
     step1: "scripts/step1"
     step1_5: "scripts/step1_5"
     step2: "scripts/step2"
