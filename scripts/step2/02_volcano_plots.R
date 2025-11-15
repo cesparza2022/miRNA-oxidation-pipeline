@@ -174,10 +174,11 @@ log_info(paste(downregulated_label, ":", n_downregulated))
 log_subsection("Generating volcano plot")
 
 # Color scheme (dynamic labels)
+# Colors are defined in colors.R (sourced via functions_common.R)
 category_colors <- c(
-  upregulated_label = color_gt,
-  downregulated_label = "#2E86AB",  # Blue
-  "Significant (low FC)" = "#F77F00",  # Orange
+  upregulated_label = COLOR_GT,
+  downregulated_label = COLOR_DOWNREGULATED,
+  "Significant (low FC)" = COLOR_SIGNIFICANT_LOW_FC,
   "High FC (not sig)" = "grey70",
   "Not significant" = "grey90"
 )

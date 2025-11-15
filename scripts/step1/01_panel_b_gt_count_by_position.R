@@ -149,7 +149,7 @@ fig_panelB <- ggplot(position_counts, aes(x = position, y = total_GT_count)) +
   # Seed region background
   annotate("rect", xmin = seed_min - 0.5, xmax = seed_max + 0.5, 
            ymin = -Inf, ymax = Inf, 
-           fill = "#e3f2fd", alpha = 0.5) +
+           fill = COLOR_SEED_HIGHLIGHT, alpha = 0.5) +
   annotate("text", x = (seed_min + seed_max) / 2, 
            y = max(position_counts$total_GT_count) * 0.95, 
            label = "SEED", color = "gray40", size = 4, fontface = "bold") +

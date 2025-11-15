@@ -93,7 +93,8 @@ cat("   📊 Total SNVs:", format(total_mut, big.mark=","),
 
 panel_d <- ggplot(pos_frac, aes(x = position_label, y = fraction)) +
   geom_col(aes(fill = region), alpha = 0.8, width = 0.7) +
-  scale_fill_manual(values = c("Seed" = "#FFD700", "Non-Seed" = "grey60"), name = "Region") +
+  # Use standardized colors from colors.R (loaded via functions_common.R)
+  scale_fill_manual(values = c("Seed" = COLOR_SEED, "Non-Seed" = COLOR_NONSEED), name = "Region") +
   geom_text(aes(label = sprintf("%.1f%%", fraction)), 
             vjust = -0.3, size = 3.5, fontface = "bold") +
   labs(

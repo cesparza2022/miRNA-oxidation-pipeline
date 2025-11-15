@@ -32,6 +32,12 @@ COLOR_GT <- COLOR_GT       # Red (already defined above)
 # Other mutation types (if needed)
 COLOR_OTHER <- "grey50"
 
+# Region colors (Seed vs Non-seed)
+COLOR_SEED <- "#FFD700"      # Gold for seed region
+COLOR_SEED_BACKGROUND <- "#FFF9C4"  # Light yellow for seed region background (Panel E)
+COLOR_SEED_HIGHLIGHT <- "#e3f2fd"   # Light blue for seed region highlight (Panel B, C)
+COLOR_NONSEED <- "#6c757d"   # Grey for non-seed region
+
 # ============================================================================
 # QUALITATIVE PALETTE
 # ============================================================================
@@ -56,13 +62,29 @@ COLORS_QUALITATIVE <- c(
 
 # Low to high gradient (white to red for G>T emphasis)
 COLORS_SEQUENTIAL_LOW <- "white"
+COLORS_SEQUENTIAL_LOW_PINK <- "#FFEBEE"  # Light pink for gradient start (Panel E)
 COLORS_SEQUENTIAL_MID <- "#FF7F0E"  # Orange
 COLORS_SEQUENTIAL_HIGH <- COLOR_GT  # Red
+COLORS_SEQUENTIAL_HIGH_DARK <- "#B71C1C"  # Dark red for gradient end (Panel E)
 
 # Alternative sequential (white to purple)
 COLORS_SEQUENTIAL_PURPLE_LOW <- "white"
 COLORS_SEQUENTIAL_PURPLE_MID <- "#9467BD"  # Purple
 COLORS_SEQUENTIAL_PURPLE_HIGH <- COLOR_GT  # Red
+
+# Effect size colors
+COLOR_EFFECT_LARGE <- COLOR_GT  # Red (same as G>T for consistency)
+COLOR_EFFECT_MEDIUM <- COLORS_SEQUENTIAL_MID  # Orange
+COLOR_EFFECT_SMALL <- "#FFBB78"  # Light orange/peach
+COLOR_EFFECT_NEGLIGIBLE <- "grey80"
+
+# Volcano plot colors
+COLOR_DOWNREGULATED <- "#2E86AB"  # Blue for downregulated
+COLOR_SIGNIFICANT_LOW_FC <- "#F77F00"  # Orange for significant but low FC
+
+# Clustering colors
+COLOR_CLUSTER_1 <- "#FF6B6B"  # Coral red for cluster 1
+COLOR_CLUSTER_2 <- "#4ECDC4"  # Turquoise for cluster 2
 
 # ============================================================================
 # HELPER FUNCTIONS
@@ -111,6 +133,27 @@ get_mutation_color <- function(mutation_type) {
   )
 }
 
+#' Get heatmap gradient colors for VAF visualization
+#' 
+#' Generates a smooth gradient from white to red for visualizing VAF values.
+#' The gradient emphasizes G>T oxidation (red).
+#' 
+#' @param n Number of colors in the gradient (default: 100)
+#' @return Vector of color codes for the gradient
+get_heatmap_gradient <- function(n = 100) {
+  # Create smooth gradient from white to red
+  # Intermediate colors provide smooth transition
+  # Use grDevices::colorRampPalette for consistency
+  grDevices::colorRampPalette(c(
+    "white",      # White for low VAF
+    "#FFE5E5",    # Very light pink
+    "#FF9999",    # Light pink
+    "#FF6666",    # Medium pink-red
+    "#FF3333",    # Bright red
+    COLOR_GT      # Dark red (G>T color)
+  ))(n)
+}
+
 # ============================================================================
 # COMPATIBILITY ALIASES (for backward compatibility)
 # ============================================================================
@@ -119,4 +162,7 @@ get_mutation_color <- function(mutation_type) {
 color_gt <- COLOR_GT
 color_als <- COLOR_ALS
 color_control <- COLOR_CONTROL
+
+# Aliases for convenience
+COLOR_OTHERS <- COLOR_OTHER  # For "Other G transversions" in Panel G
 

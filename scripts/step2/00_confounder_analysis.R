@@ -387,16 +387,17 @@ if (!is.null(output_balance_plot)) {
       # Get colors from config or use defaults (dynamic based on group names)
       config <- snakemake@config
       # Use dynamic color assignment - if group1_name is "ALS" or contains "Disease", use als color
+      # Colors are defined in colors.R (sourced via functions_common.R)
       color_group1 <- if (group1_name == "ALS" || str_detect(group1_name, regex("disease|als", ignore_case = TRUE))) {
-        if (!is.null(config$analysis$colors$als)) config$analysis$colors$als else "#D62728"
+        if (!is.null(config$analysis$colors$als)) config$analysis$colors$als else COLOR_ALS
       } else {
-        if (!is.null(config$analysis$colors$gt)) config$analysis$colors$gt else "#D62728"
+        if (!is.null(config$analysis$colors$gt)) config$analysis$colors$gt else COLOR_GT
       }
       # Use dynamic color assignment - if group2_name is "Control" or contains "control", use control color
       color_group2 <- if (group2_name == "Control" || str_detect(group2_name, regex("control|ctrl", ignore_case = TRUE))) {
-        if (!is.null(config$analysis$colors$control)) config$analysis$colors$control else "grey60"
+        if (!is.null(config$analysis$colors$control)) config$analysis$colors$control else COLOR_CONTROL
       } else {
-        "grey60"  # Default for other groups
+        COLOR_CONTROL  # Default for other groups
       }
       
       group_colors <- setNames(c(color_group1, color_group2), unique_groups)

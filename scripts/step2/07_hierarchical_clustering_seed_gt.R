@@ -278,9 +278,10 @@ annotation_col <- data.frame(
   row.names = metadata$Sample_ID
 )
 
+# Colors are defined in colors.R (sourced via functions_common.R)
 annotation_colors <- list(
-  Group = c("ALS" = color_als, "Control" = color_control, "Unknown" = "grey70"),
-  Cluster_k2 = c("1" = "#FF6B6B", "2" = "#4ECDC4")
+  Group = c("ALS" = COLOR_ALS, "Control" = COLOR_CONTROL, "Unknown" = "grey70"),
+  Cluster_k2 = c("1" = COLOR_CLUSTER_1, "2" = COLOR_CLUSTER_2)
 )
 
 # ============================================================================
@@ -313,10 +314,11 @@ pheatmap(
   show_rownames = FALSE,  # Too many SNVs potentially
   show_colnames = FALSE,  # Don't show sample names (too long and many)
   
-  # Colors (blanco a rojo para VAF/oxidación)
+  # Colors (white to red for VAF/oxidation)
   # VAF range: 0 to 0.5 (max VAF after filtering, Step 1.5)
   # Use 100 colors for smooth gradient
-  color = colorRampPalette(c("white", "#FFE5E5", "#FF9999", "#FF6666", "#FF3333", "#D62728"))(100),
+  # Gradient function is defined in colors.R (sourced via functions_common.R)
+  color = get_heatmap_gradient(100),
   
   # Annotations
   annotation_col = annotation_col,

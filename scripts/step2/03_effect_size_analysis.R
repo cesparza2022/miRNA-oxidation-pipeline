@@ -221,12 +221,13 @@ effect_plot <- effect_size_data %>%
              linetype = "dashed", color = "grey60", linewidth = 0.5) +
   
   # Color scale
+  # Colors are defined in colors.R (sourced via functions_common.R)
   scale_fill_manual(
     values = c(
-      "Large" = "#D62728",
-      "Medium" = "#FF7F0E",
-      "Small" = "#FFBB78",
-      "Negligible" = "grey80"
+      "Large" = COLOR_EFFECT_LARGE,
+      "Medium" = COLOR_EFFECT_MEDIUM,
+      "Small" = COLOR_EFFECT_SMALL,
+      "Negligible" = COLOR_EFFECT_NEGLIGIBLE
     ),
     name = "Effect Size"
   ) +

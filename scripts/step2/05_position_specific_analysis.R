@@ -377,9 +377,10 @@ plot_data <- positional_fraction %>%
 
 # Get colors from config
 color_group1 <- if (group1_name == "ALS" || str_detect(group1_name, regex("als|disease", ignore_case = TRUE))) {
-  if (!is.null(config$analysis$colors$als)) config$analysis$colors$als else "#D62728"
+  # Colors are defined in colors.R (sourced via functions_common.R)
+  if (!is.null(config$analysis$colors$als)) config$analysis$colors$als else COLOR_ALS
 } else {
-  if (!is.null(config$analysis$colors$gt)) config$analysis$colors$gt else "#D62728"
+  if (!is.null(config$analysis$colors$gt)) config$analysis$colors$gt else COLOR_GT
 }
 
 color_group2 <- if (group2_name == "Control" || str_detect(group2_name, regex("control|ctrl", ignore_case = TRUE))) {

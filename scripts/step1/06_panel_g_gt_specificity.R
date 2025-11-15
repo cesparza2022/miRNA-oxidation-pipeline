@@ -81,7 +81,8 @@ if (length(sample_cols) == 0) {
 
 log_subsection("Processing G>T specificity")
 
-COLOR_OTHERS <- "#6c757d"
+# Use standardized colors from colors.R (loaded via functions_common.R)
+# COLOR_OTHERS is defined in colors.R as alias for COLOR_OTHER
 
 g_mut <- data %>%
   filter(str_detect(pos.mut, "^\\d+:G[TCAG]$")) %>%

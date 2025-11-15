@@ -106,7 +106,8 @@ log_success(paste("Table exported:", output_table))
 
 p <- ggplot(summary_tbl, aes(x = region, y = total_mutations, fill = region)) +
   geom_col(width = 0.6, alpha = 0.9) +
-  scale_fill_manual(values = c("Seed" = "#FFD700", "Non-seed" = "#6c757d")) +
+  # Use standardized colors from colors.R (loaded via functions_common.R)
+  scale_fill_manual(values = c("Seed" = COLOR_SEED, "Non-seed" = COLOR_NONSEED)) +
   scale_y_continuous(labels = scales::comma) +
   labs(title = "Seed vs Non-seed: Total Read Counts",
        subtitle = "Sum of sequencing reads supporting mutations in seed vs non-seed regions",

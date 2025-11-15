@@ -241,7 +241,8 @@ p1 <- target_comparison %>%
     y = "Oxidized Targets (n)",
     caption = paste("Line: y=x (no change) | n =", nrow(target_comparison), "miRNAs")
   ) +
-  theme_minimal() +
+  # Use standardized theme from theme_professional.R (loaded via functions_common.R)
+  theme_professional +
   theme(
     plot.title = element_text(size = 12, face = "bold"),
     plot.subtitle = element_text(size = 10, color = "grey50")
@@ -259,7 +260,8 @@ p2 <- target_comparison %>%
     y = "Frequency",
     caption = paste("Negative = lost targets | Positive = gained targets")
   ) +
-  theme_minimal() +
+  # Use standardized theme from theme_professional.R (loaded via functions_common.R)
+  theme_professional +
   theme(
     plot.title = element_text(size = 12, face = "bold"),
     plot.subtitle = element_text(size = 10, color = "grey50")
@@ -277,7 +279,8 @@ p3 <- target_comparison %>%
     size = "Impact\nScore",
     caption = paste("Higher impact = more severe target changes")
   ) +
-  theme_minimal() +
+  # Use standardized theme from theme_professional.R (loaded via functions_common.R)
+  theme_professional +
   theme(
     plot.title = element_text(size = 12, face = "bold"),
     plot.subtitle = element_text(size = 10, color = "grey50")

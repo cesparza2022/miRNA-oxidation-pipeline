@@ -133,13 +133,13 @@ panel_e_final <- total_copies_by_position %>%
 write_csv(panel_e_final, output_table)
 log_success(paste("Table exported:", output_table))
 
-COLOR_SEED <- "#FFF9C4"
+# COLOR_SEED_BACKGROUND is defined in colors.R (sourced above)
 
 panel_e <- ggplot(panel_e_final, aes(x = Position, y = total_G_copies)) +
   annotate("rect", 
            xmin = 1.5, xmax = 8.5,  
            ymin = 0, ymax = Inf,
-           fill = COLOR_SEED, alpha = 0.35) +
+           fill = COLOR_SEED_BACKGROUND, alpha = 0.35) +
   annotate("text", x = 5, y = min(panel_e_final$total_G_copies) * 0.5,
            label = "SEED REGION\n(positions 2-8)", 
            size = 4.5, fontface = "bold", color = "gray40") +
@@ -160,8 +160,8 @@ panel_e <- ggplot(panel_e_final, aes(x = Position, y = total_G_copies)) +
     breaks = c(25, 50, 100, 150)
   ) +
   scale_fill_gradient(
-    low = "#FFEBEE",
-    high = "#B71C1C",
+    low = COLORS_SEQUENTIAL_LOW_PINK,
+    high = COLORS_SEQUENTIAL_HIGH_DARK,
     name = "G>T SNV Counts\nat Position",
     labels = comma,
     trans = "log10"
