@@ -336,11 +336,11 @@ See `config/config.yaml.example` for detailed documentation.
 * **Metadata Format**: See `sample_metadata_template.tsv` for metadata file format (optional but recommended for flexible group assignment)
 
 ### Release Information
-* **[RESUMEN_REVISION_v1.0.1.md](RESUMEN_REVISION_v1.0.1.md)** - Resumen ejecutivo de mejoras en versión 1.0.1
-* **[CHANGELOG.md](CHANGELOG.md)** - Historial detallado de cambios
-* **[RELEASE_NOTES_v1.0.1.md](RELEASE_NOTES_v1.0.1.md)** - Notas de lanzamiento para versión 1.0.1
-* **[ESTADO_PROBLEMAS_CRITICOS.md](ESTADO_PROBLEMAS_CRITICOS.md)** - Estado de problemas críticos de cohesión (todos resueltos ✅)
-* **[HALLAZGOS_REVISION_PERFECCIONISTA.md](HALLAZGOS_REVISION_PERFECCIONISTA.md)** - Hallazgos detallados de revisión comprehensiva (FASE 1-5)
+* **[RESUMEN_REVISION_v1.0.1.md](RESUMEN_REVISION_v1.0.1.md)** - Executive summary of improvements in version 1.0.1
+* **[CHANGELOG.md](CHANGELOG.md)** - Detailed change history
+* **[RELEASE_NOTES_v1.0.1.md](RELEASE_NOTES_v1.0.1.md)** - Release notes for version 1.0.1
+* **[ESTADO_PROBLEMAS_CRITICOS.md](ESTADO_PROBLEMAS_CRITICOS.md)** - Status of critical cohesion issues (all resolved ✅)
+* **[HALLAZGOS_REVISION_PERFECCIONISTA.md](HALLAZGOS_REVISION_PERFECCIONISTA.md)** - Detailed findings from comprehensive code review (PHASES 1-5)
 
 ### Technical Notes
 * **Statistical Methods**: The pipeline uses parametric (t-test) and non-parametric (Wilcoxon) tests based on data assumptions. FDR correction (Benjamini-Hochberg) is applied for multiple comparisons.
@@ -422,25 +422,25 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ## 🆕 Latest Changes (v1.0.1)
 
-Esta versión incluye una refactorización significativa enfocada en mejorar la calidad del código, consistencia visual y mantenibilidad. Ver [RESUMEN_REVISION_v1.0.1.md](RESUMEN_REVISION_v1.0.1.md) para un resumen completo o [RELEASE_NOTES_v1.0.1.md](RELEASE_NOTES_v1.0.1.md) para detalles técnicos.
+This version includes a significant refactoring focused on improving code quality, visual consistency, and maintainability. See [RESUMEN_REVISION_v1.0.1.md](RESUMEN_REVISION_v1.0.1.md) for a complete summary or [RELEASE_NOTES_v1.0.1.md](RELEASE_NOTES_v1.0.1.md) for technical details.
 
-### Correcciones Críticas
-- 🔴 **Corregido:** Cálculo correcto de VAF en figuras detalladas de Step 2
-- 🔴 **Corregido:** Combinación de heatmaps para FIG_2.15
-- 🔧 **Corregido:** Compatibilidad con ggplot2 3.4+ (`size` → `linewidth`)
+### Critical Fixes
+- 🔴 **Fixed:** Correct VAF calculation in Step 2 detailed figures
+- 🔴 **Fixed:** Heatmap combination for FIG_2.15
+- 🔧 **Fixed:** ggplot2 3.4+ compatibility (`size` → `linewidth`)
 
-### Refactorización de Código
-- ✨ **Eliminadas ~2000 líneas de código duplicado** en scripts de utilidades
-- ✨ **Estilos centralizados:** Colores y temas unificados en `colors.R` y `theme_professional.R`
-- ✨ **Mejoras de robustez:** Validación de inputs, manejo de errores y namespaces explícitos
-- ✨ **Estandarización visual:** Dimensiones, colores y temas consistentes en todas las visualizaciones
-- ✨ **Calidad de código:** Comentarios mejorados, documentación roxygen2 y organización del código
+### Code Refactoring
+- ✨ **Eliminated ~2000 lines of duplicated code** in utility scripts
+- ✨ **Centralized styling:** Unified colors and themes in `colors.R` and `theme_professional.R`
+- ✨ **Robustness improvements:** Input validation, error handling, and explicit namespaces
+- ✨ **Visual standardization:** Consistent dimensions, colors, and themes across all visualizations
+- ✨ **Code quality:** Improved comments, roxygen2 documentation, and code organization
 
-### Mejoras
-- ✨ **Mejorado:** Consistencia visual (G>T destacado en rojo)
-- 📚 **Agregado:** Documentación comprehensiva (CHANGELOG, RELEASE_NOTES, HALLAZGOS)
+### Improvements
+- ✨ **Improved:** Visual consistency (G>T highlighted in red)
+- 📚 **Added:** Comprehensive documentation (CHANGELOG, RELEASE_NOTES, HALLAZGOS)
 
-**Ver [RESUMEN_REVISION_v1.0.1.md](RESUMEN_REVISION_v1.0.1.md) para resumen ejecutivo o [HALLAZGOS_REVISION_PERFECCIONISTA.md](HALLAZGOS_REVISION_PERFECCIONISTA.md) para hallazgos detallados.**
+**See [RESUMEN_REVISION_v1.0.1.md](RESUMEN_REVISION_v1.0.1.md) for executive summary or [HALLAZGOS_REVISION_PERFECCIONISTA.md](HALLAZGOS_REVISION_PERFECCIONISTA.md) for detailed findings.**
 
 ### Critical Cohesion Issues - All Resolved ✅
 All 5 critical cohesion issues identified have been addressed:

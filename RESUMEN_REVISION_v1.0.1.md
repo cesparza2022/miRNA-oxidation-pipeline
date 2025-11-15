@@ -1,96 +1,95 @@
-# Resumen de Mejoras - Versión 1.0.1
+# Improvement Summary - Version 1.0.1
 
-**Fecha:** 2025-01-21  
-**Versión:** 1.0.1  
-**Tipo:** Mejoras de código, visualización y documentación
-
----
-
-## Mejoras Principales
-
-Esta versión representa una refactorización significativa del pipeline, enfocada en mejorar la calidad del código, consistencia visual, y mantenibilidad general. Las mejoras se realizaron de manera sistemática, revisando cada componente del pipeline.
-
-### Correcciones Críticas
-
-**Corrección de cálculo VAF en Step 2:** Se identificó y corrigió un problema donde los scripts de Step 2 recibían datos de conteo SNV en lugar de valores VAF. Ahora el pipeline calcula VAF correctamente a partir de las columnas SNV y Total, filtrando valores VAF >= 0.5 como se especifica en la configuración.
-
-### Refactorización de Código
-
-**Eliminación de código duplicado:** Se identificaron y eliminaron aproximadamente 2000 líneas de código duplicado en tres archivos principales:
-- `scripts/utils/logging.R`: Reducido de 1067 a 356 líneas
-- `scripts/utils/validate_input.R`: Reducido de 1144 a 383 líneas  
-- `scripts/utils/build_step1_viewer.R`: Reducido de 1015 a 338 líneas
-
-**Centralización de estilos:** Se creó un sistema unificado de gestión de colores y temas:
-- Nuevo archivo `scripts/utils/colors.R` con todas las definiciones de color centralizadas
-- Uso consistente de `theme_professional` en todas las figuras
-- Eliminación de valores de color hardcodeados en los scripts
-
-**Mejoras de robustez:** Se agregaron validaciones comprehensivas en todos los scripts:
-- Verificación de datos vacíos al cargar archivos
-- Validación de columnas críticas antes de procesamiento
-- Manejo de errores mejorado con funciones estandarizadas
-- Uso explícito de namespaces (p.ej., `readr::read_csv()`, `stringr::str_detect()`)
-
-### Mejoras Visuales
-
-**Consistencia en figuras:**
-- Dimensiones de figuras estandarizadas usando valores de `config.yaml`
-- Fondo blanco consistente en todas las figuras PNG
-- Ejes y escalas uniformes entre figuras relacionadas
-- Uso consistente de `scales::comma` y `scales::percent` para formateo
-
-**Claridad científica:**
-- Captions mejorados para incluir detalles de métodos estadísticos
-- Títulos y subtítulos actualizados con contexto biológico apropiado
-- Terminología consistente (p.ej., "functional binding domain" para región seed)
-- Explicaciones claras de métricas y unidades
-
-### Documentación
-
-**Documentación de usuario:**
-- README actualizado con información correcta sobre número de figuras generadas
-- Eliminación de enlaces rotos
-- Referencias cruzadas corregidas entre documentos
-- Agregada referencia a documentación de revisión detallada
-
-**Documentación de código:**
-- Agregada documentación roxygen2 a funciones helper
-- Comentarios mejorados en bloques de código complejos
-- Headers de archivos más informativos
-- Documentación de constantes y paletas de colores
-
-### Verificación y Validación
-
-**Testing comprehensivo:**
-- Verificación de sintaxis de todos los 82 scripts R (todos válidos)
-- Validación de archivos de configuración (YAML válido)
-- Verificación de dependencias en `environment.yml`
-- Confirmación de que todas las funciones helper están definidas
-- Verificación de referencias entre código y documentación
+**Date:** 2025-01-21  
+**Version:** 1.0.1  
+**Type:** Code, visualization, and documentation improvements
 
 ---
 
-## Estadísticas
+## Main Improvements
 
-- **Líneas de código eliminadas:** ~2000 (duplicados)
-- **Líneas agregadas:** ~500 (mejoras y documentación)
-- **Neto:** Reducción significativa de código manteniendo funcionalidad
-- **Scripts revisados:** 82 scripts R, 15 reglas Snakemake
-- **Archivos modificados:** 70+ archivos
+This version represents a significant refactoring of the pipeline, focused on improving code quality, visual consistency, and overall maintainability. Improvements were made systematically, reviewing each component of the pipeline.
+
+### Critical Fixes
+
+**VAF calculation correction in Step 2:** Identified and fixed an issue where Step 2 scripts were receiving SNV count data instead of VAF values. The pipeline now correctly calculates VAF from SNV and Total columns, filtering VAF values >= 0.5 as specified in the configuration.
+
+### Code Refactoring
+
+**Duplicate code elimination:** Identified and removed approximately 2000 lines of duplicated code in three main files:
+- `scripts/utils/logging.R`: Reduced from 1067 to 356 lines
+- `scripts/utils/validate_input.R`: Reduced from 1144 to 383 lines  
+- `scripts/utils/build_step1_viewer.R`: Reduced from 1015 to 338 lines
+
+**Centralized styling:** Created a unified color and theme management system:
+- New file `scripts/utils/colors.R` with all color definitions centralized
+- Consistent use of `theme_professional` in all figures
+- Removed hardcoded color values from scripts
+
+**Robustness improvements:** Added comprehensive validations across all scripts:
+- Empty data verification when loading files
+- Critical column validation before processing
+- Improved error handling with standardized functions
+- Explicit namespace usage (e.g., `readr::read_csv()`, `stringr::str_detect()`)
+
+### Visual Improvements
+
+**Figure consistency:**
+- Figure dimensions standardized using values from `config.yaml`
+- Consistent white background in all PNG figures
+- Uniform axes and scales across related figures
+- Consistent use of `scales::comma` and `scales::percent` for formatting
+
+**Scientific clarity:**
+- Improved captions to include statistical method details
+- Updated titles and subtitles with appropriate biological context
+- Consistent terminology (e.g., "functional binding domain" for seed region)
+- Clear explanations of metrics and units
+
+### Documentation
+
+**User documentation:**
+- README updated with correct information about number of figures generated
+- Removed broken links
+- Fixed cross-references between documents
+- Added reference to detailed review documentation
+
+**Code documentation:**
+- Added roxygen2 documentation to helper functions
+- Improved comments in complex code blocks
+- More informative file headers
+- Documentation of color constants and palettes
+
+### Verification and Validation
+
+**Comprehensive testing:**
+- Syntax verification of all 82 R scripts (all valid)
+- Configuration file validation (valid YAML)
+- Dependency verification in `environment.yml`
+- Confirmation that all helper functions are defined
+- Verification of references between code and documentation
 
 ---
 
-## Impacto
+## Statistics
 
-Estas mejoras resultan en un pipeline más:
-- **Mantenible:** Código centralizado sin duplicación
-- **Robusto:** Validaciones comprehensivas y manejo de errores mejorado
-- **Consistente:** Estilos y dimensiones unificadas
-- **Documentado:** Información clara para usuarios y desarrolladores
-- **Confiável:** Código verificado y validado
+- **Lines of code removed:** ~2000 (duplicates)
+- **Lines added:** ~500 (improvements and documentation)
+- **Net:** Significant code reduction while maintaining functionality
+- **Scripts reviewed:** 82 R scripts, 15 Snakemake rules
+- **Files modified:** 70+ files
 
 ---
 
-Para detalles técnicos completos, ver `HALLAZGOS_REVISION_PERFECCIONISTA.md`.
+## Impact
 
+These improvements result in a more:
+- **Maintainable:** Centralized code without duplication
+- **Robust:** Comprehensive validations and improved error handling
+- **Consistent:** Unified styles and dimensions
+- **Documented:** Clear information for users and developers
+- **Reliable:** Verified and validated code
+
+---
+
+For complete technical details, see `HALLAZGOS_REVISION_PERFECCIONISTA.md`.
