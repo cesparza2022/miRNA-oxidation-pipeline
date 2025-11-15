@@ -53,12 +53,12 @@
 - Depends on file loading order
 - Can cause unintentional visual differences
 
-**Acción Requerida:**
+**Action Required:**
 1. Remove definition from `functions_common.R`
 2. Use only `theme_professional.R`
 3. Verify that all scripts use the correct theme
 
-**Prioridad:** 🟡 IMPORTANT
+**Priority:** 🟡 IMPORTANT
 
 ---
 
@@ -81,12 +81,12 @@
 - Colors may not be exactly the same between figures
 - Makes global color changes difficult
 
-**Acción Requerida:**
+**Action Required:**
 1. Create `scripts/utils/colors.R` centralized
 2. Define all colors in one place
 3. Update all scripts to use centralized colors
 
-**Prioridad:** 🟡 IMPORTANT
+**Priority:** 🟡 IMPORTANT
 
 ---
 
@@ -108,7 +108,7 @@
 - Difficult to change dimensions globally
 - Does not respect centralized configuration
 
-**Acción Requerida:**
+**Action Required:**
 1. ✅ All scripts must use config$analysis$figure
 2. ✅ Remove hardcoded values
 3. ✅ Verify that all figures use dimensions from config
@@ -118,28 +118,28 @@
 - ✅ Replaced hardcoded values in ggsave() and png() with variables from config
 - ✅ Scripts Updated: step1 (panels B, C, D), step2 (position_specific, clustering_all, clustering_seed), step3 (clustering_visualization), step4 (pathway_enrichment), step5 (family_comparison), step7 (roc_analysis, signature_heatmap)
 
-**Prioridad:** 🟢 MENOR (quality improvement) - ✅ RESOLVED
+**Priority:** 🟢 MENOR (quality improvement) - ✅ RESOLVED
 
 ---
 
-## 🟡 PROBLEMAS IMPORTANTES
+## 🟡 IMPORTANT ISSUES
 
 ### **5. INCONSISTENCY IN PATRONES DE MANEJO DE ERRORES**
 
 **Observación:**
 - Some scripts use `tryCatch()` with logging
 - Others use `handle_error()` from logging.R
-- Algunos only usan `stop()`
+- Some only usan `stop()`
 
 **Impact:**
 - **Low-Medium:** Inconsistent error handling
 - Some errors may not be logged appropriately
 
-**Acción Requerida:**
+**Action Required:**
 - Standardize error handling
 - Use `handle_error()` consistently
 
-**Prioridad:** 🟡 IMPORTANT
+**Priority:** 🟡 IMPORTANT
 
 ---
 
@@ -155,11 +155,11 @@
 **Impact:**
 - **Low:** Makes maintenance difficult and entendimiento
 
-**Acción Requerida:**
+**Action Required:**
 - Mejorar DOCUMENTATION in scripts with DOCUMENTATION mínima
 - Standardize comment style
 
-**Prioridad:** 🟢 MENOR
+**Priority:** 🟢 MENOR
 
 ---
 
