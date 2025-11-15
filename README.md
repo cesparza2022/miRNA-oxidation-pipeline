@@ -71,7 +71,7 @@ conda env create -f environment.yml
 # 3. Activate environment
 conda activate mirna_oxidation_pipeline
 
-# 4. Configure datas´
+# 4. Configure data
 cp config/config.yaml.example config/config.yaml
 nano config/config.yaml  # Update paths to your data
 
@@ -97,7 +97,7 @@ hsa-miR-1-1,2:G>A,2,95,1,75,...
 - `pos:mut` (or `pos.mut`): Position and mutation (format: `position:mutation`)
 - Sample columns: `SampleName_SNV` and `SampleName (PM+1MM+2MM)` pairs
 
-**See:** [Data Format Documentation](docs/DATA_FORMAT_AND_FLEXIBILITY.md) for detailed format specifications.
+**See:** The `config/config.yaml.example` file for detailed format specifications and examples.
 
 ### 🎯 Flexible Group Assignment
 
@@ -124,7 +124,7 @@ Sample2	Control	Batch1	62	F
 - Searches for "control" → Control group
 - Works automatically with existing data
 
-**See:** [Flexible Group System Documentation](docs/FLEXIBLE_GROUP_SYSTEM.md) for details.
+**Note:** The pipeline automatically detects groups from column names or metadata files. See `sample_metadata_template.tsv` for metadata file format.
 
 ## 📈 Pipeline Steps
 
@@ -172,8 +172,8 @@ Sample2	Control	Batch1	62	F
 
 **Outputs:**
 - **Basic**: 5 figures (batch effect PCA, group balance, volcano, effect size, position-specific)
-- **Detailed**: 15 additional figures (VAF distributions, heatmaps, clustering, enrichment, etc.)
-- **Total**: 20 figures (PNG, 300 DPI)
+- **Detailed**: 16 additional figures (VAF distributions, heatmaps, clustering, enrichment, etc.)
+- **Total**: 21 figures (PNG, 300 DPI)
 - Statistical results tables (CSV)
 
 ### Step 3: Clustering Analysis
@@ -252,7 +252,7 @@ results/
 │   ├── figures/      # 11 PNG figures
 │   └── tables/        # Filtered data and reports
 ├── step2/final/
-│   ├── figures/      # 73 PNG figures (including detailed analysis)
+│   ├── figures/      # 21 PNG figures (5 basic + 16 detailed analysis)
 │   └── tables/        # Statistical results
 ├── step3/final/
 │   ├── figures/      # 2 PNG figures (clustering: heatmap, dendrogram)
@@ -328,21 +328,22 @@ See `config/config.yaml.example` for detailed documentation.
 
 ### Getting Started
 * **[Quick Start Guide](QUICK_START.md)** - Get running in 5 minutes
-* **[User Guide](docs/USER_GUIDE.md)** - Comprehensive usage instructions
-* **[Pipeline Overview](docs/PIPELINE_OVERVIEW.md)** - Scientific background and step descriptions
-* **[Documentation Index](docs/INDEX.md)** - Complete documentation index
+* **[README.md](README.md)** - Complete pipeline documentation (this file)
 
-### Core Documentation
-* **🔄 Flexible Group System**: [docs/FLEXIBLE_GROUP_SYSTEM.md](docs/FLEXIBLE_GROUP_SYSTEM.md) - How to use any group names via metadata file
-* **🔧 How It Works**: [docs/HOW_IT_WORKS.md](docs/HOW_IT_WORKS.md) - Technical explanation of the flexible group system
-* **📊 Data Format**: [docs/DATA_FORMAT_AND_FLEXIBILITY.md](docs/DATA_FORMAT_AND_FLEXIBILITY.md) - Input data format and parsing details
-* **📊 Statistical Methodology**: [docs/METHODOLOGY.md](docs/METHODOLOGY.md) - Comprehensive documentation of statistical methods, assumptions validation, batch effects, and confounders
+### Configuration and Data Format
+* **Configuration**: See `config/config.yaml.example` for detailed configuration options
+* **Data Format**: Input data should have `miRNA name` (or `miRNA_name`), `pos:mut` (or `pos.mut`), and sample columns in pairs (`SampleName_SNV` and `SampleName (PM+1MM+2MM)`)
+* **Metadata Format**: See `sample_metadata_template.tsv` for metadata file format (optional but recommended for flexible group assignment)
 
-### Reference Documents
-* **🧪 Testing Plan**: [TESTING_PLAN.md](TESTING_PLAN.md) - Step-by-step testing plan
-* **🔧 Software Versions**: [SOFTWARE_VERSIONS.md](SOFTWARE_VERSIONS.md) - All software and package versions
-* **🔬 Critical Expert Review**: [CRITICAL_EXPERT_REVIEW.md](CRITICAL_EXPERT_REVIEW.md) - Expert bioinformatics and statistical review
-* **📋 Comprehensive Review**: [COMPREHENSIVE_PIPELINE_REVIEW.md](COMPREHENSIVE_PIPELINE_REVIEW.md) - Complete pipeline review with missing elements identified
+### Release Information
+* **[CHANGELOG.md](CHANGELOG.md)** - Detailed change history
+* **[RELEASE_NOTES_v1.0.1.md](RELEASE_NOTES_v1.0.1.md)** - Release notes for version 1.0.1
+* **[ESTADO_PROBLEMAS_CRITICOS.md](ESTADO_PROBLEMAS_CRITICOS.md)** - Status of critical cohesion issues (all resolved ✅)
+
+### Technical Notes
+* **Statistical Methods**: The pipeline uses parametric (t-test) and non-parametric (Wilcoxon) tests based on data assumptions. FDR correction (Benjamini-Hochberg) is applied for multiple comparisons.
+* **Batch Effect Analysis**: PCA and statistical testing are performed to detect batch effects (see Step 2 outputs).
+* **Confounder Analysis**: Age, sex, and other confounders are analyzed and can be adjusted for in statistical models.
 
 ## 🔧 Troubleshooting
 
@@ -381,7 +382,7 @@ All dependencies are installed automatically when creating the conda/mamba envir
 
 **R packages:** ggplot2, dplyr, pheatmap, patchwork, ggrepel, viridis, and more
 
-See [SOFTWARE_VERSIONS.md](SOFTWARE_VERSIONS.md) for detailed version requirements.
+See `environment.yml` for detailed version requirements and dependencies.
 
 ## 📖 Citation
 

@@ -6,7 +6,7 @@
 # Project information
 project:
   name: "miRNA Oxidation Analysis"
-  version: "1.0.0"
+  version: "1.0.1"
   description: "Reproducible pipeline for analyzing G>T oxidation patterns in miRNAs"
 
 # Paths (update these to your data locations)

@@ -71,8 +71,9 @@ ls results/
 ## Need Help?
 
 - **Full documentation:** [README.md](README.md)
-- **User guide:** [docs/USER_GUIDE.md](docs/USER_GUIDE.md)
-- **Pipeline overview:** [docs/PIPELINE_OVERVIEW.md](docs/PIPELINE_OVERVIEW.md)
+- **Configuration guide:** See `config/config.yaml.example` for detailed configuration options
+- **Data format:** See README.md "Input Data Format" section for data structure requirements
+- **Troubleshooting:** See README.md "Troubleshooting" section for common issues
 
 ---
 
