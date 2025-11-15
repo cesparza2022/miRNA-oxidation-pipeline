@@ -88,8 +88,34 @@ ensure_output_dir(dirname(output_heatmap))
 
 log_subsection("Loading data")
 
-roc_table <- read_csv(input_roc, show_col_types = FALSE)
-vaf_data <- read_csv(input_vaf_filtered, show_col_types = FALSE)
+roc_table <- tryCatch({
+  result <- readr::read_csv(input_roc, show_col_types = FALSE)
+  
+  # Validate data is not empty (will be handled later, but validate structure)
+  if (ncol(result) == 0) {
+    stop("ROC table has no columns")
+  }
+  
+  result
+}, error = function(e) {
+  handle_error(e, context = "Step 7.2 - Loading ROC table", exit_code = 1, log_file = log_file)
+})
+
+vaf_data <- tryCatch({
+  result <- readr::read_csv(input_vaf_filtered, show_col_types = FALSE)
+  
+  # Validate data is not empty
+  if (nrow(result) == 0) {
+    stop("VAF filtered data is empty (0 rows)")
+  }
+  if (ncol(result) == 0) {
+    stop("VAF filtered data has no columns")
+  }
+  
+  result
+}, error = function(e) {
+  handle_error(e, context = "Step 7.2 - Loading VAF data", exit_code = 1, log_file = log_file)
+})
 
 # Check if ROC table is empty
 if (nrow(roc_table) == 0 || !"miRNA_name" %in% names(roc_table)) {

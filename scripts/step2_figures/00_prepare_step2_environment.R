@@ -38,7 +38,12 @@ cat("✅ Figures directory created:", figures_dir, "\n")
 
 # Load data to identify sample columns
 cat("\n📂 Loading data to identify sample columns...\n")
-data <- read_csv(input_data, show_col_types = FALSE, n_max = 1)
+data <- readr::read_csv(input_data, show_col_types = FALSE, n_max = 1)
+
+# Validate data is not empty
+if (ncol(data) == 0) {
+  stop("Input data file has no columns")
+}
 
 # Identify metadata columns
 metadata_cols <- c("miRNA_name", "miRNA name", "pos.mut", "pos:mut", 
@@ -82,7 +87,7 @@ cat("   ✅ ALS:", n_als, "samples\n")
 cat("   ✅ Control:", n_ctrl, "samples\n")
 
 # Save metadata
-write_csv(metadata, metadata_output)
+readr::write_csv(metadata, metadata_output)
 cat("\n✅ Metadata saved to:", metadata_output, "\n")
 
 # Create symlink or copy of data file to current directory

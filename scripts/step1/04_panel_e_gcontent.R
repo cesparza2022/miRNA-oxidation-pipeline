@@ -61,6 +61,15 @@ if (exists("validate_processed_clean")) {
 log_subsection("Loading data")
 data <- tryCatch({
   result <- load_processed_data(input_file)
+  
+  # Additional validation after loading
+  if (nrow(result) == 0) {
+    stop("Input dataset is empty (0 rows) after loading")
+  }
+  if (ncol(result) <= 2) {  # Only metadata columns
+    stop("Input dataset has no sample columns after loading")
+  }
+  
   log_success(paste("Data loaded:", nrow(result), "rows,", ncol(result), "columns"))
   result
 }, error = function(e) {
@@ -68,6 +77,11 @@ data <- tryCatch({
 })
 
 sample_cols <- setdiff(names(data), c("miRNA_name", "pos.mut"))
+
+# Validate we have sample columns
+if (length(sample_cols) == 0) {
+  stop("No sample columns found in dataset. Check column names.")
+}
 
 log_subsection("Calculating metrics")
 

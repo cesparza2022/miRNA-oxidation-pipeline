@@ -63,11 +63,20 @@ ensure_output_dir(dirname(output_go_enrichment))
 log_subsection("Loading target analysis results")
 
 target_data <- tryCatch({
-  result <- read_csv(input_targets, show_col_types = FALSE)
+  result <- readr::read_csv(input_targets, show_col_types = FALSE)
+  
+  # Validate data is not empty
+  if (nrow(result) == 0) {
+    stop("Target data table is empty (0 rows)")
+  }
+  if (ncol(result) == 0) {
+    stop("Target data table has no columns")
+  }
+  
   log_success(paste("Loaded:", nrow(result), "miRNA-target pairs"))
   result
 }, error = function(e) {
-  handle_error(e, context = "Step 6.2 - Data Loading", exit_code = 1, log_file = log_file)
+  handle_error(e, context = "Step 4.2 - Data Loading", exit_code = 1, log_file = log_file)
 })
 
 # ============================================================================

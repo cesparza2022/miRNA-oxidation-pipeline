@@ -85,7 +85,24 @@ if (!file.exists(input_cluster_summary)) {
 }
 
 cluster_assignments <- tryCatch({
-  result <- read_csv(input_cluster_assignments, show_col_types = FALSE)
+  result <- readr::read_csv(input_cluster_assignments, show_col_types = FALSE)
+  
+  # Validate data is not empty
+  if (nrow(result) == 0) {
+    stop("Cluster assignments table is empty (0 rows)")
+  }
+  if (ncol(result) == 0) {
+    stop("Cluster assignments table has no columns")
+  }
+  
+  # Validate required columns
+  if (!"miRNA_name" %in% names(result) && !"miRNA name" %in% names(result)) {
+    stop("Cluster assignments missing required column: 'miRNA_name' or 'miRNA name'")
+  }
+  if (!"cluster" %in% names(result)) {
+    stop("Cluster assignments missing required column: 'cluster'")
+  }
+  
   log_success(paste("Loaded cluster assignments:", nrow(result), "miRNAs"))
   result
 }, error = function(e) {
@@ -93,7 +110,16 @@ cluster_assignments <- tryCatch({
 })
 
 cluster_summary <- tryCatch({
-  result <- read_csv(input_cluster_summary, show_col_types = FALSE)
+  result <- readr::read_csv(input_cluster_summary, show_col_types = FALSE)
+  
+  # Validate data is not empty
+  if (nrow(result) == 0) {
+    stop("Cluster summary table is empty (0 rows)")
+  }
+  if (ncol(result) == 0) {
+    stop("Cluster summary table has no columns")
+  }
+  
   log_success(paste("Loaded cluster summary:", nrow(result), "rows"))
   result
 }, error = function(e) {
@@ -115,7 +141,16 @@ if (!file.exists(input_vaf_filtered)) {
 }
 
 vaf_data <- tryCatch({
-  result <- read_csv(input_vaf_filtered, show_col_types = FALSE)
+  result <- readr::read_csv(input_vaf_filtered, show_col_types = FALSE)
+  
+  # Validate data is not empty
+  if (nrow(result) == 0) {
+    stop("VAF filtered data is empty (0 rows)")
+  }
+  if (ncol(result) == 0) {
+    stop("VAF filtered data has no columns")
+  }
+  
   log_success(paste("Loaded VAF filtered data:", nrow(result), "SNVs"))
   result
 }, error = function(e) {
@@ -157,6 +192,11 @@ vaf_data <- vaf_data %>%
 
 sample_cols <- setdiff(names(vaf_data), c("miRNA_name", "pos.mut"))
 
+# Validate we have sample columns
+if (length(sample_cols) == 0) {
+  stop("No sample columns found in VAF data. Check column names.")
+}
+
 # Prepare heatmap data
 heatmap_data <- vaf_data %>%
   filter(
@@ -176,6 +216,11 @@ heatmap_data <- vaf_data %>%
   ) %>%
   left_join(cluster_assignments, by = "miRNA_name") %>%
   arrange(cluster)
+
+# Validate heatmap data is not empty
+if (nrow(heatmap_data) == 0) {
+  stop("No heatmap data available after filtering. Check miRNA matching and position filtering.")
+}
 
 # ============================================================================
 # PANEL A: Cluster Heatmap

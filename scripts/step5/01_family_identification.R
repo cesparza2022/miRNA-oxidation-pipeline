@@ -88,7 +88,16 @@ extract_mirna_family <- function(mirna_name) {
 log_subsection("Loading data")
 
 statistical_results <- tryCatch({
-  result <- read_csv(input_statistical, show_col_types = FALSE)
+  result <- readr::read_csv(input_statistical, show_col_types = FALSE)
+  
+  # Validate data is not empty
+  if (nrow(result) == 0) {
+    stop("Statistical results table is empty (0 rows)")
+  }
+  if (ncol(result) == 0) {
+    stop("Statistical results table has no columns")
+  }
+  
   log_success(paste("Loaded:", nrow(result), "SNVs from statistical results"))
   result
 }, error = function(e) {
@@ -96,7 +105,16 @@ statistical_results <- tryCatch({
 })
 
 vaf_data <- tryCatch({
-  result <- read_csv(input_vaf_filtered, show_col_types = FALSE)
+  result <- readr::read_csv(input_vaf_filtered, show_col_types = FALSE)
+  
+  # Validate data is not empty
+  if (nrow(result) == 0) {
+    stop("VAF filtered data is empty (0 rows)")
+  }
+  if (ncol(result) == 0) {
+    stop("VAF filtered data has no columns")
+  }
+  
   log_success(paste("Loaded:", nrow(result), "SNVs from VAF filtered data"))
   result
 }, error = function(e) {
@@ -106,9 +124,19 @@ vaf_data <- tryCatch({
 # Load cluster assignments from Step 3
 cluster_assignments <- tryCatch({
   if (file.exists(input_cluster_assignments)) {
-    result <- read_csv(input_cluster_assignments, show_col_types = FALSE)
-    log_success(paste("Loaded:", nrow(result), "cluster assignments from Step 3"))
-    result
+    result <- readr::read_csv(input_cluster_assignments, show_col_types = FALSE)
+    
+    # Validate cluster assignments is not empty (if file exists)
+    if (nrow(result) == 0) {
+      log_warning("Cluster assignments file is empty (0 rows), proceeding without cluster information")
+      result <- NULL
+    } else if (ncol(result) == 0) {
+      log_warning("Cluster assignments file has no columns, proceeding without cluster information")
+      result <- NULL
+    } else {
+      log_success(paste("Loaded:", nrow(result), "cluster assignments from Step 3"))
+      result
+    }
   } else {
     log_warning("Cluster assignments file not found, proceeding without cluster information")
     NULL

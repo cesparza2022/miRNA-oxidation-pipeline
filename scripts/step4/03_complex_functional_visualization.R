@@ -93,7 +93,16 @@ for (name in names(input_files)) {
 }
 
 target_data <- tryCatch({
-  result <- read_csv(input_targets, show_col_types = FALSE)
+  result <- readr::read_csv(input_targets, show_col_types = FALSE)
+  
+  # Validate data is not empty
+  if (nrow(result) == 0) {
+    stop("Target data table is empty (0 rows)")
+  }
+  if (ncol(result) == 0) {
+    stop("Target data table has no columns")
+  }
+  
   log_success(paste("Loaded target data:", nrow(result), "miRNA-target pairs"))
   result
 }, error = function(e) {
@@ -101,7 +110,16 @@ target_data <- tryCatch({
 })
 
 go_data <- tryCatch({
-  result <- read_csv(input_go, show_col_types = FALSE)
+  result <- readr::read_csv(input_go, show_col_types = FALSE)
+  
+  # Validate data is not empty
+  if (nrow(result) == 0) {
+    stop("GO enrichment table is empty (0 rows)")
+  }
+  if (ncol(result) == 0) {
+    stop("GO enrichment table has no columns")
+  }
+  
   log_success(paste("Loaded GO enrichment:", nrow(result), "GO terms"))
   result
 }, error = function(e) {
@@ -109,7 +127,16 @@ go_data <- tryCatch({
 })
 
 kegg_data <- tryCatch({
-  result <- read_csv(input_kegg, show_col_types = FALSE)
+  result <- readr::read_csv(input_kegg, show_col_types = FALSE)
+  
+  # Validate data is not empty
+  if (nrow(result) == 0) {
+    stop("KEGG enrichment table is empty (0 rows)")
+  }
+  if (ncol(result) == 0) {
+    stop("KEGG enrichment table has no columns")
+  }
+  
   log_success(paste("Loaded KEGG enrichment:", nrow(result), "pathways"))
   result
 }, error = function(e) {
@@ -117,15 +144,34 @@ kegg_data <- tryCatch({
 })
 
 als_genes_data <- tryCatch({
-  result <- read_csv(input_als_genes, show_col_types = FALSE)
-  log_success(paste("Loaded ALS genes data:", nrow(result), "genes"))
+  result <- readr::read_csv(input_als_genes, show_col_types = FALSE)
+  
+  # Validate data is not empty (allow empty for optional data)
+  if (nrow(result) == 0) {
+    log_warning("ALS genes data table is empty (0 rows), continuing with empty data")
+  } else if (ncol(result) == 0) {
+    log_warning("ALS genes data table has no columns, continuing with empty data")
+    result <- tibble()  # Create empty tibble
+  } else {
+    log_success(paste("Loaded ALS genes data:", nrow(result), "genes"))
+  }
+  
   result
 }, error = function(e) {
   handle_error(e, context = "Step 4.3 - Loading ALS genes data", exit_code = 1, log_file = log_file)
 })
 
 target_comp <- tryCatch({
-  result <- read_csv(input_target_comp, show_col_types = FALSE)
+  result <- readr::read_csv(input_target_comp, show_col_types = FALSE)
+  
+  # Validate data is not empty
+  if (nrow(result) == 0) {
+    stop("Target comparison table is empty (0 rows)")
+  }
+  if (ncol(result) == 0) {
+    stop("Target comparison table has no columns")
+  }
+  
   log_success(paste("Loaded target comparison:", nrow(result), "comparisons"))
   result
 }, error = function(e) {

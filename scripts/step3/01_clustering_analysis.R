@@ -78,7 +78,16 @@ ensure_output_dir(dirname(output_cluster_summary))
 log_subsection("Loading data")
 
 statistical_results <- tryCatch({
-  result <- read_csv(input_statistical, show_col_types = FALSE)
+  result <- readr::read_csv(input_statistical, show_col_types = FALSE)
+  
+  # Validate data is not empty
+  if (nrow(result) == 0) {
+    stop("Statistical results table is empty (0 rows)")
+  }
+  if (ncol(result) == 0) {
+    stop("Statistical results table has no columns")
+  }
+  
   log_success(paste("Loaded:", nrow(result), "SNVs from statistical results"))
   result
 }, error = function(e) {
@@ -86,7 +95,16 @@ statistical_results <- tryCatch({
 })
 
 vaf_data <- tryCatch({
-  result <- read_csv(input_vaf_filtered, show_col_types = FALSE)
+  result <- readr::read_csv(input_vaf_filtered, show_col_types = FALSE)
+  
+  # Validate data is not empty
+  if (nrow(result) == 0) {
+    stop("VAF filtered data is empty (0 rows)")
+  }
+  if (ncol(result) == 0) {
+    stop("VAF filtered data has no columns")
+  }
+  
   log_success(paste("Loaded:", nrow(result), "SNVs from VAF filtered data"))
   result
 }, error = function(e) {
@@ -193,6 +211,11 @@ significant_gt <- statistical_results %>%
   filter(in_seed == TRUE) %>%
   distinct(miRNA_name, pos.mut, .keep_all = TRUE)
 
+# Validate we have significant G>T mutations
+if (nrow(significant_gt) == 0) {
+  stop("No significant G>T mutations found for clustering. Check statistical results and filtering criteria.")
+}
+
 log_info(paste("Significant G>T mutations for clustering:", nrow(significant_gt)))
 
 # Create matrix: rows = miRNAs, columns = samples (or positions)
@@ -221,6 +244,14 @@ clustering_data <- vaf_data %>%
 
 # Remove miRNAs with all zeros or all NAs
 clustering_data <- clustering_data[rowSums(!is.na(clustering_data)) > 0 & rowSums(clustering_data, na.rm = TRUE) > 0, ]
+
+# Validate clustering data is not empty
+if (nrow(clustering_data) == 0) {
+  stop("No miRNAs available for clustering after filtering. Check data filtering and miRNA matching.")
+}
+if (ncol(clustering_data) == 0) {
+  stop("No samples available for clustering. Check sample column detection.")
+}
 
 log_info(paste("miRNAs for clustering:", nrow(clustering_data)))
 log_info(paste("Samples for clustering:", ncol(clustering_data)))

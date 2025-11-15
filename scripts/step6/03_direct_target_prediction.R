@@ -56,8 +56,39 @@ log_info("")
 
 log_subsection("Loading data")
 
-target_analysis <- read_csv(input_targets, show_col_types = FALSE)
-vaf_data <- read_csv(input_vaf_filtered, show_col_types = FALSE)
+target_analysis <- tryCatch({
+  result <- readr::read_csv(input_targets, show_col_types = FALSE)
+  
+  # Validate data is not empty
+  if (nrow(result) == 0) {
+    stop("Target analysis table is empty (0 rows)")
+  }
+  if (ncol(result) == 0) {
+    stop("Target analysis table has no columns")
+  }
+  
+  log_info(paste("Target analysis loaded:", nrow(result), "mutations"))
+  result
+}, error = function(e) {
+  handle_error(e, context = "Step 6.3 - Loading target analysis", exit_code = 1, log_file = log_file)
+})
+
+vaf_data <- tryCatch({
+  result <- readr::read_csv(input_vaf_filtered, show_col_types = FALSE)
+  
+  # Validate data is not empty
+  if (nrow(result) == 0) {
+    stop("VAF filtered data is empty (0 rows)")
+  }
+  if (ncol(result) == 0) {
+    stop("VAF filtered data has no columns")
+  }
+  
+  log_info(paste("VAF data loaded:", nrow(result), "mutations"))
+  result
+}, error = function(e) {
+  handle_error(e, context = "Step 6.3 - Loading VAF data", exit_code = 1, log_file = log_file)
+})
 
 # Normalize column names
 if ("miRNA name" %in% names(vaf_data)) {
@@ -105,11 +136,11 @@ ALS_RELEVANT_GENES <- c("SOD1", "TDP43", "FUS", "OPTN", "C9ORF72",
 # Function to simulate canonical targets (based on miRNA family)
 simulate_canonical_targets <- function(mirna_name) {
   # Simulate based on miRNA family
-  if (str_detect(mirna_name, "let-7")) {
+  if (stringr::str_detect(mirna_name, "let-7")) {
     return(paste(ALS_RELEVANT_GENES[1:5], collapse = ";"))
-  } else if (str_detect(mirna_name, "miR-1|miR-206")) {
+  } else if (stringr::str_detect(mirna_name, "miR-1|miR-206")) {
     return(paste(ALS_RELEVANT_GENES[6:10], collapse = ";"))
-  } else if (str_detect(mirna_name, "miR-16|miR-15")) {
+  } else if (stringr::str_detect(mirna_name, "miR-16|miR-15")) {
     return(paste(ALS_RELEVANT_GENES[11:15], collapse = ";"))
   } else {
     return(paste(sample(ALS_RELEVANT_GENES, 5), collapse = ";"))
@@ -118,7 +149,7 @@ simulate_canonical_targets <- function(mirna_name) {
 
 # Function to simulate oxidized targets (lost some, gained some)
 simulate_oxidized_targets <- function(mirna_name, canonical_targets, position) {
-  canonical_list <- str_split(canonical_targets, ";")[[1]]
+  canonical_list <- stringr::str_split(canonical_targets, ";")[[1]]
   
   # Lost targets (higher impact if in seed region)
   n_lost <- ifelse(position <= 8, ceiling(length(canonical_list) * 0.3), 

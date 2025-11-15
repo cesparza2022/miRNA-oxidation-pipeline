@@ -78,11 +78,39 @@ ensure_output_dir(dirname(output_figure_a))
 
 log_subsection("Loading family analysis data")
 
-family_summary <- read_csv(input_family_summary, show_col_types = FALSE)
-family_comparison <- read_csv(input_family_comparison, show_col_types = FALSE)
+family_summary <- tryCatch({
+  result <- readr::read_csv(input_family_summary, show_col_types = FALSE)
+  
+  # Validate data is not empty
+  if (nrow(result) == 0) {
+    stop("Family summary table is empty (0 rows)")
+  }
+  if (ncol(result) == 0) {
+    stop("Family summary table has no columns")
+  }
+  
+  log_info(paste("Loaded family summary:", nrow(result), "families"))
+  result
+}, error = function(e) {
+  handle_error(e, context = "Step 5.2 - Loading family summary", exit_code = 1, log_file = log_file)
+})
 
-log_info(paste("Loaded family summary:", nrow(family_summary), "families"))
-log_info(paste("Loaded family comparison:", nrow(family_comparison), "families"))
+family_comparison <- tryCatch({
+  result <- readr::read_csv(input_family_comparison, show_col_types = FALSE)
+  
+  # Validate data is not empty
+  if (nrow(result) == 0) {
+    stop("Family comparison table is empty (0 rows)")
+  }
+  if (ncol(result) == 0) {
+    stop("Family comparison table has no columns")
+  }
+  
+  log_info(paste("Loaded family comparison:", nrow(result), "families"))
+  result
+}, error = function(e) {
+  handle_error(e, context = "Step 5.2 - Loading family comparison", exit_code = 1, log_file = log_file)
+})
 
 # Detect group names from family_comparison columns
 # Try to extract from column names in family_summary first (most reliable)

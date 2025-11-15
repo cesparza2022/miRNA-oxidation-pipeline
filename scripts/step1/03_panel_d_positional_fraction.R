@@ -42,7 +42,21 @@ if (exists("validate_processed_clean")) {
 # ============================================================================
 
 # Load processed_clean data (same as other panels for consistency)
-data <- load_processed_data(input_data)
+data <- tryCatch({
+  result <- load_processed_data(input_data)
+  
+  # Validate data is not empty
+  if (nrow(result) == 0) {
+    stop("Input dataset is empty (0 rows) after loading")
+  }
+  if (ncol(result) <= 2) {  # Only metadata columns
+    stop("Input dataset has no sample columns after loading")
+  }
+  
+  result
+}, error = function(e) {
+  stop(paste("Failed to load data:", e$message))
+})
 
 # Extract position from pos.mut (format: "18:TC")
 processed_data <- data %>%
@@ -50,6 +64,11 @@ processed_data <- data %>%
     position = as.numeric(str_extract(pos.mut, "^\\d+"))
   ) %>%
   filter(!is.na(position), position >= 1, position <= 22)
+
+# Validate processed data is not empty
+if (nrow(processed_data) == 0) {
+  stop("No valid mutations found after processing. Check position extraction.")
+}
 
 # COUNT SNVs by position (NOT sum counts) - ALL mutations
 pos_counts <- processed_data %>%

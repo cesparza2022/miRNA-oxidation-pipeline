@@ -66,7 +66,16 @@ ensure_output_dir(dirname(output_expression_summary))
 log_subsection("Loading data")
 
 statistical_results <- tryCatch({
-  result <- read_csv(input_statistical, show_col_types = FALSE)
+  result <- readr::read_csv(input_statistical, show_col_types = FALSE)
+  
+  # Validate data is not empty
+  if (nrow(result) == 0) {
+    stop("Statistical results table is empty (0 rows)")
+  }
+  if (ncol(result) == 0) {
+    stop("Statistical results table has no columns")
+  }
+  
   log_success(paste("Loaded:", nrow(result), "SNVs from statistical results"))
   result
 }, error = function(e) {
@@ -74,7 +83,16 @@ statistical_results <- tryCatch({
 })
 
 vaf_data <- tryCatch({
-  result <- read_csv(input_vaf_filtered, show_col_types = FALSE)
+  result <- readr::read_csv(input_vaf_filtered, show_col_types = FALSE)
+  
+  # Validate data is not empty
+  if (nrow(result) == 0) {
+    stop("VAF filtered data is empty (0 rows)")
+  }
+  if (ncol(result) == 0) {
+    stop("VAF filtered data has no columns")
+  }
+  
   log_success(paste("Loaded:", nrow(result), "SNVs from VAF filtered data"))
   result
 }, error = function(e) {
@@ -125,8 +143,19 @@ if (exists("identify_snv_count_columns")) {
 expression_data <- NULL
 if (file.exists(input_expression)) {
   expression_data <- tryCatch({
-    result <- read_tsv(input_expression, show_col_types = FALSE)
-    log_success(paste("Loaded expression data from:", input_expression))
+    result <- readr::read_tsv(input_expression, show_col_types = FALSE)
+    
+    # Validate expression data is not empty
+    if (nrow(result) == 0) {
+      log_warning("Expression data file is empty (0 rows), will use fallback")
+      result <- NULL
+    } else if (ncol(result) == 0) {
+      log_warning("Expression data file has no columns, will use fallback")
+      result <- NULL
+    } else {
+      log_success(paste("Loaded expression data from:", input_expression))
+    }
+    
     result
   }, error = function(e) {
     log_warning(paste("Failed to load primary expression file:", e$message))
@@ -136,9 +165,19 @@ if (file.exists(input_expression)) {
 
 if (is.null(expression_data) && !is.null(config$paths$data$raw_alt) && file.exists(config$paths$data$raw_alt)) {
   expression_data <- tryCatch({
-    result <- read_tsv(config$paths$data$raw_alt, show_col_types = FALSE)
-    log_success(paste("Loaded expression data from alternative location:", config$paths$data$raw_alt))
-    result
+    result <- readr::read_tsv(config$paths$data$raw_alt, show_col_types = FALSE)
+    
+    # Validate expression data is not empty
+    if (nrow(result) == 0) {
+      log_warning("Alternative expression data file is empty (0 rows), will use fallback")
+      result <- NULL
+    } else if (ncol(result) == 0) {
+      log_warning("Alternative expression data file has no columns, will use fallback")
+      result <- NULL
+    } else {
+      log_success(paste("Loaded expression data from alternative location:", config$paths$data$raw_alt))
+      result
+    }
   }, error = function(e) {
     log_warning(paste("Failed to load alternative expression file:", e$message))
     NULL

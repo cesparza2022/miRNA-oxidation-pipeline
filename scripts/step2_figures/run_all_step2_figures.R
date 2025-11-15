@@ -74,7 +74,12 @@ setwd(work_dir)
 cat("📋 Generating metadata...\n")
 
 # Load data to identify sample columns (use absolute path)
-data <- read_csv(normalizePath(input_data), show_col_types = FALSE, n_max = 1)
+data <- readr::read_csv(normalizePath(input_data), show_col_types = FALSE, n_max = 1)
+
+# Validate data is not empty
+if (ncol(data) == 0) {
+  stop("Input data file has no columns")
+}
 
 # Identify metadata columns
 metadata_cols <- c("miRNA_name", "miRNA name", "pos.mut", "pos:mut", 
@@ -109,8 +114,8 @@ if (sum(metadata$Group == "Unknown") == length(sample_cols)) {
 }
 
 # Save metadata (use absolute path for output)
-write_csv(metadata, "metadata.csv")
-write_csv(metadata, normalizePath(metadata_output, mustWork = FALSE))  # Also save to output location
+readr::write_csv(metadata, "metadata.csv")
+readr::write_csv(metadata, normalizePath(metadata_output, mustWork = FALSE))  # Also save to output location
 
 n_als <- sum(metadata$Group == "ALS")
 n_ctrl <- sum(metadata$Group == "Control")
@@ -129,8 +134,16 @@ if (file.exists(data_link)) {
 
 # Read original data and fix column names
 cat("   📖 Reading original data...\n")
-data_original <- read_csv(normalizePath(input_data, mustWork = TRUE), 
+data_original <- readr::read_csv(normalizePath(input_data, mustWork = TRUE), 
                          show_col_types = FALSE)
+
+# Validate data is not empty
+if (nrow(data_original) == 0) {
+  stop("Input data file is empty (0 rows)")
+}
+if (ncol(data_original) == 0) {
+  stop("Input data file has no columns")
+}
 
 # Fix column name: scripts expect "pos.mut" but file has "pos:mut"
 if ("pos:mut" %in% colnames(data_original) && !"pos.mut" %in% colnames(data_original)) {
@@ -213,7 +226,7 @@ if (length(total_cols) > 0 && length(snv_cols) > 0) {
 }
 
 # Write fixed data with VAF calculated
-write_csv(data_original, data_link)
+readr::write_csv(data_original, data_link)
 cat("   ✅ Data copy created with VAF calculated and fixed column names:", data_link, "\n\n")
 
 # ============================================================================

@@ -78,7 +78,16 @@ ensure_output_dir(dirname(output_targets))
 log_subsection("Loading statistical results")
 
 statistical_results <- tryCatch({
-  result <- read_csv(input_statistical, show_col_types = FALSE)
+  result <- readr::read_csv(input_statistical, show_col_types = FALSE)
+  
+  # Validate data is not empty
+  if (nrow(result) == 0) {
+    stop("Statistical results table is empty (0 rows)")
+  }
+  if (ncol(result) == 0) {
+    stop("Statistical results table has no columns")
+  }
+  
   log_success(paste("Loaded:", nrow(result), "SNVs"))
   result
 }, error = function(e) {
@@ -88,7 +97,16 @@ statistical_results <- tryCatch({
 # Load cluster assignments from Step 3
 cluster_assignments <- tryCatch({
   if (file.exists(input_cluster_assignments)) {
-    result <- read_csv(input_cluster_assignments, show_col_types = FALSE)
+    result <- readr::read_csv(input_cluster_assignments, show_col_types = FALSE)
+    
+    # Validate cluster assignments is not empty (if file exists)
+    if (nrow(result) == 0) {
+      log_warning("Cluster assignments file is empty (0 rows), proceeding without cluster information")
+      result <- NULL
+    } else if (ncol(result) == 0) {
+      log_warning("Cluster assignments file has no columns, proceeding without cluster information")
+      result <- NULL
+    } else {
     log_success(paste("Loaded:", nrow(result), "cluster assignments from Step 3"))
     # Add cluster information to statistical results
     if ("miRNA_name" %in% names(result) && "cluster" %in% names(result)) {
@@ -97,6 +115,7 @@ cluster_assignments <- tryCatch({
       log_success("Cluster information added to statistical results")
     }
     result
+    }
   } else {
     log_warning("Cluster assignments file not found, proceeding without cluster information")
     NULL

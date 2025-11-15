@@ -138,16 +138,40 @@ load_processed_data <- function(input_file) {
   }
   
   cat("📂 Loading data from:", input_file, "\n")
-  data <- read_csv(input_file, show_col_types = FALSE)
+  data <- readr::read_csv(input_file, show_col_types = FALSE)
   
-  # Verify expected columns exist
-  if (!"miRNA_name" %in% names(data) || !"pos.mut" %in% names(data)) {
-    stop("❌ Input file missing required columns: 'miRNA_name' or 'pos.mut'")
+  # Validate data is not empty
+  if (nrow(data) == 0) {
+    stop("❌ Input dataset is empty (0 rows)")
+  }
+  if (ncol(data) == 0) {
+    stop("❌ Input dataset has no columns")
+  }
+  
+  # Verify expected columns exist (with flexible naming)
+  has_mirna_col <- any(c("miRNA_name", "miRNA name") %in% names(data))
+  has_pos_col <- any(c("pos.mut", "pos:mut") %in% names(data))
+  
+  if (!has_mirna_col || !has_pos_col) {
+    stop("❌ Input file missing required columns: 'miRNA_name' or 'miRNA name' and 'pos.mut' or 'pos:mut'")
+  }
+  
+  # Normalize column names if needed
+  if ("miRNA name" %in% names(data) && !"miRNA_name" %in% names(data)) {
+    data <- data %>% rename(miRNA_name = `miRNA name`)
+  }
+  if ("pos:mut" %in% names(data) && !"pos.mut" %in% names(data)) {
+    data <- data %>% rename(pos.mut = `pos:mut`)
   }
   
   sample_cols <- setdiff(names(data), c("miRNA_name", "pos.mut"))
   
-  cat("   ✅ Data loaded:", nrow(data), "rows\n")
+  # Validate that we have sample columns
+  if (length(sample_cols) == 0) {
+    stop("❌ Input dataset has no sample columns (only metadata columns)")
+  }
+  
+  cat("   ✅ Data loaded:", nrow(data), "rows,", length(sample_cols), "sample columns\n")
   cat("   ✅ Samples:", length(sample_cols), "\n")
   
   return(data)
@@ -163,7 +187,7 @@ load_and_process_raw_data <- function(raw_file) {
   }
   
   cat("📂 Loading raw data from:", raw_file, "\n")
-  raw_data <- read_csv(
+  raw_data <- readr::read_csv(
     raw_file,
     col_types = cols(
       .default = col_skip(),
@@ -172,6 +196,14 @@ load_and_process_raw_data <- function(raw_file) {
     ),
     show_col_types = FALSE
   )
+  
+  # Validate raw data is not empty
+  if (nrow(raw_data) == 0) {
+    stop("❌ Raw dataset is empty (0 rows)")
+  }
+  if (ncol(raw_data) == 0) {
+    stop("❌ Raw dataset has no columns")
+  }
   
   cat("   ✅ Raw data loaded:", nrow(raw_data), "rows\n")
   

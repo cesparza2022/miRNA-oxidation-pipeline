@@ -90,8 +90,37 @@ ensure_output_dir(dirname(output_roc_table))
 
 log_subsection("Loading data")
 
-statistical_results <- read_csv(input_statistical, show_col_types = FALSE)
-vaf_data <- read_csv(input_vaf_filtered, show_col_types = FALSE)
+statistical_results <- tryCatch({
+  result <- readr::read_csv(input_statistical, show_col_types = FALSE)
+  
+  # Validate data is not empty
+  if (nrow(result) == 0) {
+    stop("Statistical results table is empty (0 rows)")
+  }
+  if (ncol(result) == 0) {
+    stop("Statistical results table has no columns")
+  }
+  
+  result
+}, error = function(e) {
+  handle_error(e, context = "Step 7.1 - Loading statistical results", exit_code = 1, log_file = log_file)
+})
+
+vaf_data <- tryCatch({
+  result <- readr::read_csv(input_vaf_filtered, show_col_types = FALSE)
+  
+  # Validate data is not empty
+  if (nrow(result) == 0) {
+    stop("VAF filtered data is empty (0 rows)")
+  }
+  if (ncol(result) == 0) {
+    stop("VAF filtered data has no columns")
+  }
+  
+  result
+}, error = function(e) {
+  handle_error(e, context = "Step 7.1 - Loading VAF data", exit_code = 1, log_file = log_file)
+})
 
 # Normalize column names (handle different formats)
 if ("miRNA name" %in% names(vaf_data)) {
@@ -261,7 +290,12 @@ log_subsection("Performing ROC analysis for individual miRNAs")
 
 roc_results <- list()
 
-for (i in 1:min(nrow(significant_gt), 30)) {  # Top 30 for computational efficiency
+# Validate we have significant G>T mutations
+if (nrow(significant_gt) == 0) {
+  stop("No significant G>T mutations found for ROC analysis. Check statistical results and filtering criteria.")
+}
+
+for (i in seq_len(min(nrow(significant_gt), 30))) {  # Top 30 for computational efficiency
   snv_id <- significant_gt$SNV_id[i]
   mirna <- significant_gt$miRNA_name[i]
   pos_mut <- significant_gt$pos.mut[i]
@@ -472,8 +506,13 @@ log_subsection("Generating ROC curves figure")
 top_5 <- roc_table %>% head(5)
 roc_curves <- list()
 
+# Validate we have data for ROC curves
+if (nrow(top_5) == 0) {
+  stop("No ROC data available for curve generation. Check ROC table.")
+}
+
 # Individual ROC curves
-for (i in 1:nrow(top_5)) {
+for (i in seq_len(nrow(top_5))) {
   snv_id <- top_5$SNV_id[i]
   mirna <- top_5$miRNA_name[i]
   pos_mut <- top_5$pos.mut[i]

@@ -63,11 +63,40 @@ ensure_output_dir(dirname(output_figure_a))
 
 log_subsection("Loading correlation data")
 
-correlation_data <- read_csv(input_correlation, show_col_types = FALSE)
-expression_summary <- read_csv(input_expression_summary, show_col_types = FALSE)
+correlation_data <- tryCatch({
+  result <- readr::read_csv(input_correlation, show_col_types = FALSE)
+  
+  # Validate data is not empty
+  if (nrow(result) == 0) {
+    stop("Correlation data table is empty (0 rows)")
+  }
+  if (ncol(result) == 0) {
+    stop("Correlation data table has no columns")
+  }
+  
+  log_info(paste("Loaded correlation data:", nrow(result), "miRNAs"))
+  result
+}, error = function(e) {
+  handle_error(e, context = "Step 6.2 - Loading correlation data", exit_code = 1, log_file = log_file)
+})
 
-log_info(paste("Loaded correlation data:", nrow(correlation_data), "miRNAs"))
-log_info(paste("Loaded expression summary:", nrow(expression_summary), "categories"))
+expression_summary <- tryCatch({
+  result <- readr::read_csv(input_expression_summary, show_col_types = FALSE)
+  
+  # Validate data is not empty (allow empty for optional data)
+  if (nrow(result) == 0) {
+    log_warning("Expression summary table is empty (0 rows), continuing with empty data")
+  } else if (ncol(result) == 0) {
+    log_warning("Expression summary table has no columns, continuing with empty data")
+    result <- tibble()  # Create empty tibble
+  } else {
+    log_info(paste("Loaded expression summary:", nrow(result), "categories"))
+  }
+  
+  result
+}, error = function(e) {
+  handle_error(e, context = "Step 6.2 - Loading expression summary", exit_code = 1, log_file = log_file)
+})
 
 # Check if data is empty
 if (nrow(correlation_data) == 0 || !"estimated_rpm" %in% names(correlation_data) || !"total_gt_counts" %in% names(correlation_data)) {
