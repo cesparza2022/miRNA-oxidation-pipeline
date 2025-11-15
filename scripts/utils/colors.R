@@ -43,6 +43,8 @@ COLOR_NONSEED <- "#6c757d"   # Grey for non-seed region
 # ============================================================================
 
 # Standard color palette for categorical data
+# Used when you need distinct colors for multiple categories (e.g., multiple miRNA families)
+# Based on ColorBrewer Set1 palette - colorblind-friendly and publication-ready
 COLORS_QUALITATIVE <- c(
   "#1f77b4",  # Blue
   "#ff7f0e",  # Orange
@@ -60,48 +62,60 @@ COLORS_QUALITATIVE <- c(
 # SEQUENTIAL PALETTE (for gradients)
 # ============================================================================
 
-# Low to high gradient (white to red for G>T emphasis)
-COLORS_SEQUENTIAL_LOW <- "white"
-COLORS_SEQUENTIAL_LOW_PINK <- "#FFEBEE"  # Light pink for gradient start (Panel E)
-COLORS_SEQUENTIAL_MID <- "#FF7F0E"  # Orange
-COLORS_SEQUENTIAL_HIGH <- COLOR_GT  # Red
-COLORS_SEQUENTIAL_HIGH_DARK <- "#B71C1C"  # Dark red for gradient end (Panel E)
+# Sequential palettes are used for continuous data (e.g., VAF values, read counts)
+# Colors progress from light (low values) to dark (high values)
 
-# Alternative sequential (white to purple)
-COLORS_SEQUENTIAL_PURPLE_LOW <- "white"
-COLORS_SEQUENTIAL_PURPLE_MID <- "#9467BD"  # Purple
-COLORS_SEQUENTIAL_PURPLE_HIGH <- COLOR_GT  # Red
+# Standard sequential: White to red (emphasizes G>T oxidation)
+COLORS_SEQUENTIAL_LOW <- "white"  # Low values (white background)
+COLORS_SEQUENTIAL_LOW_PINK <- "#FFEBEE"  # Light pink for gradient start (Panel E - G-content landscape)
+COLORS_SEQUENTIAL_MID <- "#FF7F0E"  # Orange (medium values)
+COLORS_SEQUENTIAL_HIGH <- COLOR_GT  # Red (high values - G>T color)
+COLORS_SEQUENTIAL_HIGH_DARK <- "#B71C1C"  # Dark red for gradient end (Panel E - emphasizes high G>T burden)
 
-# Effect size colors
-COLOR_EFFECT_LARGE <- COLOR_GT  # Red (same as G>T for consistency)
-COLOR_EFFECT_MEDIUM <- COLORS_SEQUENTIAL_MID  # Orange
-COLOR_EFFECT_SMALL <- "#FFBB78"  # Light orange/peach
-COLOR_EFFECT_NEGLIGIBLE <- "grey80"
+# Alternative sequential: White to purple (for alternative visualizations)
+COLORS_SEQUENTIAL_PURPLE_LOW <- "white"  # Low values
+COLORS_SEQUENTIAL_PURPLE_MID <- "#9467BD"  # Purple (medium values)
+COLORS_SEQUENTIAL_PURPLE_HIGH <- COLOR_GT  # Red (high values - maintains G>T emphasis)
 
-# Volcano plot colors
-COLOR_DOWNREGULATED <- "#2E86AB"  # Blue for downregulated
-COLOR_SIGNIFICANT_LOW_FC <- "#F77F00"  # Orange for significant but low FC
+# Effect size colors (Cohen's d categories)
+# Used in Step 2.3 for visualizing effect size magnitudes
+COLOR_EFFECT_LARGE <- COLOR_GT  # Red (same as G>T for consistency) - |d| >= 0.8
+COLOR_EFFECT_MEDIUM <- COLORS_SEQUENTIAL_MID  # Orange - 0.5 <= |d| < 0.8
+COLOR_EFFECT_SMALL <- "#FFBB78"  # Light orange/peach - 0.2 <= |d| < 0.5
+COLOR_EFFECT_NEGLIGIBLE <- "grey80"  # Grey - |d| < 0.2
 
-# Clustering colors
+# Volcano plot colors (Step 2.2)
+# Used for categorizing points in volcano plots based on significance and fold change
+COLOR_DOWNREGULATED <- "#2E86AB"  # Blue for downregulated (lower in group1 than group2)
+COLOR_SIGNIFICANT_LOW_FC <- "#F77F00"  # Orange for significant but low fold change
+
+# Clustering colors (Step 3)
+# Used for visualizing cluster assignments in hierarchical clustering
 COLOR_CLUSTER_1 <- "#FF6B6B"  # Coral red for cluster 1
 COLOR_CLUSTER_2 <- "#4ECDC4"  # Turquoise for cluster 2
 
-# Pathway/Functional analysis colors
+# Pathway/Functional analysis colors (Step 4)
+# Used for distinguishing different functional annotation sources
 COLOR_GO <- "#2E86AB"  # Blue for GO Biological Process
 COLOR_KEGG <- "#A23B72"  # Purple for KEGG Pathway
 
-# Significance/AUC category colors
-COLOR_SIGNIFICANCE_HIGH <- COLOR_GT  # Red (same as G>T for consistency)
-COLOR_SIGNIFICANCE_MEDIUM <- COLORS_SEQUENTIAL_MID  # Orange
-COLOR_SIGNIFICANCE_LOW <- "#2CA02C"  # Green
-COLOR_SIGNIFICANCE_NONE <- "grey70"
+# Significance category colors (Step 5 - miRNA families)
+# Used for categorizing statistical significance levels
+COLOR_SIGNIFICANCE_HIGH <- COLOR_GT  # Red (same as G>T for consistency) - High significance
+COLOR_SIGNIFICANCE_MEDIUM <- COLORS_SEQUENTIAL_MID  # Orange - Medium significance
+COLOR_SIGNIFICANCE_LOW <- "#2CA02C"  # Green - Low significance
+COLOR_SIGNIFICANCE_NONE <- "grey70"  # Grey - Not significant
 
-COLOR_AUC_EXCELLENT <- COLOR_GT  # Red
-COLOR_AUC_GOOD <- COLORS_SEQUENTIAL_MID  # Orange
-COLOR_AUC_FAIR <- COLOR_SIGNIFICANCE_LOW  # Green
-COLOR_AUC_POOR <- "grey70"
+# AUC category colors (Step 7 - biomarker analysis)
+# Used for categorizing Area Under Curve (AUC) values in ROC analysis
+COLOR_AUC_EXCELLENT <- COLOR_GT  # Red - AUC >= 0.9 (excellent classifier)
+COLOR_AUC_GOOD <- COLORS_SEQUENTIAL_MID  # Orange - 0.8 <= AUC < 0.9 (good classifier)
+COLOR_AUC_FAIR <- COLOR_SIGNIFICANCE_LOW  # Green - 0.7 <= AUC < 0.8 (fair classifier)
+COLOR_AUC_POOR <- "grey70"  # Grey - AUC < 0.7 (poor classifier)
 
 # Gradient colors for heatmaps (alternative blue-to-red)
+# Used in clustering and functional analysis visualizations
+# Blue (low) → white (zero/medium) → red (high) provides intuitive visualization
 COLOR_GRADIENT_LOW_BLUE <- COLOR_GO  # Blue for low values in blue-red gradients
 
 # ============================================================================

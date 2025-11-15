@@ -34,12 +34,33 @@ log_section("STEP 2.2: Volcano Plots - Dynamic Group Comparison")
 # HELPER FUNCTION: Detect Group Names from Comparison Table
 # ============================================================================
 
+#' Detect group names from statistical comparison table columns
+#' 
+#' Automatically detects group names from column names in the comparison table.
+#' Supports flexible group naming (not hardcoded to ALS/Control).
+#' 
+#' Detection logic:
+#' 1. Looks for columns ending with "_mean" suffix (e.g., "Group1_mean", "Group2_mean")
+#' 2. Extracts group names by removing "_mean" suffix
+#' 3. Falls back to "ALS" and "Control" if no dynamic names found (backward compatibility)
+#' 4. Filters out backward-compatible columns if dynamic names exist
+#' 
+#' @param comparison_table Data frame with statistical comparison results
+#' @return Named list with group1 and group2 names
+#' @examples
+#' # Table with dynamic group names
+#' table <- data.frame(miRNA_name = "hsa-miR-1", GroupA_mean = 0.5, GroupB_mean = 0.3)
+#' detect_group_names_from_table(table)  # Returns: list(group1 = "GroupA", group2 = "GroupB")
+#' 
+#' # Table with ALS/Control (backward compatibility)
+#' table <- data.frame(miRNA_name = "hsa-miR-1", ALS_mean = 0.5, Control_mean = 0.3)
+#' detect_group_names_from_table(table)  # Returns: list(group1 = "ALS", group2 = "Control")
 detect_group_names_from_table <- function(comparison_table) {
-  # Look for columns ending with _mean
+  # Look for columns ending with _mean (standard pattern for group means)
   mean_cols <- names(comparison_table)[str_detect(names(comparison_table), "_mean$")]
   
   if (length(mean_cols) == 0) {
-    # Fallback: try to find ALS_mean, Control_mean
+    # Fallback: try to find ALS_mean, Control_mean (backward compatibility)
     if ("ALS_mean" %in% names(comparison_table) && "Control_mean" %in% names(comparison_table)) {
       return(list(group1 = "ALS", group2 = "Control"))
     }
@@ -50,20 +71,21 @@ detect_group_names_from_table <- function(comparison_table) {
   group_names <- str_replace(mean_cols, "_mean$", "")
   
   # Filter out backward-compatible columns if dynamic names exist
+  # This allows new group names to take priority over ALS/Control
   if (length(group_names) > 2) {
-    # Remove ALS and Control if other groups exist
+    # Remove ALS and Control if other groups exist (prioritize new names)
     group_names <- group_names[!group_names %in% c("ALS", "Control")]
   }
   
   if (length(group_names) < 2) {
-    # Fallback to ALS/Control if only one detected
+    # Fallback to ALS/Control if only one detected (ensure we have 2 groups)
     if ("ALS_mean" %in% names(comparison_table) && "Control_mean" %in% names(comparison_table)) {
       return(list(group1 = "ALS", group2 = "Control"))
     }
     stop("Could not detect 2 groups from comparison table")
   }
   
-  # Sort for consistency
+  # Sort for consistency (alphabetical order for reproducibility)
   group_names <- sort(group_names)[1:2]
   
   return(list(group1 = group_names[1], group2 = group_names[2]))
@@ -130,30 +152,41 @@ log_info(paste("Detected groups:", group1_name, "vs", group2_name))
 
 log_subsection("Preparing volcano plot data")
 
-# Use Wilcoxon FDR if available, otherwise t-test FDR
+# Prepare data for volcano plot visualization
+# Prefer Wilcoxon FDR if available (non-parametric, more robust), otherwise use t-test FDR
 volcano_data <- comparison_results %>%
   mutate(
-    # Select p-value (prefer Wilcoxon)
+    # Select p-value (prefer Wilcoxon rank-sum test FDR over t-test FDR)
+    # Wilcoxon is more robust to non-normal distributions
     pvalue = ifelse(!is.na(wilcoxon_fdr), wilcoxon_fdr, t_test_fdr),
+    # Transform p-value to -log10 scale for volcano plot visualization
+    # Higher values = more significant (easier to visualize on y-axis)
     neg_log10_p = -log10(pvalue),
     
-    # Fold change
+    # Fold change (log2 scale for symmetry and easier interpretation)
+    # Positive = higher in group1, negative = higher in group2
     log2FC = log2_fold_change,
     
-    # Significance categories (dynamic labels)
-    significant = !is.na(pvalue) & pvalue < alpha,
-    high_fc = !is.na(log2FC) & abs(log2FC) > log2fc_threshold,
+    # Categorize points based on significance and fold change
+    # Categories help distinguish biologically meaningful changes
+    significant = !is.na(pvalue) & pvalue < alpha,  # FDR-adjusted p < threshold
+    high_fc = !is.na(log2FC) & abs(log2FC) > log2fc_threshold,  # |log2FC| > threshold
     category = case_when(
+      # Both significant and high fold change (most biologically interesting)
       significant & high_fc & log2FC > 0 ~ paste0("Upregulated (", group1_name, " > ", group2_name, ")"),
       significant & high_fc & log2FC < 0 ~ paste0("Downregulated (", group1_name, " < ", group2_name, ")"),
+      # Significant but low fold change (statistically significant but small effect)
       significant ~ "Significant (low FC)",
+      # High fold change but not significant (large effect but high variability)
       high_fc ~ "High FC (not sig)",
+      # Neither significant nor high fold change
       TRUE ~ "Not significant"
     ),
     
-    # Labels for top significant points
+    # Labels for top significant points (will be plotted with ggrepel)
+    # Only label points that are both significant and have high fold change
     label = ifelse(significant & high_fc, 
-                  paste(miRNA_name, pos.mut, sep = "|"),
+                  paste(miRNA_name, pos.mut, sep = "|"),  # Format: "hsa-miR-1|5:GT"
                   NA_character_)
   )
 

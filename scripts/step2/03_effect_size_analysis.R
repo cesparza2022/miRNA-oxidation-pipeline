@@ -34,12 +34,33 @@ log_section("STEP 2.3: Effect Size Analysis - Dynamic Group Comparison")
 # HELPER FUNCTION: Detect Group Names from Comparison Table
 # ============================================================================
 
+#' Detect group names from statistical comparison table columns
+#' 
+#' Automatically detects group names from column names in the comparison table.
+#' Supports flexible group naming (not hardcoded to ALS/Control).
+#' 
+#' Detection logic:
+#' 1. Looks for columns ending with "_mean" suffix (e.g., "Group1_mean", "Group2_mean")
+#' 2. Extracts group names by removing "_mean" suffix
+#' 3. Falls back to "ALS" and "Control" if no dynamic names found (backward compatibility)
+#' 4. Filters out backward-compatible columns if dynamic names exist
+#' 
+#' @param comparison_table Data frame with statistical comparison results
+#' @return Named list with group1 and group2 names
+#' @examples
+#' # Table with dynamic group names
+#' table <- data.frame(miRNA_name = "hsa-miR-1", GroupA_mean = 0.5, GroupB_mean = 0.3)
+#' detect_group_names_from_table(table)  # Returns: list(group1 = "GroupA", group2 = "GroupB")
+#' 
+#' # Table with ALS/Control (backward compatibility)
+#' table <- data.frame(miRNA_name = "hsa-miR-1", ALS_mean = 0.5, Control_mean = 0.3)
+#' detect_group_names_from_table(table)  # Returns: list(group1 = "ALS", group2 = "Control")
 detect_group_names_from_table <- function(comparison_table) {
-  # Look for columns ending with _mean
+  # Look for columns ending with _mean (standard pattern for group means)
   mean_cols <- names(comparison_table)[str_detect(names(comparison_table), "_mean$")]
   
   if (length(mean_cols) == 0) {
-    # Fallback: try to find ALS_mean, Control_mean
+    # Fallback: try to find ALS_mean, Control_mean (backward compatibility)
     if ("ALS_mean" %in% names(comparison_table) && "Control_mean" %in% names(comparison_table)) {
       return(list(group1 = "ALS", group2 = "Control"))
     }
@@ -50,20 +71,21 @@ detect_group_names_from_table <- function(comparison_table) {
   group_names <- str_replace(mean_cols, "_mean$", "")
   
   # Filter out backward-compatible columns if dynamic names exist
+  # This allows new group names to take priority over ALS/Control
   if (length(group_names) > 2) {
-    # Remove ALS and Control if other groups exist
+    # Remove ALS and Control if other groups exist (prioritize new names)
     group_names <- group_names[!group_names %in% c("ALS", "Control")]
   }
   
   if (length(group_names) < 2) {
-    # Fallback to ALS/Control if only one detected
+    # Fallback to ALS/Control if only one detected (ensure we have 2 groups)
     if ("ALS_mean" %in% names(comparison_table) && "Control_mean" %in% names(comparison_table)) {
       return(list(group1 = "ALS", group2 = "Control"))
     }
     stop("Could not detect 2 groups from comparison table")
   }
   
-  # Sort for consistency
+  # Sort for consistency (alphabetical order for reproducibility)
   group_names <- sort(group_names)[1:2]
   
   return(list(group1 = group_names[1], group2 = group_names[2]))

@@ -1,7 +1,7 @@
 # 🔍 HALLAZGOS DE REVISIÓN PERFECCIONISTA
 
 **Fecha:** 2025-01-21  
-**Status:** 🟡 En progreso (FASE 3.2 completada, FASE 3.3-3.4 pendientes)  
+**Status:** 🟡 En progreso (FASE 3.3 completada, FASE 3.4 pendiente)  
 **Revisión:** Sistemática y perfeccionista
 
 ---
@@ -486,5 +486,70 @@
 - `CHANGELOG.md`: Actualizado con todas las FASES 1.1-3.1 de la revisión perfeccionista
 - `RELEASE_NOTES_v1.0.1.md`: Actualizado con mejoras masivas y estado actual de problemas
 
-**Próximo paso:** FASE 3.3 - Revisar documentación en código (comentarios, funciones)
+---
+
+## ✅ FASE 3.3: REVISIÓN DE DOCUMENTACIÓN EN CÓDIGO (COMPLETADA)
+
+**Status:** ✅ **COMPLETADA**
+
+### **Problemas identificados y corregidos:**
+
+1. **Funciones sin documentación roxygen2:**
+   - ❌ `validate_output_file()` en `scripts/utils/functions_common.R` NO tenía documentación roxygen2
+   - ❌ `detect_group_names_from_table()` en `scripts/step2/02_volcano_plots.R` NO tenía documentación roxygen2
+   - ❌ `detect_group_names_from_table()` en `scripts/step2/03_effect_size_analysis.R` NO tenía documentación roxygen2
+   - ❌ `detect_group_mean_columns()` en `scripts/step2/04_generate_summary_tables.R` NO tenía documentación roxygen2
+   - ✅ Agregada documentación roxygen2 completa a todas las funciones helper:
+     - Descripción de propósito y comportamiento
+     - Parámetros documentados con `@param`
+     - Valores de retorno documentados con `@return`
+     - Ejemplos de uso con `@examples`
+     - Lógica de detección explicada paso a paso
+
+2. **Bloques de código complejos sin comentarios explicativos:**
+   - ❌ Cálculo de `position_counts` en `scripts/step1/01_panel_b_gt_count_by_position.R` tenía comentarios mínimos
+   - ❌ Cálculo de `total_copies_by_position` en `scripts/step1/04_panel_e_gcontent.R` tenía comentarios incompletos
+   - ❌ Procesamiento de `volcano_data` en `scripts/step2/02_volcano_plots.R` tenía comentarios insuficientes
+   - ❌ Cálculo de `gx_spectrum_data` en `scripts/step1/02_panel_c_gx_spectrum.R` tenía comentarios mínimos
+   - ✅ Agregados comentarios explicativos detallados a todos los bloques complejos:
+     - Explicación de la lógica de cada paso
+     - Descripción de transformaciones de datos
+     - Ejemplos concretos donde apropiado
+     - Aclaraciones sobre métricas y cálculos
+
+3. **Constantes sin comentarios explicativos:**
+   - ❌ Paletas de colores en `scripts/utils/colors.R` tenían comentarios mínimos
+   - ❌ Constantes de categorías (effect size, AUC, significance) no explicaban sus umbrales
+   - ✅ Mejorados comentarios para todas las constantes complejas:
+     - Descripción de cuándo y cómo usar cada paleta
+     - Explicación de umbrales para categorías (Cohen's d, AUC, etc.)
+     - Contexto de uso en el pipeline (qué scripts las usan)
+     - Referencias a fuentes (ColorBrewer para paletas)
+
+4. **Headers de archivos incompletos:**
+   - ❌ `scripts/utils/theme_professional.R` tenía header básico sin detalles de uso
+   - ✅ Mejorado header con:
+     - Descripción completa del propósito
+     - Características del tema documentadas
+     - Ejemplos de uso
+     - Documentación roxygen2 agregada para `theme_professional`
+
+**Archivos modificados:**
+- `scripts/utils/functions_common.R`: Agregada documentación roxygen2 a `validate_output_file()`
+- `scripts/utils/theme_professional.R`: Mejorado header y agregada documentación roxygen2
+- `scripts/utils/colors.R`: Mejorados comentarios para paletas y constantes complejas
+- `scripts/step2/02_volcano_plots.R`: Agregada documentación roxygen2 a `detect_group_names_from_table()` y mejorados comentarios en bloques complejos
+- `scripts/step2/03_effect_size_analysis.R`: Agregada documentación roxygen2 a `detect_group_names_from_table()`
+- `scripts/step2/04_generate_summary_tables.R`: Agregada documentación roxygen2 a `detect_group_mean_columns()`
+- `scripts/step1/01_panel_b_gt_count_by_position.R`: Mejorados comentarios en cálculo de `position_counts`
+- `scripts/step1/02_panel_c_gx_spectrum.R`: Mejorados comentarios en cálculo de `gx_spectrum_data`
+- `scripts/step1/04_panel_e_gcontent.R`: Mejorados comentarios en cálculo de `total_copies_by_position`
+
+**Impacto:**
+- ✅ Todas las funciones helper ahora tienen documentación roxygen2 completa
+- ✅ Bloques de código complejos tienen comentarios explicativos detallados
+- ✅ Constantes tienen comentarios que explican su propósito y uso
+- ✅ Headers de archivos son más informativos y útiles para desarrolladores
+
+**Próximo paso:** FASE 3.4 - Revisar coherencia y actualización de documentación
 

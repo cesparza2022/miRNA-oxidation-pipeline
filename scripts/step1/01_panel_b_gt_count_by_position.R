@@ -101,12 +101,14 @@ if (length(sample_cols) == 0) {
 log_subsection("Processing G>T mutations")
 
 # Filter G>T mutations only
+# Panel B shows absolute count of G>T mutations across all positions (1-23)
+# We filter for mutations matching the pattern ":GT$" (position:G>T, e.g., "5:GT")
 gt_data <- data %>%
-  filter(str_detect(pos.mut, ":GT$")) %>%
+  filter(str_detect(pos.mut, ":GT$")) %>%  # Match pattern: "position:GT" (e.g., "5:GT")
   mutate(
-    position = as.numeric(str_extract(pos.mut, "^\\d+"))
+    position = as.numeric(str_extract(pos.mut, "^\\d+"))  # Extract position number (e.g., "5:GT" → 5)
   ) %>%
-  filter(!is.na(position), position >= 1, position <= 23)
+  filter(!is.na(position), position >= 1, position <= 23)  # Ensure valid positions (miRNA length: 1-23)
 
 # Validate G>T data is not empty
 if (nrow(gt_data) == 0) {
@@ -116,19 +118,25 @@ if (nrow(gt_data) == 0) {
 log_info(paste("G>T mutations found:", format(nrow(gt_data), big.mark = ","), "SNVs"))
 
 # Calculate total counts per position (sum across all samples)
+# This metric sums read counts for G>T mutations at each position across all samples.
+# Each row represents a unique SNV event (miRNA + position + mutation type).
+# For each position, we sum all reads supporting G>T mutations at that position.
 position_counts <- gt_data %>%
+  # Calculate total read count for this specific SNV across all samples
   rowwise() %>%
   mutate(
-    total_count = sum(c_across(all_of(sample_cols)), na.rm = TRUE)
+    total_count = sum(c_across(all_of(sample_cols)), na.rm = TRUE)  # Sum reads across all samples
   ) %>%
   ungroup() %>%
+  # Aggregate by position: sum all reads from G>T mutations at this position
   group_by(position) %>%
   summarise(
-    total_GT_count = sum(total_count, na.rm = TRUE),  # Suma de reads (usado en figura)
-    # n_SNVs y n_miRNAs se calculan pero no se usan en la figura - eliminados para evitar confusión
+    total_GT_count = sum(total_count, na.rm = TRUE),  # Total reads for G>T at this position
+    # Note: n_SNVs and n_miRNAs were previously calculated but not used in the figure
+    # Removed to avoid confusion and unnecessary computation
     .groups = "drop"
   ) %>%
-  arrange(position)
+  arrange(position)  # Sort by position for visualization
 
 log_info(paste("Positions analyzed:", nrow(position_counts)))
 log_info(paste("Total G>T counts:", format(sum(position_counts$total_GT_count), big.mark = ",")))

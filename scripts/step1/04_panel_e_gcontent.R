@@ -88,15 +88,25 @@ log_subsection("Calculating metrics")
 log_info("Metric 1: Total copies of miRNAs with G at each position (CORRECTED: only counts from that specific position)")
 
 # ✅ CORREGIDO: Sumar solo los reads de esa posición específica, no todos los reads del miRNA
+# This metric counts reads supporting G mutations at each specific position (1-23).
+# Each row in the data represents a unique SNV event at a specific position.
+# We sum reads across all samples for SNVs at position X, not all reads from miRNAs that have G at position X.
+# 
+# Example: If miRNA "hsa-miR-1" has G>T at position 5 with 100 reads, we count 100 for position 5.
+# We do NOT count reads from other positions (e.g., position 10) of the same miRNA.
 total_copies_by_position <- data %>%
+  # Filter for any G mutation (G>T, G>C, G>A) to get all G-containing positions
   filter(str_detect(pos.mut, "^\\d+:G[TCAG]")) %>%
+  # Extract position number from pos.mut (format: "5:GT" → 5)
   mutate(Position = as.numeric(str_extract(pos.mut, "^\\d+"))) %>%
+  # Calculate position-specific read counts (sum across all samples for this specific SNV)
   rowwise() %>%
   mutate(position_specific_counts = sum(c_across(all_of(sample_cols)), na.rm = TRUE)) %>%
   ungroup() %>%
+  # Aggregate by position: sum all reads from SNVs at this specific position
   group_by(Position) %>%
   summarise(
-    total_G_copies = sum(position_specific_counts, na.rm = TRUE),  # ✅ Solo reads de esa posición
+    total_G_copies = sum(position_specific_counts, na.rm = TRUE),  # Total reads for G mutations at this position
     .groups = 'drop'
   )
 

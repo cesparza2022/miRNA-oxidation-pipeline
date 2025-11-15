@@ -37,15 +37,39 @@ log_section("STEP 2.4: Generate Summary Tables (Interpretative)")
 # HELPER FUNCTION: Detect Group Mean Columns
 # ============================================================================
 
+#' Detect group mean column names from data table
+#' 
+#' Automatically detects group mean column names (e.g., "Group1_mean", "Group2_mean")
+#' from column names in the data table. Returns full column names (with "_mean" suffix)
+#' for use in data processing.
+#' 
+#' Detection logic:
+#' 1. Looks for columns ending with "_mean" suffix
+#' 2. Extracts group names by removing "_mean" suffix
+#' 3. Falls back to "ALS_mean" and "Control_mean" if no dynamic names found (backward compatibility)
+#' 4. Filters out backward-compatible columns if dynamic names exist
+#' 5. Returns NULL for both groups if detection fails
+#' 
+#' @param data Data frame with statistical results or comparison data
+#' @return Named list with group1_mean and group2_mean column names (or NULL if not found)
+#' @examples
+#' # Table with dynamic group names
+#' table <- data.frame(miRNA_name = "hsa-miR-1", GroupA_mean = 0.5, GroupB_mean = 0.3)
+#' detect_group_mean_columns(table)  # Returns: list(group1_mean = "GroupA_mean", group2_mean = "GroupB_mean")
+#' 
+#' # Table with ALS/Control (backward compatibility)
+#' table <- data.frame(miRNA_name = "hsa-miR-1", ALS_mean = 0.5, Control_mean = 0.3)
+#' detect_group_mean_columns(table)  # Returns: list(group1_mean = "ALS_mean", group2_mean = "Control_mean")
 detect_group_mean_columns <- function(data) {
-  # Look for columns ending with _mean
+  # Look for columns ending with _mean (standard pattern for group means)
   mean_cols <- names(data)[str_detect(names(data), "_mean$")]
   
   if (length(mean_cols) == 0) {
-    # Fallback: try ALS_mean, Control_mean
+    # Fallback: try ALS_mean, Control_mean (backward compatibility)
     if ("ALS_mean" %in% names(data) && "Control_mean" %in% names(data)) {
       return(list(group1_mean = "ALS_mean", group2_mean = "Control_mean"))
     }
+    # No mean columns found
     return(list(group1_mean = NULL, group2_mean = NULL))
   }
   
@@ -53,22 +77,23 @@ detect_group_mean_columns <- function(data) {
   group_names <- str_replace(mean_cols, "_mean$", "")
   
   # Filter out backward-compatible columns if dynamic names exist
+  # This allows new group names to take priority over ALS/Control
   if (length(group_names) > 2) {
-    # Remove ALS and Control if other groups exist
+    # Remove ALS and Control if other groups exist (prioritize new names)
     dynamic_names <- group_names[!group_names %in% c("ALS", "Control")]
     if (length(dynamic_names) >= 2) {
-      group_names <- sort(dynamic_names)[1:2]
+      group_names <- sort(dynamic_names)[1:2]  # Sort for consistency
     }
   }
   
   if (length(group_names) < 2) {
-    # Fallback to ALS/Control if only one detected
+    # Fallback to ALS/Control if only one detected (ensure we have 2 groups)
     if ("ALS_mean" %in% names(data) && "Control_mean" %in% names(data)) {
       return(list(group1_mean = "ALS_mean", group2_mean = "Control_mean"))
     }
-    # If still only one, return what we have
+    # If still only one, try to combine with backward-compatible columns
     if (length(group_names) == 1) {
-      # Try to find a second group
+      # Try to find a second group from backward-compatible columns
       if ("ALS_mean" %in% names(data)) {
         return(list(group1_mean = "ALS_mean", group2_mean = paste0(group_names[1], "_mean")))
       }
@@ -76,15 +101,16 @@ detect_group_mean_columns <- function(data) {
         return(list(group1_mean = paste0(group_names[1], "_mean"), group2_mean = "Control_mean"))
       }
     }
+    # Detection failed: return NULL for both groups
     return(list(group1_mean = NULL, group2_mean = NULL))
   }
   
-  # Sort for consistency
+  # Sort for consistency (alphabetical order for reproducibility)
   group_names <- sort(group_names)[1:2]
   
   return(list(
-    group1_mean = paste0(group_names[1], "_mean"),
-    group2_mean = paste0(group_names[2], "_mean")
+    group1_mean = paste0(group_names[1], "_mean"),  # Full column name with suffix
+    group2_mean = paste0(group_names[2], "_mean")   # Full column name with suffix
   ))
 }
 

@@ -83,20 +83,29 @@ if (nrow(processed_data) == 0) {
 
 # COLOR_GC and COLOR_GA are defined in colors.R (sourced above)
 
+# Calculate G>X mutation spectrum by position
+# Panel C shows the percentage distribution of G>X mutations (G>C, G>A, G>T) at each position
+# This metric counts unique SNV events (not read counts), providing insight into mutation patterns
 gx_spectrum_data <- processed_data %>%
+  # Filter for G>X mutations only (G>C, G>A, G>T)
   filter(str_detect(mutation_type, "^G>")) %>%
+  # Count unique SNV events (rows) by position and mutation type
+  # Each row represents one unique SNV event, so n = number of unique SNVs
   count(position, mutation_type) %>%
+  # Calculate percentage of each mutation type at each position
   group_by(position) %>%
   mutate(
-    percentage = n / sum(n) * 100,
-    total_gx_at_pos = sum(n)
+    percentage = n / sum(n) * 100,  # Percentage of G>X mutations at this position
+    total_gx_at_pos = sum(n)  # Total G>X SNVs at this position (for reference)
   ) %>%
   ungroup() %>%
+  # Convert to factors for proper ordering in visualization
   mutate(
-    position_label = factor(position, levels = 1:22),
-    mutation_type = factor(mutation_type, levels = c("G>C", "G>A", "G>T"))
+    position_label = factor(position, levels = 1:22),  # Position as factor for x-axis
+    mutation_type = factor(mutation_type, levels = c("G>C", "G>A", "G>T"))  # Mutation type ordering
   )
 
+# Calculate overall G>T percentage across all positions (for subtitle)
 gt_percentage_overall <- sum(gx_spectrum_data$n[gx_spectrum_data$mutation_type == "G>T"]) / sum(gx_spectrum_data$n) * 100
 
 write_csv(gx_spectrum_data %>% mutate(position_label = as.character(position_label)), output_table)

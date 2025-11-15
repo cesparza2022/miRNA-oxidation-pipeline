@@ -96,6 +96,22 @@ if (file.exists("scripts/utils/theme_professional.R")) {
 # OUTPUT VALIDATION HELPERS
 # ============================================================================
 
+#' Validate output file exists and meets size requirements
+#' 
+#' Checks that an output file exists and is at least a minimum size.
+#' Useful for validating pipeline outputs before downstream steps.
+#' 
+#' @param output_path Path to output file to validate
+#' @param min_size_bytes Minimum file size in bytes (default: 1024)
+#' @param context Context description for error messages (default: "Output validation")
+#' @param fail_on_missing If TRUE, stops execution on missing file (default: TRUE)
+#' @return TRUE if validation passes, FALSE otherwise (invisibly)
+#' @examples
+#' # Validate output file (stops on failure by default)
+#' validate_output_file("results/step1/final/figures/panel_b.png")
+#' 
+#' # Validate with warning instead of error
+#' validate_output_file("results/step1/final/figures/panel_b.png", fail_on_missing = FALSE)
 validate_output_file <- function(output_path,
                                  min_size_bytes = 1024,
                                  context = "Output validation",
