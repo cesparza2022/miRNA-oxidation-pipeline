@@ -407,7 +407,7 @@ p <- ggplot(plot_data, aes(x = position, y = positional_fraction, fill = group))
   annotate("text",
            x = (seed_start + seed_end) / 2, 
            y = max(plot_data$positional_fraction, na.rm = TRUE) * 0.98,
-           label = paste("Región seed sombreada (pos", seed_start, "-", seed_end, ")"),
+           label = paste("SEED REGION (pos", seed_start, "-", seed_end, ")"),
            size = 3.5, color = "gray30", hjust = 0.5, vjust = 0) +
   # Bars
   geom_bar(stat = "identity", position = "dodge", width = 0.7, alpha = 0.85) +
@@ -426,14 +426,14 @@ p <- ggplot(plot_data, aes(x = position, y = positional_fraction, fill = group))
                      labels = scales::number_format(accuracy = 0.001)) +
   # Labels (matching provided figure style)
   labs(
-    title = paste("Distribución de mutaciones G>T por posición:", group2_name, "vs", group1_name),
-    subtitle = paste("Fracción posicional de G>T | Región seed (pos", seed_start, "-", seed_end, ") destacada |",
+    title = paste("Position-Specific G>T Distribution:", group1_name, "vs", group2_name),
+    subtitle = paste("Positional fraction of G>T mutations | Seed region (pos", seed_start, "-", seed_end, ") highlighted |",
                      "* = p_adj <", alpha),
-    x = "Posición en miRNA",
-    y = "Fracción posicional",
-    caption = paste("Posiciones significativas:", sum(position_summary$significant, na.rm = TRUE),
-                    "|", group1_name, "mayor:", sum(position_summary$significant & position_summary$higher_in_group1, na.rm = TRUE),
-                    "|", group2_name, "mayor:", sum(position_summary$significant & !position_summary$higher_in_group1, na.rm = TRUE))
+    x = "Position in miRNA",
+    y = "Positional Fraction",
+    caption = paste("Significant positions:", sum(position_summary$significant, na.rm = TRUE),
+                    "| Higher in", group1_name, ":", sum(position_summary$significant & position_summary$higher_in_group1, na.rm = TRUE),
+                    "| Higher in", group2_name, ":", sum(position_summary$significant & !position_summary$higher_in_group1, na.rm = TRUE))
   ) +
   theme_professional +
   theme(
