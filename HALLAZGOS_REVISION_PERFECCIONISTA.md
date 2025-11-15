@@ -287,9 +287,20 @@
 - ✅ Corrección de valores hardcoded en volcano plot:
   - Agregado config de fig_width, fig_height, fig_dpi
   - Reemplazados valores hardcoded (12, 9, 300) con variables del config
+- ✅ Estandarización de escalas del eje Y y expand:
+  - Panel D: Agregado `scale_y_continuous(expand = expansion(mult = c(0, 0.1)))` para consistencia
+  - Panel F: Agregado `expand = expansion(mult = c(0, 0.1))` para consistencia con Panel B
+  - Panels C y G ya usan `expand = expansion(mult = c(0, 0.02))` apropiado para porcentajes (0-100) ✅
+- ✅ Estandarización de etiquetas de ejes:
+  - Panel G: Cambiado `x = NULL` a `x = "Mutation Type"` para consistencia con Panel F
+  - Panel E: Cambiado `x = "Position in miRNA (1-23)"` a `x = "Position in miRNA"` para consistencia
+- ✅ Estandarización de namespaces para funciones de formato:
+  - Panel E: Cambiado `comma` a `scales::comma` (2 lugares)
+  - step1_5/02_generate_diagnostic_figures.R: Cambiado `comma` a `scales::comma` (4 lugares)
+  - step1_5/02_generate_diagnostic_figures.R: Cambiado `percent` a `scales::percent` (1 lugar)
 
 **Total FASE 2.2:** 
-- 3 scripts actualizados para mejorar consistencia visual (panels B, E de step1, volcano plot de step2)
+- 8 scripts actualizados para mejorar consistencia visual (step1: panels B, C, D, E, F, G; step2: volcano plot; step1_5: diagnostic figures)
 
 ---
 
