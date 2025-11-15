@@ -596,7 +596,7 @@ roc_plot <- ggplot(all_roc, aes(x = Specificity, y = Sensitivity, color = Label)
     subtitle = paste("Top", nrow(top_5), "individual biomarkers + combined signature | G>T mutations in seed region"),
     x = "1 - Specificity (False Positive Rate)",
     y = "Sensitivity (True Positive Rate)",
-    caption = paste("Analysis based on", length(group1_samples), group1_name, "and", length(group2_samples), group2_name, "samples")
+    caption = paste("ROC analysis using pROC package. AUC = Area Under Curve (0.5 = random, 1.0 = perfect). Analysis based on", length(group1_samples), group1_name, "and", length(group2_samples), group2_name, "samples. Combined signature = average of top 10 individual biomarkers")
   ) +
   theme_professional +
   theme(

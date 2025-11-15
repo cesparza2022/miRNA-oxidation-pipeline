@@ -169,7 +169,7 @@ panel_a <- ggplot(correlation_data, aes(x = estimated_rpm, y = total_gt_counts))
                      "Pearson r =", cor_pearson, ", p =", format(p_value, scientific = TRUE, digits = 2)),
     x = "Expression Level (RPM, log10 scale)",
     y = "G>T Oxidation Counts (log10 scale)",
-    caption = paste("n =", n_miRNAs, "miRNAs | RPM range:", rpm_range, "| Oxidation range:", oxidation_range)
+    caption = paste("Pearson correlation test (r = correlation coefficient, p = significance). n =", n_miRNAs, "miRNAs | RPM range:", rpm_range, "| Oxidation range:", oxidation_range, "| Linear regression with 95% confidence intervals")
   ) +
   theme_professional +
   theme(
