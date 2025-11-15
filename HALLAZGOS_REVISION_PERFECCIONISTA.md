@@ -360,11 +360,7 @@
 - step6: 1 script (correlation visualization)
 - step7: 1 script (ROC analysis)
 
-**Próximo paso:** FASE 2.4 - Revisar calidad técnica de gráficas lineal con 95% CI
-- ✅ Captions mejorados en step7:
-  - ROC analysis: Explica método (pROC package), AUC (0.5 = random, 1.0 = perfect), y Combined signature
-- ✅ Corrección técnica:
-  - step7/01_biomarker_roc_analysis.R: Reemplazados valores hardcoded (12, 10, 300) con fig_width, fig_height, fig_dpi
+**Próximo paso:** FASE 2.4 - Revisar calidad técnica de gráficas
 
 **Total FASE 2.3 (hasta ahora):**
 - 9 scripts actualizados para mejorar claridad científica en captions
