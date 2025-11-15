@@ -109,7 +109,8 @@ panel_d <- ggplot(pos_frac, aes(x = position_label, y = fraction)) +
     subtitle = sprintf("What percentage of ALL mutations occur at each position? (Total: %s SNVs)", 
                        format(total_mut, big.mark=",")),
     x = "Position in miRNA",
-    y = "Percentage of total mutations (%)"
+    y = "Percentage of total mutations (%)",
+    caption = "Shows percentage of unique SNVs (not read counts). Each position's contribution to total mutation load. Combined analysis (ALS + Control, no VAF filtering)"
   ) +
   theme_professional +
   theme(axis.text.x = element_text(angle = 45, hjust = 1))

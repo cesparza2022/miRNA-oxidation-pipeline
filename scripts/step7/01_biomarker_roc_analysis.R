@@ -607,7 +607,7 @@ roc_plot <- ggplot(all_roc, aes(x = Specificity, y = Sensitivity, color = Label)
 
 # Save figure
 ggsave(output_roc_figure, roc_plot, 
-       width = 12, height = 10, dpi = 300, bg = "white")
+       width = fig_width, height = fig_height, dpi = fig_dpi, bg = "white")
 
 log_success(paste("ROC figure saved:", output_roc_figure))
 log_success("Step 4.1 completed successfully")

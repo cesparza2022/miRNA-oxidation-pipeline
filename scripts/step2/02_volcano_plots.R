@@ -208,7 +208,7 @@ volcano_plot <- ggplot(volcano_data, aes(x = log2FC, y = neg_log10_p)) +
     subtitle = paste("G>T mutations | FDR <", alpha, "| log2FC >", log2fc_threshold),
     x = paste0("Log2 Fold Change (", group1_name, " / ", group2_name, ")"),
     y = "-Log10 FDR-adjusted p-value",
-    caption = paste("Significant:", n_significant, "| Up:", n_upregulated, "| Down:", n_downregulated)
+    caption = paste("FDR-adjusted p-values (Benjamini-Hochberg). Significant (FDR <", alpha, "):", n_significant, "| Upregulated:", n_upregulated, "| Downregulated:", n_downregulated)
   ) +
   
   # Theme

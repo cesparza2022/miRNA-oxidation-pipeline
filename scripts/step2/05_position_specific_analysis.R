@@ -431,7 +431,7 @@ p <- ggplot(plot_data, aes(x = position, y = positional_fraction, fill = group))
                      "* = p_adj <", alpha),
     x = "Position in miRNA",
     y = "Positional Fraction",
-    caption = paste("Significant positions:", sum(position_summary$significant, na.rm = TRUE),
+    caption = paste("Wilcoxon rank-sum test with FDR correction (Benjamini-Hochberg). Significant (p_adj <", alpha, "):", sum(position_summary$significant, na.rm = TRUE),
                     "| Higher in", group1_name, ":", sum(position_summary$significant & position_summary$higher_in_group1, na.rm = TRUE),
                     "| Higher in", group2_name, ":", sum(position_summary$significant & !position_summary$higher_in_group1, na.rm = TRUE))
   ) +

@@ -238,9 +238,10 @@ effect_plot <- effect_size_data %>%
     subtitle = "Cohen's d for G>T mutations",
     x = "Cohen's d (Effect Size)",
     y = "Number of SNVs",
-    caption = paste("Total SNVs:", nrow(effect_size_data), 
+    caption = paste("Cohen's d = (mean1 - mean2) / pooled_SD. Thresholds: |d| >= 0.8 (Large), 0.5-0.8 (Medium), 0.2-0.5 (Small). Total:", nrow(effect_size_data), 
                    "| Large:", effect_summary$n_large,
-                   "| Medium:", effect_summary$n_medium)
+                   "| Medium:", effect_summary$n_medium,
+                   "| Small:", effect_summary$n_small)
   ) +
   
   # Theme
