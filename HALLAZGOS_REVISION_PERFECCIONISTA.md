@@ -254,8 +254,17 @@
   - 00_confounder_analysis.R: COLOR_ALS, COLOR_GT, COLOR_CONTROL
 - ✅ Actualizado step6 (1 script):
   - 03_direct_target_prediction.R: theme_professional (reemplazo de theme_minimal)
+- ✅ Actualizados scripts de step3-step7 (6 scripts):
+  - step3/02_clustering_visualization.R: get_blue_red_heatmap_gradient()
+  - step4/02_pathway_enrichment_analysis.R: COLOR_GO, COLOR_KEGG, get_heatmap_gradient()
+  - step4/03_complex_functional_visualization.R: COLOR_GRADIENT_LOW_BLUE, COLOR_SEED_HIGHLIGHT, COLOR_GT
+  - step5/02_family_comparison_visualization.R: get_blue_red_heatmap_gradient(), COLOR_SIGNIFICANCE_*
+  - step6/03_direct_target_prediction.R: COLOR_GRADIENT_LOW_BLUE, COLOR_GT (3 lugares)
+  - step7/02_biomarker_signature_heatmap.R: get_blue_red_heatmap_gradient(), COLOR_AUC_*, eliminado código muerto
+
+**Total FASE 2.1:** 21 scripts actualizados (step1-step7) + colors.R centralizado con 20+ colores y 2 funciones helper
 
 ---
 
-**Próximo paso:** Continuar con FASE 2.1 - Revisar otros scripts con colores hardcodeados o theme_void()
+**Próximo paso:** Continuar con FASE 2.1 - Revisar otros aspectos de calidad visual (dimensiones de figuras, tema, etc.)
 

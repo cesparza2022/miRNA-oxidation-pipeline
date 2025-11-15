@@ -280,7 +280,7 @@ family_annotation <- heatmap_families %>%
   column_to_rownames(var = "family")
 
 # Generate heatmap
-png(output_figure_b, width = 14, height = 12, units = "in", res = 300)
+png(output_figure_b, width = fig_width, height = fig_height, units = "in", res = fig_dpi)
 
 # ✅ NOTA: cluster_rows = TRUE y cluster_cols = TRUE reordenan los datos para descubrimiento de patrones
 # Si se necesita un orden específico (ej. por significancia), estos pueden desactivarse

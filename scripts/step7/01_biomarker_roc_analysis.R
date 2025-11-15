@@ -77,6 +77,9 @@ seed_end <- if (!is.null(config$analysis$seed_region$end)) config$analysis$seed_
 # Allow override from config if specified, otherwise use COLOR_GT, COLOR_CONTROL
 color_gt <- if (!is.null(config$analysis$colors$gt)) config$analysis$colors$gt else COLOR_GT
 color_control <- if (!is.null(config$analysis$colors$control)) config$analysis$colors$control else COLOR_CONTROL
+fig_width <- if (!is.null(config$analysis$figure$width)) config$analysis$figure$width else 12
+fig_height <- if (!is.null(config$analysis$figure$height)) config$analysis$figure$height else 10
+fig_dpi <- if (!is.null(config$analysis$figure$dpi)) config$analysis$figure$dpi else 300
 
 log_info(paste("Significance threshold (FDR):", alpha))
 log_info(paste("Log2FC threshold (minimum):", log2fc_threshold))
@@ -278,7 +281,7 @@ if (nrow(significant_gt) == 0) {
     theme_void() +
     theme(plot.margin = margin(20, 20, 20, 20))
   
-  ggsave(output_roc_figure, p_empty, width = 12, height = 10, dpi = 300)
+  ggsave(output_roc_figure, p_empty, width = fig_width, height = fig_height, dpi = fig_dpi, bg = "white")
   
   log_success("Step 7.1 completed (empty outputs created).")
   quit(save = "no", status = 0)

@@ -258,7 +258,7 @@ names(cluster_colors) <- as.character(1:n_clusters)
 # Validate output directory exists before saving
 ensure_output_dir(dirname(output_figure_a))
 
-png(output_figure_a, width = 16, height = 14, units = "in", res = 300)
+png(output_figure_a, width = fig_width, height = fig_height, units = "in", res = fig_dpi)
 
 # Colors are defined in colors.R (sourced via functions_common.R)
 # Gradient function is defined in colors.R
@@ -298,7 +298,7 @@ dist_matrix <- dist(heatmap_matrix_norm, method = "euclidean")
 hc <- hclust(dist_matrix, method = "ward.D2")
 
 # Create dendrogram plot using base R plot (simpler, no extra packages)
-png(output_figure_b, width = 16, height = 12, units = "in", res = 300)
+png(output_figure_b, width = fig_width, height = fig_height, units = "in", res = fig_dpi)
 
 par(mar = c(8, 4, 4, 2))
 plot(hc, 

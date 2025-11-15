@@ -33,6 +33,12 @@ log_section("PANEL B: G>T Count by Position")
 # GET SNAKEMAKE PARAMETERS
 # ============================================================================
 
+# Load configuration
+config <- snakemake@config
+fig_width <- if (!is.null(config$analysis$figure$width)) config$analysis$figure$width else 12
+fig_height <- if (!is.null(config$analysis$figure$height)) config$analysis$figure$height else 10
+fig_dpi <- if (!is.null(config$analysis$figure$dpi)) config$analysis$figure$dpi else 300
+
 input_file <- snakemake@input[["data"]]
 output_figure <- snakemake@output[["figure"]]
 output_table <- snakemake@output[["table"]]
@@ -175,9 +181,9 @@ fig_panelB <- ggplot(position_counts, aes(x = position, y = total_GT_count)) +
 ggsave(
   output_figure,
   fig_panelB,
-  width = 14,
-  height = 8,
-  dpi = 300,
+  width = fig_width,
+  height = fig_height,
+  dpi = fig_dpi,
   bg = "white"
 )
 

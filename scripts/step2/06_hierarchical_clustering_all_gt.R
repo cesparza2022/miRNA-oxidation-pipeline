@@ -38,6 +38,9 @@ source(snakemake@input[["functions"]], local = TRUE)
 # Get configuration
 seed_start <- if (!is.null(config$analysis$seed_region$start)) config$analysis$seed_region$start else 2
 seed_end <- if (!is.null(config$analysis$seed_region$end)) config$analysis$seed_region$end else 8
+fig_width <- if (!is.null(config$analysis$figure$width)) config$analysis$figure$width else 12
+fig_height <- if (!is.null(config$analysis$figure$height)) config$analysis$figure$height else 10
+fig_dpi <- if (!is.null(config$analysis$figure$dpi)) config$analysis$figure$dpi else 300
 # Use standardized colors from colors.R (loaded via functions_common.R)
 # Allow override from config if specified, otherwise use COLOR_ALS, COLOR_CONTROL
 color_als <- if (!is.null(config$analysis$colors$als)) config$analysis$colors$als else COLOR_ALS
@@ -302,7 +305,7 @@ vaf_matrix_viz <- vaf_matrix_viz[, sample_order, drop = FALSE]
 annotation_col <- annotation_col[sample_order, , drop = FALSE]
 
 # Generate heatmap
-png(output_figure, width = 16, height = 12, units = "in", res = 300)
+png(output_figure, width = fig_width, height = fig_height, units = "in", res = fig_dpi)
 
 pheatmap(
   vaf_matrix_viz,

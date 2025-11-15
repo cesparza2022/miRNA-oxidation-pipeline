@@ -79,6 +79,9 @@ config <- snakemake@config
 # Allow override from config if specified, otherwise use COLOR_GT, COLOR_CONTROL
 color_gt <- if (!is.null(config$analysis$colors$gt)) config$analysis$colors$gt else COLOR_GT
 color_control <- if (!is.null(config$analysis$colors$control)) config$analysis$colors$control else COLOR_CONTROL
+fig_width <- if (!is.null(config$analysis$figure$width)) config$analysis$figure$width else 12
+fig_height <- if (!is.null(config$analysis$figure$height)) config$analysis$figure$height else 10
+fig_dpi <- if (!is.null(config$analysis$figure$dpi)) config$analysis$figure$dpi else 300
 
 log_info(paste("Input ROC:", input_roc))
 log_info(paste("Input VAF filtered:", input_vaf_filtered))
@@ -130,7 +133,7 @@ if (nrow(roc_table) == 0 || !"miRNA_name" %in% names(roc_table)) {
     theme_void() +
     theme(plot.margin = margin(20, 20, 20, 20))
   
-  ggsave(output_heatmap, p_empty, width = 12, height = 10, dpi = 300)
+  ggsave(output_heatmap, p_empty, width = fig_width, height = fig_height, dpi = fig_dpi, bg = "white")
   
   log_success("Step 7.2 completed (empty figure created).")
   quit(save = "no", status = 0)
@@ -441,7 +444,7 @@ if (length(heatmap_matrix_list) > 0) {
     log_subsection("Generating comprehensive heatmap")
     
     if (nrow(heatmap_matrix_norm) > 0 && ncol(heatmap_matrix_norm) > 0 && nrow(biomarker_annotation) > 0) {
-      png(output_heatmap, width = 16, height = 12, units = "in", res = 300)
+      png(output_heatmap, width = fig_width, height = fig_height, units = "in", res = fig_dpi)
       
       # Calculate gap position (between groups)
       n_group2 <- sum(sample_annotation$Group == group2_name)
@@ -489,7 +492,7 @@ if (length(heatmap_matrix_list) > 0) {
       log_success(paste("Heatmap saved:", output_heatmap))
     } else {
       log_warning("Insufficient data for heatmap generation")
-      png(output_heatmap, width = 10, height = 8, units = "in", res = 300)
+      png(output_heatmap, width = fig_width, height = fig_height, units = "in", res = fig_dpi)
       plot.new()
       text(0.5, 0.5, "Insufficient biomarkers for heatmap", cex = 1.5)
       dev.off()

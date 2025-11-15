@@ -20,6 +20,12 @@ suppressPackageStartupMessages({
 # Load common functions
 source(snakemake@params[["functions"]], local = TRUE)
 
+# Load configuration
+config <- snakemake@config
+fig_width <- if (!is.null(config$analysis$figure$width)) config$analysis$figure$width else 12
+fig_height <- if (!is.null(config$analysis$figure$height)) config$analysis$figure$height else 10
+fig_dpi <- if (!is.null(config$analysis$figure$dpi)) config$analysis$figure$dpi else 300
+
 # Load group comparison utilities
 group_functions_path <- if (!is.null(snakemake@params[["group_functions"]])) {
   snakemake@params[["group_functions"]]
@@ -441,7 +447,7 @@ p <- ggplot(plot_data, aes(x = position, y = positional_fraction, fill = group))
   )
 
 # Save figure
-ggsave(output_figure, plot = p, width = 14, height = 8, dpi = 300)
+ggsave(output_figure, plot = p, width = fig_width, height = fig_height, dpi = fig_dpi, bg = "white")
 log_success(paste("Saved figure to:", output_figure))
 
 # ============================================================================

@@ -53,6 +53,9 @@ pathway_padjust_threshold <- if (!is.null(config$analysis$pathway_enrichment$pad
 # Use standardized colors from colors.R (loaded via functions_common.R)
 # Allow override from config if specified, otherwise use COLOR_GT
 color_gt <- if (!is.null(config$analysis$colors$gt)) config$analysis$colors$gt else COLOR_GT
+fig_width <- if (!is.null(config$analysis$figure$width)) config$analysis$figure$width else 12
+fig_height <- if (!is.null(config$analysis$figure$height)) config$analysis$figure$height else 10
+fig_dpi <- if (!is.null(config$analysis$figure$dpi)) config$analysis$figure$dpi else 300
 
 log_info(paste("Input:", input_targets))
 log_info(paste("Pathway significance threshold (p.adjust):", pathway_padjust_threshold))
@@ -222,7 +225,7 @@ heatmap_matrix <- heatmap_data %>%
 color_palette <- colorRampPalette(c("white", color_gt))(100)
 
 # Generate heatmap
-png(output_heatmap, width = 12, height = 10, units = "in", res = 300)
+png(output_heatmap, width = fig_width, height = fig_height, units = "in", res = fig_dpi)
 
 pheatmap(
   heatmap_matrix,
