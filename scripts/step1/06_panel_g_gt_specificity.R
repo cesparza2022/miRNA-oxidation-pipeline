@@ -112,8 +112,8 @@ p <- ggplot(spec_tbl, aes(x = category, y = percentage, fill = category)) +
   geom_col(width = 0.6, alpha = 0.9) +
   scale_fill_manual(values = c("G>T" = COLOR_GT, "Other G transversions" = COLOR_OTHERS)) +
   scale_y_continuous(limits = c(0, 100), expand = expansion(mult = c(0, 0.02))) +
-  labs(title = "G>T Specificity (Overall)",
-       subtitle = "Percentage of G mutation reads that are G>T vs other G transversions",
+  labs(title = "G. G>T Specificity (Overall)",
+       subtitle = "Percentage of G mutation reads that are G>T (oxidative signature) vs other G transversions",
        x = "Mutation Type", y = "Percentage (%)",
        caption = "Shows percentage based on sequencing read counts (not number of unique SNVs). Combined analysis (ALS + Control, no VAF filtering)") +
   theme_professional +

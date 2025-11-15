@@ -165,9 +165,9 @@ panel_a <- ggplot(correlation_data, aes(x = estimated_rpm, y = total_gt_counts))
   scale_color_brewer(palette = "RdYlBu", direction = -1, name = "Expression\nCategory") +
   labs(
     title = "miRNA Expression vs Oxidative Damage",
-    subtitle = paste("Correlation between RPM and SIGNIFICANT G>T mutations in seed region (", seed_start, "-", seed_end, ") |",
+    subtitle = paste("Correlation between RPM (Reads Per Million) and SIGNIFICANT G>T mutations in seed region (positions", seed_start, "-", seed_end, ": functional binding domain) |",
                      "Pearson r =", cor_pearson, ", p =", format(p_value, scientific = TRUE, digits = 2)),
-    x = "Expression Level (RPM, log10 scale)",
+    x = "Expression Level (RPM = Reads Per Million, log10 scale)",
     y = "G>T Oxidation Counts (log10 scale)",
     caption = paste("Pearson correlation test (r = correlation coefficient, p = significance). n =", n_miRNAs, "miRNAs | RPM range:", rpm_range, "| Oxidation range:", oxidation_range, "| Linear regression with 95% confidence intervals")
   ) +
@@ -234,7 +234,7 @@ panel_b <- ggplot(expression_comparison, aes(x = expression_category, y = total_
   scale_fill_brewer(palette = "RdYlBu", direction = -1, guide = "none") +
   labs(
     title = "Oxidative Damage by Expression Category",
-    subtitle = paste("SIGNIFICANT G>T mutations in seed region (", seed_start, "-", seed_end, ") grouped by expression level |",
+    subtitle = paste("SIGNIFICANT G>T mutations in seed region (positions", seed_start, "-", seed_end, ": functional binding domain) grouped by expression level |",
                      "High expression miRNAs show", fold_diff, "x more oxidation than low expression"),
     x = "Expression Category",
     y = "G>T Oxidation Counts (log10 scale)",

@@ -109,9 +109,9 @@ p <- ggplot(summary_tbl, aes(x = region, y = total_mutations, fill = region)) +
   # Use standardized colors from colors.R (loaded via functions_common.R)
   scale_fill_manual(values = c("Seed" = COLOR_SEED, "Non-seed" = COLOR_NONSEED)) +
   scale_y_continuous(labels = scales::comma, expand = expansion(mult = c(0, 0.1))) +
-  labs(title = "Seed vs Non-seed: Total Read Counts",
-       subtitle = "Sum of sequencing reads supporting mutations in seed vs non-seed regions",
-       x = "Region", y = "Total Read Counts",
+  labs(title = "F. Seed vs Non-seed: Mutation Burden Comparison",
+       subtitle = "Total G>T mutation read counts in seed region (positions 2-8: functional binding domain) vs non-seed region",
+       x = "Region (Seed vs Non-seed)", y = "Total G>T Read Counts",
        caption = "Shows sum of sequencing reads (not number of unique SNVs). Combined analysis (ALS + Control, no VAF filtering)") +
   theme_professional
 

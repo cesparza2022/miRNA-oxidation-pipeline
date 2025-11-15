@@ -141,7 +141,7 @@ panel_e <- ggplot(panel_e_final, aes(x = Position, y = total_G_copies)) +
            ymin = 0, ymax = Inf,
            fill = COLOR_SEED_BACKGROUND, alpha = 0.35) +
   annotate("text", x = 5, y = min(panel_e_final$total_G_copies) * 0.5,
-           label = "SEED REGION\n(positions 2-8)", 
+           label = "SEED REGION\n(positions 2-8:\nfunctional binding domain)", 
            size = 4.5, fontface = "bold", color = "gray40") +
   geom_point(aes(size = n_unique_miRNAs, 
                  fill = GT_counts_at_position),

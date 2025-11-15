@@ -106,6 +106,9 @@ seed_min <- 2; seed_max <- 8
 p <- ggplot(gx_spectrum_data, aes(x = position_label, y = percentage, fill = mutation_type)) +
   annotate("rect", xmin = seed_min - 0.5, xmax = seed_max + 0.5, 
            ymin = -Inf, ymax = Inf, fill = COLOR_SEED_HIGHLIGHT, alpha = 0.5) +
+  annotate("text", x = (seed_min + seed_max) / 2, 
+           y = max(gx_spectrum_data$percentage, na.rm = TRUE) * 0.95, 
+           label = "SEED\n(2-8:\nfunctional\nbinding)", color = "gray40", size = 3, fontface = "bold") +
   geom_col(position = "stack", color = "white", linewidth = 0.3) +
   scale_fill_manual(values = c("G>C" = COLOR_GC, "G>A" = COLOR_GA, "G>T" = COLOR_GT), 
                     name = "Mutation Type") +

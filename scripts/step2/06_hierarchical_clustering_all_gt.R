@@ -340,7 +340,7 @@ pheatmap(
   legend = TRUE,
   
   # Main title (include number of miRNAs)
-  main = paste("Hierarchical Clustering of Samples by G>T Profile\n(ALL G>T SNVs: n =", 
+  main = paste("Hierarchical Clustering of Samples by G>T Profile (Oxidative Signature)\n(ALL G>T SNVs: n =", 
                format(nrow(vaf_matrix), big.mark = ","), "SNVs,", n_mirnas, "miRNAs,", 
                ncol(vaf_matrix), "samples)"),
   fontsize = 12,

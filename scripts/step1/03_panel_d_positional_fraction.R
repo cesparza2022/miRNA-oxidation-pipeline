@@ -87,7 +87,7 @@ pos_frac <- pos_counts %>%
   mutate(
     fraction = snv_count / total_mut * 100,
     position_label = factor(position, levels = 1:22),
-    region = ifelse(position >= 2 & position <= 8, "Seed", "Non-Seed")
+    region = ifelse(position >= 2 & position <= 8, "Seed", "Non-seed")
   )
 
 write_csv(pos_frac %>% mutate(position_label = as.character(position_label)) %>%
@@ -100,13 +100,13 @@ cat("   📊 Total SNVs:", format(total_mut, big.mark=","),
 panel_d <- ggplot(pos_frac, aes(x = position_label, y = fraction)) +
   geom_col(aes(fill = region), alpha = 0.8, width = 0.7) +
   # Use standardized colors from colors.R (loaded via functions_common.R)
-  scale_fill_manual(values = c("Seed" = COLOR_SEED, "Non-Seed" = COLOR_NONSEED), name = "Region") +
+  scale_fill_manual(values = c("Seed" = COLOR_SEED, "Non-seed" = COLOR_NONSEED), name = "Region\n(Seed vs Non-seed)") +
   scale_y_continuous(expand = expansion(mult = c(0, 0.1))) +
   geom_text(aes(label = sprintf("%.1f%%", fraction)), 
             vjust = -0.3, size = 3.5, fontface = "bold") +
   labs(
     title = "D. Positional Fraction of Mutations",
-    subtitle = sprintf("What percentage of ALL mutations occur at each position? (Total: %s SNVs)", 
+    subtitle = sprintf("Positional distribution of all mutation types (Total: %s SNVs) | Seed region (positions 2-8): functional miRNA binding domain", 
                        format(total_mut, big.mark=",")),
     x = "Position in miRNA",
     y = "Percentage of total mutations (%)",

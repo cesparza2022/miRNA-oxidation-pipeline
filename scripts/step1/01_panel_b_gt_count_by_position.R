@@ -169,8 +169,8 @@ fig_panelB <- ggplot(position_counts, aes(x = position, y = total_GT_count)) +
   
   # Labels
   labs(
-    title = "G>T Read Counts by Position",
-    subtitle = "Total read counts supporting G>T mutations across miRNA positions | Shaded region = seed (2-8)",
+    title = "B. G>T Read Counts by Position",
+    subtitle = "Total read counts supporting G>T mutations across miRNA positions | Shaded region = seed (positions 2-8: functional binding domain)",
     x = "Position in miRNA",
     y = "Total G>T Read Counts",
     caption = "Shows sum of sequencing reads (not number of unique SNVs). Combined analysis (ALS + Control, no VAF filtering)"

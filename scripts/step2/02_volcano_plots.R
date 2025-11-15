@@ -205,7 +205,7 @@ volcano_plot <- ggplot(volcano_data, aes(x = log2FC, y = neg_log10_p)) +
   # Labels (dynamic group names)
   labs(
     title = paste0("Volcano Plot: ", group1_name, " vs ", group2_name, " Comparison"),
-    subtitle = paste("G>T mutations | FDR <", alpha, "| log2FC >", log2fc_threshold),
+    subtitle = paste("G>T mutations (oxidative signature) | FDR <", alpha, "| log2FC >", log2fc_threshold, "| Comparison of differential oxidation burden"),
     x = paste0("Log2 Fold Change (", group1_name, " / ", group2_name, ")"),
     y = "-Log10 FDR-adjusted p-value",
     caption = paste("FDR-adjusted p-values (Benjamini-Hochberg). Significant (FDR <", alpha, "):", n_significant, "| Upregulated:", n_upregulated, "| Downregulated:", n_downregulated)

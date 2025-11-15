@@ -593,7 +593,7 @@ roc_plot <- ggplot(all_roc, aes(x = Specificity, y = Sensitivity, color = Label)
   scale_y_continuous(limits = c(0, 1), breaks = seq(0, 1, 0.2)) +
   labs(
     title = "ROC Curves: Diagnostic Potential of miRNA Oxidation Patterns",
-    subtitle = paste("Top", nrow(top_5), "individual biomarkers + combined signature | G>T mutations in seed region"),
+    subtitle = paste("Top", nrow(top_5), "individual biomarkers + combined signature | G>T mutations (oxidative signature) in seed region (positions 2-8: functional binding domain)"),
     x = "1 - Specificity (False Positive Rate)",
     y = "Sensitivity (True Positive Rate)",
     caption = paste("ROC analysis using pROC package. AUC = Area Under Curve (0.5 = random, 1.0 = perfect). Analysis based on", length(group1_samples), group1_name, "and", length(group2_samples), group2_name, "samples. Combined signature = average of top 10 individual biomarkers")

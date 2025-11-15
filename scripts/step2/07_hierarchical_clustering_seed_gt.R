@@ -338,7 +338,7 @@ pheatmap(
   
   # Main title (include number of miRNAs)
   main = paste("Hierarchical Clustering of Samples by G>T Profile (SEED REGION ONLY)\n(Positions", 
-               seed_start, "-", seed_end, ": n =", format(nrow(vaf_matrix), big.mark = ","), "SNVs,", 
+               seed_start, "-", seed_end, ": functional binding domain | n =", format(nrow(vaf_matrix), big.mark = ","), "SNVs,", 
                n_mirnas, "miRNAs,", ncol(vaf_matrix), "samples)"),
   fontsize = 12,
   fontsize_row = 6,
@@ -358,7 +358,7 @@ log_subsection("Saving summary table")
 
 # Create summary table with cluster composition
 summary_table <- data.frame(
-  Analysis = paste("Hierarchical Clustering - SEED REGION G>T SNVs (pos", seed_start, "-", seed_end, ")"),
+  Analysis = paste("Hierarchical Clustering - SEED REGION G>T SNVs (positions", seed_start, "-", seed_end, ": functional binding domain)"),
   Total_SNVs = nrow(vaf_matrix),
   Total_Samples = ncol(vaf_matrix),
   ALS_Samples = n_als,

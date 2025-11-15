@@ -192,7 +192,7 @@ panel_a <- ggplot(family_comparison_long, aes(x = reorder(family, Mean_VAF), y =
   coord_flip() +
   labs(
     title = paste0("miRNA Family Oxidation Patterns: ", group1_name, " vs ", group2_name),
-    subtitle = paste("Top 20 families by significance | Seed region (", seed_start, "-", seed_end, ") |",
+    subtitle = paste("Top 20 families by significance | Seed region (positions", seed_start, "-", seed_end, ": functional binding domain) |",
                      "Total families analyzed:", total_families),
     x = "miRNA Family",
     y = "Mean VAF (Variant Allele Frequency)",

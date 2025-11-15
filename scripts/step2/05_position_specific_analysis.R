@@ -427,10 +427,10 @@ p <- ggplot(plot_data, aes(x = position, y = positional_fraction, fill = group))
   # Labels (matching provided figure style)
   labs(
     title = paste("Position-Specific G>T Distribution:", group1_name, "vs", group2_name),
-    subtitle = paste("Positional fraction of G>T mutations | Seed region (pos", seed_start, "-", seed_end, ") highlighted |",
+    subtitle = paste("Positional fraction of G>T mutations | Seed region (positions", seed_start, "-", seed_end, ": functional binding domain) highlighted |",
                      "* = p_adj <", alpha),
     x = "Position in miRNA",
-    y = "Positional Fraction",
+    y = "Positional Fraction of G>T Mutations",
     caption = paste("Wilcoxon rank-sum test with FDR correction (Benjamini-Hochberg). Significant (p_adj <", alpha, "):", sum(position_summary$significant, na.rm = TRUE),
                     "| Higher in", group1_name, ":", sum(position_summary$significant & position_summary$higher_in_group1, na.rm = TRUE),
                     "| Higher in", group2_name, ":", sum(position_summary$significant & !position_summary$higher_in_group1, na.rm = TRUE))

@@ -217,12 +217,12 @@ panel_a <- ggplot(top_pathways, aes(x = reorder(Pathway_Label, -log10(p.adjust))
   coord_flip() +
   labs(
     title = "Top Enriched Pathways: Targets of Oxidized miRNAs",
-    subtitle = paste("GO Biological Process & KEGG Pathways | Top 15 by significance |",
+    subtitle = paste("GO Biological Process & KEGG Pathways enriched in targets of oxidized miRNAs (G>T in seed region, positions 2-8: functional binding domain) | Top 15 by significance |",
                      n_significant_go, "GO terms,", n_significant_kegg, "KEGG pathways significant (p.adj < ", alpha, ")"),
     x = "",
     y = "-Log10 Adjusted p-value",
     caption = paste("Max RichFactor =", top_richfactor, "| Analysis based on targets of",
-                   nrow(target_data), "oxidized miRNAs in seed region")
+                   nrow(target_data), "oxidized miRNAs (G>T mutations in seed region, positions 2-8: functional binding domain)")
   ) +
   theme_professional +
   theme(
@@ -367,7 +367,7 @@ if (nrow(target_comp) == 0) {
       x = "miRNA",
       y = "Number of Predicted Targets",
       caption = paste("Analysis based on", nrow(target_comp), 
-                     "miRNAs with G>T mutations in seed region")
+                     "miRNAs with G>T mutations (oxidative signature) in seed region (positions 2-8: functional binding domain)")
     ) +
     theme_professional +
     theme(
@@ -432,7 +432,7 @@ if (nrow(target_data) == 0) {
              fill = COLOR_SEED_HIGHLIGHT, alpha = 0.5) +
     annotate("text", x = (seed_start + seed_end) / 2, 
              y = max(position_impact$total_impact) * 0.95, 
-             label = paste0("SEED REGION\n(positions ", seed_start, "-", seed_end, ")"), 
+             label = paste0("SEED REGION\n(positions ", seed_start, "-", seed_end, ":\nfunctional binding domain)"), 
              color = "gray40", size = 4, fontface = "bold") +
     geom_bar(stat = "identity", fill = COLOR_GT, alpha = 0.85, width = 0.7) +
     geom_point(aes(size = n_mutations), color = "white", fill = COLOR_GT, 
@@ -443,7 +443,7 @@ if (nrow(target_data) == 0) {
     labs(
       title = "Position-Specific Functional Impact",
       subtitle = paste("Cumulative functional impact by position |",
-                       "Seed region (2-8) has", seed_ratio, "x more impact than non-seed |",
+                       "Seed region (positions 2-8: functional binding domain) has", seed_ratio, "x more impact than non-seed |",
                        sum(position_impact$in_seed), "positions in seed region"),
       x = "Position in miRNA",
       y = "Total Functional Impact Score",

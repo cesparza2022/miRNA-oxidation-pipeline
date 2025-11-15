@@ -235,7 +235,7 @@ effect_plot <- effect_size_data %>%
   # Labels (dynamic group names)
   labs(
     title = paste0("Effect Size Distribution: ", group1_name, " vs ", group2_name),
-    subtitle = "Cohen's d for G>T mutations",
+    subtitle = "Cohen's d effect sizes for G>T mutations (oxidative signature) | Large effect (|d| >= 0.8) indicates substantial group differences",
     x = "Cohen's d (Effect Size)",
     y = "Number of SNVs",
     caption = paste("Cohen's d = (mean1 - mean2) / pooled_SD. Thresholds: |d| >= 0.8 (Large), 0.5-0.8 (Medium), 0.2-0.5 (Small). Total:", nrow(effect_size_data), 
