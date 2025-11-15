@@ -276,7 +276,22 @@
 - 13 scripts actualizados para usar dimensiones configurables (step1-step7)
 - colors.R centralizado con 20+ colores y 2 funciones helper
 
+### **FASE 2.2: Consistencia entre figuras - EN PROGRESO**
+- ✅ Estandarización de breaks del eje X:
+  - Panel B: Cambiado de `seq(1, 23, by = 2)` a `breaks = 1:23` (mostrar todas las posiciones)
+  - Todos los panels de step1 ahora muestran todas las posiciones de manera consistente
+- ✅ Estandarización de ángulo del eje X:
+  - Panel B: Agregado `axis.text.x = element_text(angle = 45, hjust = 1)` para consistencia
+  - Panel E: Agregado `axis.text.x = element_text(angle = 45, hjust = 1)` para consistencia
+  - Panels C y D ya tenían ángulo de 45° ✅
+- ✅ Corrección de valores hardcoded en volcano plot:
+  - Agregado config de fig_width, fig_height, fig_dpi
+  - Reemplazados valores hardcoded (12, 9, 300) con variables del config
+
+**Total FASE 2.2:** 
+- 3 scripts actualizados para mejorar consistencia visual (panels B, E de step1, volcano plot de step2)
+
 ---
 
-**Próximo paso:** Continuar con FASE 2.1 - Revisar otros aspectos de calidad visual (consistencia entre figuras, mensaje científico, etc.)
+**Próximo paso:** Continuar con FASE 2.2 - Revisar otros aspectos de consistencia (escalas del eje Y, formatos de labels, etc.) o pasar a FASE 2.3 (mensaje científico)
 
