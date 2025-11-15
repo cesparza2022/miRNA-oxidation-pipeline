@@ -84,7 +84,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Explicación del problema, solución, y verificación
   - Flujo de datos corregido
 
-- **PROBLEMAS_CRITICOS_COHESION.md**
+- **ESTADO_PROBLEMAS_CRITICOS.md**
   - Identificación de 5 problemas críticos de cohesión en el pipeline
   - Problemas identificados pero **NO corregidos aún**:
     1. 🔴 Inconsistencia en archivos de entrada (Step 1)

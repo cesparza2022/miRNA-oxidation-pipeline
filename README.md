@@ -339,6 +339,7 @@ See `config/config.yaml.example` for detailed documentation.
 * **[CHANGELOG.md](CHANGELOG.md)** - Detailed change history
 * **[RELEASE_NOTES_v1.0.1.md](RELEASE_NOTES_v1.0.1.md)** - Release notes for version 1.0.1
 * **[ESTADO_PROBLEMAS_CRITICOS.md](ESTADO_PROBLEMAS_CRITICOS.md)** - Status of critical cohesion issues (all resolved ✅)
+* **[HALLAZGOS_REVISION_PERFECCIONISTA.md](HALLAZGOS_REVISION_PERFECCIONISTA.md)** - Detailed findings from comprehensive code review (FASE 1-3)
 
 ### Technical Notes
 * **Statistical Methods**: The pipeline uses parametric (t-test) and non-parametric (Wilcoxon) tests based on data assumptions. FDR correction (Benjamini-Hochberg) is applied for multiple comparisons.
@@ -427,10 +428,19 @@ See [RELEASE_NOTES_v1.0.1.md](RELEASE_NOTES_v1.0.1.md) for detailed release note
 - 🔴 **Fixed:** Heatmap combination for FIG_2.15
 - 🔧 **Fixed:** ggplot2 3.4+ compatibility (`size` → `linewidth`)
 
+### Major Refactoring (Perfectionist Review)
+- ✨ **Eliminated ~2000 lines of duplicated code** across utility scripts (`logging.R`, `validate_input.R`, `build_step1_viewer.R`)
+- ✨ **Centralized styling:** All colors and themes now use unified `colors.R` and `theme_professional.R`
+- ✨ **Robustness improvements:** Comprehensive input validation, error handling, and namespace management across all scripts
+- ✨ **Visual standardization:** Consistent figure dimensions, colors, themes, and scientific clarity across all visualizations
+- ✨ **Code quality:** Improved comments, roxygen2 documentation, and code organization
+
 ### Improvements
 - ✨ **Improved:** Visual consistency (G>T highlighted in red)
-- 📚 **Added:** Comprehensive documentation (CHANGELOG, RELEASE_NOTES)
+- 📚 **Added:** Comprehensive documentation (CHANGELOG, RELEASE_NOTES, HALLAZGOS)
 - 📚 **Added:** Critical cohesion issues identified and documented
+
+**See [HALLAZGOS_REVISION_PERFECCIONISTA.md](HALLAZGOS_REVISION_PERFECCIONISTA.md) for detailed review findings (FASE 1-3).**
 
 ### Critical Cohesion Issues - All Resolved ✅
 All 5 critical cohesion issues identified have been addressed:

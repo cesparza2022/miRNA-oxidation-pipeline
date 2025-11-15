@@ -145,7 +145,7 @@ Si estás usando el pipeline para análisis de datos, debes actualizar a esta ve
 - Explicación del problema y solución
 - Flujo de datos corregido
 
-### 3. PROBLEMAS_CRITICOS_COHESION.md
+### 3. ESTADO_PROBLEMAS_CRITICOS.md
 - Identificación de 5 problemas críticos pendientes
 - Guía para correcciones futuras
 - Plan de acción recomendado
