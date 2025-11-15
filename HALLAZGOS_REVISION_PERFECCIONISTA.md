@@ -90,7 +90,7 @@
 
 ---
 
-### **4. INCONSISTENCIA EN DIMENSIONES DE FIGURAS**
+### **4. INCONSISTENCIA EN DIMENSIONES DE FIGURAS** ✅ RESUELTO
 
 **Problema:**
 - Algunos scripts usan `config$analysis$figure$width/height/dpi`
@@ -109,11 +109,16 @@
 - No respeta configuración centralizada
 
 **Acción Requerida:**
-1. Todos los scripts deben usar config$analysis$figure
-2. Eliminar valores hardcoded
-3. Verificar que todas las figuras usan dimensiones de config
+1. ✅ Todos los scripts deben usar config$analysis$figure
+2. ✅ Eliminar valores hardcoded
+3. ✅ Verificar que todas las figuras usan dimensiones de config
 
-**Prioridad:** 🟢 MENOR (mejora de calidad)
+**Correcciones Aplicadas:**
+- ✅ Agregadas variables fig_width, fig_height, fig_dpi usando config$analysis$figure en 13 scripts
+- ✅ Reemplazados valores hardcoded en ggsave() y png() con variables del config
+- ✅ Scripts actualizados: step1 (panels B, C, D), step2 (position_specific, clustering_all, clustering_seed), step3 (clustering_visualization), step4 (pathway_enrichment), step5 (family_comparison), step7 (roc_analysis, signature_heatmap)
+
+**Prioridad:** 🟢 MENOR (mejora de calidad) - ✅ RESUELTO
 
 ---
 
@@ -231,7 +236,7 @@
 - ✅ No se requieren cambios adicionales
 
 ### **FASE 2.1: Calidad visual de gráficas - EN PROGRESO**
-- ✅ Actualizado colors.R con nuevos colores:
+- ✅ Estandarización de colores:
   - COLOR_SEED, COLOR_SEED_BACKGROUND, COLOR_SEED_HIGHLIGHT, COLOR_NONSEED
   - COLOR_EFFECT_LARGE, COLOR_EFFECT_MEDIUM, COLOR_EFFECT_SMALL, COLOR_EFFECT_NEGLIGIBLE
   - COLOR_DOWNREGULATED, COLOR_SIGNIFICANT_LOW_FC
@@ -261,10 +266,17 @@
   - step5/02_family_comparison_visualization.R: get_blue_red_heatmap_gradient(), COLOR_SIGNIFICANCE_*
   - step6/03_direct_target_prediction.R: COLOR_GRADIENT_LOW_BLUE, COLOR_GT (3 lugares)
   - step7/02_biomarker_signature_heatmap.R: get_blue_red_heatmap_gradient(), COLOR_AUC_*, eliminado código muerto
+- ✅ Estandarización de dimensiones de figuras:
+  - Agregadas variables fig_width, fig_height, fig_dpi usando config$analysis$figure en 13 scripts
+  - Reemplazados valores hardcoded en ggsave() y png() con variables del config
+  - Scripts actualizados: step1 (panels B, C, D), step2 (position_specific, clustering_all, clustering_seed), step3 (clustering_visualization), step4 (pathway_enrichment), step5 (family_comparison), step7 (roc_analysis, signature_heatmap)
 
-**Total FASE 2.1:** 21 scripts actualizados (step1-step7) + colors.R centralizado con 20+ colores y 2 funciones helper
+**Total FASE 2.1:** 
+- 21 scripts actualizados para usar colores centralizados (step1-step7)
+- 13 scripts actualizados para usar dimensiones configurables (step1-step7)
+- colors.R centralizado con 20+ colores y 2 funciones helper
 
 ---
 
-**Próximo paso:** Continuar con FASE 2.1 - Revisar otros aspectos de calidad visual (dimensiones de figuras, tema, etc.)
+**Próximo paso:** Continuar con FASE 2.1 - Revisar otros aspectos de calidad visual (consistencia entre figuras, mensaje científico, etc.)
 
