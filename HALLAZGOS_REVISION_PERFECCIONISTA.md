@@ -570,7 +570,7 @@
    - ❌ `README.md` no mencionaba "HALLAZGOS_REVISION_PERFECCIONISTA.md" en la sección de documentación
    - ❌ `README.md` no mencionaba las mejoras masivas de la revisión perfeccionista en "Latest Changes"
    - ✅ Agregada referencia a "HALLAZGOS_REVISION_PERFECCIONISTA.md" en la sección "Release Information"
-   - ✅ Agregada sección "Major Refactoring (Perfectionist Review)" en "Latest Changes" con detalles de las mejoras
+   - ✅ Added section "Major Refactoring (Perfectionist Review)" en "Latest Changes" con detalles de las mejoras
 
 3. **Consistencia de versiones:**
    - ✅ Verificado que todas las referencias a versiones son consistentes (v1.0.1)
@@ -580,7 +580,7 @@
 - `CHANGELOG.md`: Corregida referencia de "PROBLEMAS_CRITICOS_COHESION.md" a "ESTADO_PROBLEMAS_CRITICOS.md"
 - `RELEASE_NOTES_v1.0.1.md`: Corregida referencia de "PROBLEMAS_CRITICOS_COHESION.md" a "ESTADO_PROBLEMAS_CRITICOS.md"
 - `README.md`: Agregada referencia a "HALLAZGOS_REVISION_PERFECCIONISTA.md" y sección detallada de "Major Refactoring (Perfectionist Review)"
-- `HALLAZGOS_REVISION_PERFECCIONISTA.md`: Actualizado status a "PHASE 3.4 completada" y agregada sección documentando las correcciones
+- `HALLAZGOS_REVISION_PERFECCIONISTA.md`: Actualizado status a "PHASE 3.4 completada" y agregada sección documenting las correcciones
 
 **Impact:**
 - ✅ Todas las referencias cruzadas entre documentos son consistentes
@@ -592,22 +592,22 @@
 
 ---
 
-## ✅ PHASE 4: VERIFICACIÓN INTEGRADA (CÓDIGO, GRÁFICAS, DOCUMENTACIÓN) (COMPLETED)
+## ✅ PHASE 4: INTEGRATED VERIFICATION (CODE, GRAPHICS, DOCUMENTATION) (COMPLETED)
 
 **Status:** ✅ **COMPLETED**
 
 ### **Verifications performed:**
 
-1. **Conteo de figuras de Step 2:**
-   - ✅ Verificado que Step 2 genera exactamente 21 figuras totales:
-     - 5 figuras básicas (de `step2.smk`): batch effect PCA, group balance, volcano plot, effect size distribution, position-specific distribution
-     - 16 figuras detalladas (de `step2_figures.smk`): FIG_2.1 a FIG_2.15 (15) + FIG_2.16 y FIG_2.17 (2) - FIG_2.8 removida (redundante)
-   - ✅ Corregido comentario en `Snakefile`: "(15 figures)" → "(16 figures)"
-   - ✅ Corregido comentario en `rules/step2_figures.smk`: "(15 original + 2 clustering = 17 total)" → "(16 figures total)"
-   - ✅ Verificado que el README documenta correctamente: "21 figures total (5 basic + 16 detailed)"
+1. **Step 2 figure count:**
+   - ✅ Verified that Step 2 generates exactly 21 total figures:
+     - 5 basic figures (from `step2.smk`): batch effect PCA, group balance, volcano plot, effect size distribution, position-specific distribution
+     - 16 detailed figures (from `step2_figures.smk`): FIG_2.1 to FIG_2.15 (15) + FIG_2.16 and FIG_2.17 (2) - FIG_2.8 removed (redundant)
+   - ✅ Fixed comment in `Snakefile`: "(15 figures)" → "(16 figures)"
+   - ✅ Fixed comment in `rules/step2_figures.smk`: "(15 original + 2 clustering = 17 total)" → "(16 figures total)"
+   - ✅ Verified that README correctly documents: "21 figures total (5 basic + 16 detailed)"
 
-2. **Referencias a archivos en documentación:**
-   - ✅ Verificado que todos los archivos mencionados en README.md existen:
+2. **File references in documentation:**
+   - ✅ Verified that all files mentioned in README.md exist:
      - `QUICK_START.md` ✅
      - `CHANGELOG.md` ✅
      - `RELEASE_NOTES_v1.0.1.md` ✅
@@ -617,106 +617,106 @@
      - `sample_metadata_template.tsv` ✅
      - `LICENSE` ✅
 
-3. **Consistencia de comandos Snakemake:**
-   - ✅ Verificado que todos los comandos mencionados en README (`all_step0`, `all_step1`, `all_step1_5`, `all_step2`, `all_step3`, `all_step4`, `all_step5`, `all_step6`, `all_step7`, `all_step2_figures`) existen en las reglas correspondientes
+3. **Snakemake command consistency:**
+   - ✅ Verified that all commands mentioned in README (`all_step0`, `all_step1`, `all_step1_5`, `all_step2`, `all_step3`, `all_step4`, `all_step5`, `all_step6`, `all_step7`, `all_step2_figures`) exist in corresponding rules
 
-4. **Consistencia de versiones:**
-   - ✅ Verificado que todas las referencias a versiones son consistentes (v1.0.1)
-   - ✅ Verificado que todas las fechas son consistentes (2025-01-21)
+4. **Version consistency:**
+   - ✅ Verified that all version references are consistent (v1.0.1)
+   - ✅ Verified that all dates are consistent (2025-01-21)
 
-5. **Referencias cruzadas entre documentos:**
-   - ✅ Verificado que todas las referencias entre documentos son correctas y consistentes
-   - ✅ Verificado que no hay referencias rotas o archivos faltantes
+5. **Cross-references between documents:**
+   - ✅ Verified that all references between documents are correct and consistent
+   - ✅ Verified that there are no broken references or missing files
 
 **Files modified:**
-- `Snakefile`: Corregido comentario "(15 figures)" → "(16 figures)" en dos lugares
-- `rules/step2_figures.smk`: Corregido comentario "(15 original + 2 clustering = 17 total)" → "(16 figures total)"
-- `HALLAZGOS_REVISION_PERFECCIONISTA.md`: Agregada sección documentando las verificaciones de PHASE 4
+- `Snakefile`: Fixed comment "(15 figures)" → "(16 figures)" in two places
+- `rules/step2_figures.smk`: Fixed comment "(15 original + 2 clustering = 17 total)" → "(16 figures total)"
+- `HALLAZGOS_REVISION_PERFECCIONISTA.md`: Added section documenting PHASE 4 verifications
 
 **Impact:**
-- ✅ Todas las referencias entre código, documentación y estructura del proyecto son consistentes
-- ✅ El conteo de figuras está correctamente documentado en todos los lugares
-- ✅ Los comandos Snakemake mencionados en la documentación existen y funcionan
-- ✅ No hay referencias rotas o archivos faltantes
+- ✅ All references between code, documentation and project structure are consistent
+- ✅ Figure count is correctly documented in all places
+- ✅ Snakemake commands mentioned in documentation exist and work
+- ✅ No broken references or missing files
 
-**Next step:** PHASE 5 - Testing y validación del pipeline completo
+**Next step:** PHASE 5 - Testing and validation of complete pipeline
 
 ---
 
-## ✅ PHASE 5: TESTING Y VALIDACIÓN DEL PIPELINE COMPLETO (COMPLETED)
+## ✅ PHASE 5: TESTING AND VALIDATION OF COMPLETE PIPELINE (COMPLETED)
 
 **Status:** ✅ **COMPLETED**
 
 ### **Verifications performed:**
 
-1. **Sintaxis de scripts R:**
-   - ✅ Verificada sintaxis de todos los 82 scripts R del pipeline
-   - ✅ Todos los scripts son válidos (sin errores de sintaxis)
-   - ✅ Scripts verificados incluyen: Step 0-7, utilidades, preprocesamiento
+1. **R script syntax:**
+   - ✅ Verified syntax of all 82 R scripts in the pipeline
+   - ✅ All scripts are valid (no syntax errors)
+   - ✅ Scripts verified include: Step 0-7, utilities, preprocessing
 
-2. **Validación de archivos de configuración:**
-   - ✅ `config/config.yaml.example` es válido YAML (verificado con parser)
-   - ✅ Rutas en config.yaml.example son consistentes y correctas
-   - ✅ Estructura de configuración es válida y completa
+2. **Configuration file validation:**
+   - ✅ `config/config.yaml.example` is valid YAML (verified with parser)
+   - ✅ Paths in config.yaml.example are consistent and correct
+   - ✅ Configuration structure is valid and complete
 
-3. **Verificación de dependencias:**
-   - ✅ `environment.yml` incluye todos los paquetes R necesarios:
-     - `r-tidyverse`, `r-ggplot2`, `r-dplyr` (datos y visualización)
-     - `r-factoextra>=1.0.7` (PCA y análisis multivariado)
-     - `r-pROC`, `r-e1071`, `r-cluster` (estadísticas y clustering)
-     - `r-patchwork`, `r-ggrepel`, `r-pheatmap` (visualización avanzada)
-     - `r-yaml`, `r-base64enc`, `r-jsonlite` (utilidades)
-   - ✅ PCA usa `prcomp()` (base R, no requiere FactoMineR adicional)
-   - ✅ Snakemake instalado y funcional (versión 9.13.4)
+3. **Dependency verification:**
+   - ✅ `environment.yml` includes all necessary R packages:
+     - `r-tidyverse`, `r-ggplot2`, `r-dplyr` (data and visualization)
+     - `r-factoextra>=1.0.7` (PCA and multivariate analysis)
+     - `r-pROC`, `r-e1071`, `r-cluster` (statistics and clustering)
+     - `r-patchwork`, `r-ggrepel`, `r-pheatmap` (advanced visualization)
+     - `r-yaml`, `r-base64enc`, `r-jsonlite` (utilities)
+   - ✅ PCA uses `prcomp()` (base R, no additional FactoMineR required)
+   - ✅ Snakemake installed and functional (version 9.13.4)
 
-4. **Verificación de funciones helper:**
-   - ✅ Todas las funciones helper están definidas y documentadas:
+4. **Helper function verification:**
+   - ✅ All helper functions are defined and documented:
      - `load_processed_data()`, `load_and_process_raw_data()` ✅
      - `validate_output_file()`, `ensure_output_dir()` ✅
      - `log_info()`, `log_warning()`, `log_error()`, `log_success()` ✅
      - `get_heatmap_gradient()`, `get_blue_red_heatmap_gradient()` ✅
      - `get_group_color()`, `get_mutation_color()` ✅
-   - ✅ Constantes de color están todas definidas en `colors.R`:
+   - ✅ All color constants are defined in `colors.R`:
      - `COLOR_GT`, `COLOR_ALS`, `COLOR_CONTROL` ✅
      - `COLOR_SEED`, `COLOR_NONSEED`, `COLOR_OTHERS` ✅
-     - Todos los colores de categorías (effect size, AUC, significance) ✅
+     - All category colors (effect size, AUC, significance) ✅
 
-5. **Verificación de estructura del proyecto:**
-   - ✅ 82 scripts R verificados sintácticamente
-   - ✅ 15 archivos Snakemake (.smk) presentes y correctos
-   - ✅ Script `preprocess_data.R` existe y es válido (mencionado en README)
-   - ✅ Todos los archivos de documentación existen y son accesibles
+5. **Project structure verification:**
+   - ✅ 82 R scripts syntactically verified
+   - ✅ 15 Snakemake files (.smk) present and correct
+   - ✅ `preprocess_data.R` script exists and is valid (mentioned in README)
+   - ✅ All documentation files exist and are accessible
 
-6. **Consistencia de rutas y referencias:**
-   - ✅ Rutas en `config.yaml.example` son relativas y consistentes
-   - ✅ Rutas en reglas Snakemake usan prefijos correctos (`../scripts/`)
-   - ✅ Todas las referencias a archivos utilitarios son correctas
+6. **Path and reference consistency:**
+   - ✅ Paths in `config.yaml.example` are relative and consistent
+   - ✅ Paths in Snakemake rules use correct prefixes (`../scripts/`)
+   - ✅ All references to utility files are correct
 
-7. **Integridad de código:**
-   - ✅ No hay funciones undefined o variables no definidas en código principal
-   - ✅ Todas las funciones helper están disponibles a través de `functions_common.R`
-   - ✅ Manejo de errores está implementado (`safe_execute()`, `handle_error()`)
-   - ✅ Validación de inputs implementada en funciones de carga de datos
+7. **Code integrity:**
+   - ✅ No undefined functions or undefined variables in main code
+   - ✅ All helper functions are available through `functions_common.R`
+   - ✅ Error handling is implemented (`safe_execute()`, `handle_error()`)
+   - ✅ Input validation implemented in data loading functions
 
-**Archivos verificados:**
-- ✅ 82 scripts R: sintaxis válida, sin errores
-- ✅ 15 archivos Snakemake: estructura correcta
-- ✅ `config/config.yaml.example`: YAML válido
-- ✅ `environment.yml`: dependencias completas y correctas
-- ✅ `scripts/preprocess_data.R`: existe y es válido
+**Files verified:**
+- ✅ 82 R scripts: valid syntax, no errors
+- ✅ 15 Snakemake files: correct structure
+- ✅ `config/config.yaml.example`: valid YAML
+- ✅ `environment.yml`: complete and correct dependencies
+- ✅ `scripts/preprocess_data.R`: exists and is valid
 
 **Final statistics:**
-- **R scripts:** 82 archivos (todos válidos sintácticamente)
-- **Snakemake rules:** 15 archivos (.smk)
-- **Archivos de documentación:** 79 archivos Markdown
-- **Cobertura:** 100% de scripts principales verificados
+- **R scripts:** 82 files (all syntactically valid)
+- **Snakemake rules:** 15 files (.smk)
+- **Documentation files:** 79 Markdown files
+- **Coverage:** 100% of main scripts verified
 
 **Impact:**
-- ✅ Pipeline tiene sintaxis válida y puede ejecutarse sin errores de parsing
-- ✅ Todas las dependencias están documentadas y disponibles
-- ✅ Funciones helper están definidas y accesibles
-- ✅ Estructura del proyecto es consistente y correcta
-- ✅ No hay referencias rotas o archivos faltantes
+- ✅ Pipeline has valid syntax and can execute without parsing errors
+- ✅ All dependencies are documented and available
+- ✅ Helper functions are defined and accessible
+- ✅ Project structure is consistent and correct
+- ✅ No broken references or missing files
 
-**Next step:** Perfectionist review completed ✅ - Pipeline listo para uso en producción
+**Next step:** Perfectionist review completed ✅ - Pipeline ready for production use
 
