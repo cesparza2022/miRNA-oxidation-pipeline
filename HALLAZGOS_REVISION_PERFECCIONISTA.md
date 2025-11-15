@@ -58,7 +58,7 @@
 2. Use only `theme_professional.R`
 3. Verify that all scripts use the correct theme
 
-**Prioridad:** 🟡 IMPORTANTE
+**Prioridad:** 🟡 IMPORTANT
 
 ---
 
@@ -68,7 +68,7 @@
 - Múltiples formas from definir colors:
   - `COLOR_GT` in `functions_common.R` (line 65)
   - `color_gt` defined locally in scripts
-  - Algunos scripts definen colors in config
+  - Some scripts definen colors in config
 
 **Evidence:**
 - `functions_common.R` line 65: `COLOR_GT <- "#D62728"`
@@ -83,14 +83,14 @@
 
 **Acción Requerida:**
 1. Create `scripts/utils/colors.R` centralized
-2. Definir all the colors in un only lugar
+2. Define all colors in one place
 3. Update all scripts to use centralized colors
 
-**Prioridad:** 🟡 IMPORTANTE
+**Prioridad:** 🟡 IMPORTANT
 
 ---
 
-### **4. INCONSISTENCY IN DIMENSIONES DE FIGURAS** ✅ RESOLVED
+### **4. INCONSISTENCY IN FIGURE DIMENSIONS** ✅ RESOLVED
 
 **Issue:**
 - Some scripts use `config$analysis$figure$width/height/dpi`
@@ -139,7 +139,7 @@
 - Standardize error handling
 - Use `handle_error()` consistently
 
-**Prioridad:** 🟡 IMPORTANTE
+**Prioridad:** 🟡 IMPORTANT
 
 ---
 
